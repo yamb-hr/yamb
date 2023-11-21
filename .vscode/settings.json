@@ -2,5 +2,6 @@
   "java.project.sourcePaths": [
     "server\\src\\main\\java\\matej\\tejkogames\\exceptions"
   ],
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic"
 }
