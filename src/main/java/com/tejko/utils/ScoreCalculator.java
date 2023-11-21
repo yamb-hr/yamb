@@ -3,13 +3,13 @@ package com.tejko.utils;
 import java.util.Collection;
 
 import com.tejko.constants.YambConstants;
-import com.tejko.exceptions.UnknownBoxTypeException;
 import com.tejko.models.Dice;
 import com.tejko.models.enums.BoxType;
 
 public class ScoreCalculator {
 
 	public static int calculateScore(Collection<Dice> diceList, BoxType boxType) {
+		int score = 0;
 		switch (boxType) {
 			case ONES:
 			case TWOS:
@@ -17,23 +17,29 @@ public class ScoreCalculator {
 			case FOURS:
 			case FIVES:
 			case SIXES:
-				return calculateSum(diceList, boxType);
+				score = calculateSum(diceList, boxType);
+				break;
 			case MAX:
 			case MIN:
-				return calculateSum(diceList);
+				score =  calculateSum(diceList);
+				break;
 			case TRIPS:
-				return calculateTrips(diceList);
+				score =  calculateTrips(diceList);
+				break;
 			case STRAIGHT:
-				return calculateStraight(diceList);
+				score =  calculateStraight(diceList);
+				break;
 			case BOAT:
-				return calculateBoat(diceList);
+				score =  calculateBoat(diceList);
+				break;
 			case CARRIAGE:
-				return calculateCarriage(diceList);
+				score =  calculateCarriage(diceList);
+				break;
 			case YAMB:
-				return calculateYamb(diceList);
-			default:
-				throw new UnknownBoxTypeException("Unknown Box Type: " + boxType);
+				score =  calculateYamb(diceList);
+				break;
 		}
+		return score;
 	}
 
 	// returns sum of all dice values
@@ -78,26 +84,27 @@ public class ScoreCalculator {
 		return 0;
 	}
 	
-	// checks if two distinct dice values repeat 2 and 3 times respectively
+	// boat consists of a pair and trips
 	public static int calculateBoat(Collection<Dice> diceList) {
 		int pairSum = calculateRecurringValueSum(diceList, 2);
 		int tripsSum = calculateRecurringValueSum(diceList, 3);
-		
         if (pairSum > 0 && tripsSum > 0 && (pairSum / 2) != (tripsSum / 3)) {
             return pairSum + tripsSum + YambConstants.BONUS_BOAT;
         }
         return 0;
 	}
 
+	// four of a kind
 	private static int calculateCarriage(Collection<Dice> diceList) {
 		return calculateRecurringValueSum(diceList, 4) + YambConstants.BONUS_CARRIAGE;
 	}
 
+	// five of a kind
 	private static int calculateYamb(Collection<Dice> diceList) {
 		return calculateRecurringValueSum(diceList, 5) + YambConstants.BONUS_YAMB;
 	}
 
-	// returns sum of dice values if the number of times that the value ocurrs is equal to or larger than the repeat threshold
+	// returns sum of dice values if the number of times that the value ocurrs is equal to or larger than the threshold
 	// values exceeding the threshold are ignored 
 	private static int calculateRecurringValueSum(Collection<Dice> diceList, int threshold) {
 		int sum = 0;
