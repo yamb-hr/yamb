@@ -50,11 +50,15 @@ public class Player implements UserDetails {
     @Transient
     private Collection<? extends GrantedAuthority> authorities;  
 
-    public Player() {}
+    private Player() {}
 
-    public Player(String username, String password) {
+    private Player(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public static Player getInstance(String username, String password) {
+        return new Player(username, password);
     }
 
     public UUID getId() {

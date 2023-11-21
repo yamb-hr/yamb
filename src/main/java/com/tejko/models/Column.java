@@ -1,8 +1,8 @@
 package com.tejko.models;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -13,22 +13,25 @@ import com.tejko.models.enums.ColumnType;
 public class Column implements Serializable { 
 
     private ColumnType type;
+    private List<Box> boxList;
 
-    private Map<BoxType, Box> boxMap;
+    private Column() {}
 
-    public Column() {}
+    private Column (ColumnType type, List<Box> boxList) {
+        this.type = type; 
+        this.boxList = boxList;
+    }
     
-    public Column(ColumnType type) {
-        this.type = type;
-        this.boxMap = generateBoxMap(type);
+    public static Column getInstance(ColumnType type) {
+        return new Column(type, generateBoxList(type));
     }
 
-    private Map<BoxType, Box> generateBoxMap(ColumnType columnType) {
-        Map<BoxType, Box> boxMap = new HashMap<>();
+    private static List<Box> generateBoxList(ColumnType columnType) {
+        List<Box> boxList = new ArrayList<>();
         for (BoxType boxType : BoxType.values()) {
-            boxMap.put(boxType, new Box(boxType, isBoxAvailableAtStart(type, boxType)));
+            boxList.add(Box.getInstance(boxType, isBoxAvailableAtStart(columnType, boxType)));
         }
-        return boxMap;
+        return boxList;
     }
     
     public ColumnType getType() {
@@ -39,15 +42,15 @@ public class Column implements Serializable {
         this.type = type;
     }
     
-    public Map<BoxType, Box> getBoxMap() {
-        return boxMap;
+    public List<Box> getBoxList() {
+        return boxList;
     }
 
     @JsonProperty(access = Access.READ_ONLY)
     public int getTopSectionSum() {
         int topSectionSum = 0;
         for (BoxType boxType : YambConstants.TOP_SECTION) {
-            topSectionSum += boxMap.get(boxType).getValue();
+            topSectionSum += boxList.get(boxType.ordinal()).getValue();
         }
         if (topSectionSum >= YambConstants.TOP_SECTION_SUM_BONUS_THRESHOLD) {
             topSectionSum += YambConstants.TOP_SECTION_SUM_BONUS;
@@ -58,9 +61,9 @@ public class Column implements Serializable {
     @JsonProperty(access = Access.READ_ONLY)
     public int getMiddleSectionSum() {
         int middleSectionSum = 0;
-        Box ones = boxMap.get(BoxType.ONES);
-        Box max = boxMap.get(BoxType.MAX);
-        Box min = boxMap.get(BoxType.MIN);
+        Box ones = boxList.get(BoxType.ONES.ordinal());
+        Box max = boxList.get(BoxType.MAX.ordinal());
+        Box min = boxList.get(BoxType.MIN.ordinal());
         if (ones.isFilled() && max.isFilled() && min.isFilled()) {
             middleSectionSum = ones.getValue() * (max.getValue() - min.getValue());
         }
@@ -71,7 +74,7 @@ public class Column implements Serializable {
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
         for (BoxType boxType : YambConstants.BOTTOM_SECTION) {
-            bottomSectionSum += boxMap.get(boxType).getValue();
+            bottomSectionSum += boxList.get(boxType.ordinal()).getValue();
         }
         return bottomSectionSum;
     }
@@ -83,7 +86,7 @@ public class Column implements Serializable {
 
     private int getNumOfAvailableBoxes() {
         int numOfAvailableBoxes = 0;
-        for (Box box : boxMap.values()) {
+        for (Box box : boxList) {
             if (box.isAvailable()) {
                 numOfAvailableBoxes += 1;
             }
@@ -92,7 +95,7 @@ public class Column implements Serializable {
     }  
 
     public void fillBox(BoxType boxType, int value) { 
-        Box selectedBox = boxMap.get(boxType);
+        Box selectedBox = boxList.get(boxType.ordinal());
         selectedBox.fill(value);
         makeNextBoxAvailable(boxType);
     }
@@ -100,9 +103,9 @@ public class Column implements Serializable {
     private void makeNextBoxAvailable(BoxType selectedBoxType) {
         Box nextBox = null;
         if (type == ColumnType.DOWNWARDS && selectedBoxType != BoxType.YAMB) {
-            nextBox = boxMap.get(BoxType.values()[selectedBoxType.ordinal() + 1]);
+            nextBox = boxList.get(selectedBoxType.ordinal() + 1);
         } else if (type == ColumnType.UPWARDS && selectedBoxType != BoxType.ONES) {
-            nextBox = boxMap.get(BoxType.values()[selectedBoxType.ordinal() - 1]);
+            nextBox = boxList.get(selectedBoxType.ordinal() - 1);
         }
     
         if (nextBox != null) {

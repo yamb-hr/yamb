@@ -4,22 +4,27 @@ import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Dice implements Serializable {
+    
+    private int index;
+    private int value;
 
-    private int value = 6;
-    private int order;
+    private Dice() {}
 
-    public Dice() {}
+    private Dice(int index, int value) {
+        this.index = index;
+        this.value = value;
+    }
 
-    public Dice(int order) {
-        this.order = order;
+    public static Dice getInstance(int index) {
+        return new Dice(index, 6);
     }
 
     public int getValue() {
         return value;
     }
 
-    public int getOrder() {
-        return order;
+    public int getIndex() {
+        return index;
     }
 
     public void roll() {

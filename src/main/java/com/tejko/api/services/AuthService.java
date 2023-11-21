@@ -39,7 +39,7 @@ public class AuthService {
     }
 
     public Player register(AuthRequest authRequest) throws UsernameTakenException {
-        Player user = new Player(
+        Player user = Player.getInstance(
             authRequest.username, 
             encoder.encode(authRequest.password)
         );

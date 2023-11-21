@@ -34,11 +34,15 @@ public class Score {
 	@Column(nullable = false)
 	private int value;
 
-	public Score() {}
+	private Score() {}
 
-	public Score(Player player, int value) {
+	private Score(Player player, int value) {
 		this.player = player;
 		this.value = value;
+	}
+
+	public static Score getInstance(Player player, int value) {
+		return new Score(player, value);
 	}
 
 	public UUID getId() {

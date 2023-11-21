@@ -1,8 +1,8 @@
 package com.tejko.models;
 
 import java.io.Serializable;
-import java.util.HashMap; 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -11,28 +11,34 @@ import com.tejko.models.enums.ColumnType;
 
 public class Sheet implements Serializable {
 
-    private Map<ColumnType, Column> columnMap;
+    private List<Column> columnList;
 
-    public Sheet() {
-        this.columnMap = generateColumnMap();
+    private Sheet() { }
+
+    private Sheet(List<Column> columnList) {
+        this.columnList = columnList;
     }
 
-    private static Map<ColumnType, Column> generateColumnMap() {
-        Map<ColumnType, Column> columnMap = new HashMap<>();
+    public static Sheet getInstance() {
+        return new Sheet(generateColumnList());
+    }
+
+    private static List<Column> generateColumnList() {
+        List<Column> columnList = new ArrayList<>();
         for (ColumnType columnType : ColumnType.values()) {
-            columnMap.put(columnType, new Column(columnType));
+            columnList.add(Column.getInstance(columnType));
         }
-        return columnMap;
+        return columnList;
     }
 
-    public Map<ColumnType, Column> getColumnMap() {
-        return columnMap;
+    public List<Column> getColumnList() {
+        return columnList;
     }
 
     @JsonProperty(access = Access.READ_ONLY)
     public int getTopSectionSum() {  
         int topSectionSum = 0;
-        for (Column column : columnMap.values()) {
+        for (Column column : columnList) {
             topSectionSum += column.getTopSectionSum();
         }
         return topSectionSum;
@@ -41,7 +47,7 @@ public class Sheet implements Serializable {
     @JsonProperty(access = Access.READ_ONLY)
     public int getMiddleSectionSum() { 
         int middleSectionSum = 0;
-        for (Column column : columnMap.values()) {
+        for (Column column : columnList) {
             middleSectionSum += column.getMiddleSectionSum();
         }
         return middleSectionSum;
@@ -50,7 +56,7 @@ public class Sheet implements Serializable {
     @JsonProperty(access = Access.READ_ONLY)
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
-        for (Column column : columnMap.values()) {
+        for (Column column : columnList) {
             bottomSectionSum += column.getBottomSectionSum();
         }
         return bottomSectionSum;
@@ -63,8 +69,8 @@ public class Sheet implements Serializable {
     
     @JsonProperty(access = Access.READ_ONLY)
     public boolean isCompleted() {
-        for (ColumnType columnType : columnMap.keySet()) {
-            if (!columnMap.get(columnType).isCompleted()) {
+        for (Column column : columnList) {
+            if (!column.isCompleted()) {
                 return false;
             }
         }
@@ -72,11 +78,11 @@ public class Sheet implements Serializable {
     }
 
     public void fillBox(ColumnType columnType, BoxType boxType, int value) {
-        columnMap.get(columnType).fillBox(boxType, value);
+        columnList.get(columnType.ordinal()).fillBox(boxType, value);
     }
 
     public boolean areAllNonAnnouncementColumnsCompleted() {
-        for (Column column : columnMap.values()) {
+        for (Column column : columnList) {
             if (column.getType() != ColumnType.ANNOUNCEMENT && !column.isCompleted()) {
                 return false;
             }

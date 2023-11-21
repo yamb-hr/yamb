@@ -43,7 +43,7 @@ public class GameService {
 
     public Game create() {
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        Game game = new Game(playerRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
+        Game game = Game.getInstance(playerRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
         return gameRepository.save(game);
     }
 
@@ -69,7 +69,7 @@ public class GameService {
         game.fillBox(columnType, boxType);
 
         if (game.getSheet().isCompleted()) {
-            Score score = new Score(
+            Score score = Score.getInstance(
                 game.getPlayer(),
                 game.getSheet().getTotalSum()
             );

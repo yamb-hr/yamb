@@ -1,8 +1,7 @@
 package com.tejko.models;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -44,20 +43,26 @@ public class Game {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private Map<Integer, Dice> diceMap;
+    private List<Dice> diceList;
 
     @Column
     private int rollCount = 0;
     
     @Column
-    private BoxType announcement = null;
+    private BoxType announcement;
 
-    public Game() {}
+    private Game() {}
 
-    public Game(Player player) {
+    private Game(Player player, Sheet sheet, List<Dice> diceList, int rollCount, BoxType announcement) {
         this.player = player;
-        this.sheet = new Sheet();
-        this.diceMap = generateDiceMap();
+        this.sheet = sheet;
+        this.diceList = diceList;
+        this.rollCount = rollCount;
+        this.announcement = announcement;
+    }
+
+    public static Game getInstance(Player player) {
+        return new Game(player, Sheet.getInstance(), generateDiceList(), 0, null);
     }
 
     public UUID getId() {
@@ -72,8 +77,8 @@ public class Game {
         return sheet;
     }
     
-    public Map<Integer, Dice> getDiceMap() {
-        return diceMap;
+    public List<Dice> getDiceList() {
+        return diceList;
     }
 
     public int getRollCount() {
@@ -84,12 +89,12 @@ public class Game {
         return announcement;
     }
 
-    private static Map<Integer, Dice> generateDiceMap() {
-        Map<Integer, Dice> diceMap = new HashMap<>();
+    private static List<Dice> generateDiceList() {
+        List<Dice> diceList = new ArrayList<>();
         for (int i = 0; i < YambConstants.DICE_LIMIT; i++) {
-            diceMap.put(i, new Dice(i));
+            diceList.add(Dice.getInstance(i));
         }
-        return diceMap;
+        return diceList;
     }
 
     public boolean isAnnouncementRequired() {
@@ -100,21 +105,21 @@ public class Game {
         validateRollAction();
         // always roll all dice for the first roll
         if (rollCount == 0) {
-            for (Dice dice : diceMap.values()) {
+            for (Dice dice : diceList) {
                 dice.roll();
             }
         } else {
-            for (int diceOrder : diceToRoll) {
-                Dice dice = diceMap.get(diceOrder);
+            for (int index : diceToRoll) {
+                Dice dice = diceList.get(index);
                 dice.roll();
             }
         }
         rollCount += 1;
-    }   
+    }
     
     public void fillBox(ColumnType columnType, BoxType boxType) {
         validateFillBoxAction(columnType, boxType);
-        sheet.fillBox(columnType, boxType, ScoreCalculator.calculateScore(diceMap.values(), boxType));
+        sheet.fillBox(columnType, boxType, ScoreCalculator.calculateScore(diceList, boxType));
     }
     
     public void announce(BoxType boxType) {
@@ -126,8 +131,8 @@ public class Game {
         validateRestartAction();
         rollCount = 0;
         announcement = null;
-        sheet = new Sheet();
-        diceMap = generateDiceMap();
+        sheet = Sheet.getInstance();
+        diceList = generateDiceList();
     }
 
     private void validateRollAction() {

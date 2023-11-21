@@ -9,18 +9,21 @@ import com.tejko.models.enums.BoxType;
 public class Box implements Serializable {
 
     private BoxType type;
-
-    private int value = 0;
-
-    private boolean filled = false;
-
+    private int value;
+    private boolean filled;
     private boolean available;
 
-    public Box() {}
+    private Box() {}
 
-    public Box(BoxType type, boolean available) {
+    private Box(BoxType type, int value, boolean filled, boolean available) {
         this.type = type;
+        this.value = value;
+        this.filled = filled;
         this.available = available;
+    }  
+
+    public static Box getInstance(BoxType type, boolean available) {
+        return new Box(type, 0, false, available);
     }    
 
     public BoxType getType() {
