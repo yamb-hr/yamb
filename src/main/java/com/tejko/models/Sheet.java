@@ -1,18 +1,14 @@
 package com.tejko.models;
 
-import java.beans.Transient;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashMap; 
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Sheet implements Serializable {
 
     private Map<ColumnType, Column> columnMap;
@@ -32,13 +28,8 @@ public class Sheet implements Serializable {
     public Map<ColumnType, Column> getColumnMap() {
         return columnMap;
     }
-    
-    @Transient
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<Column> getColumnList() { 
-        return columnMap.values().stream().collect(Collectors.toList());
-    }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public int getTopSectionSum() {  
         int topSectionSum = 0;
         for (Column column : columnMap.values()) {
@@ -47,6 +38,7 @@ public class Sheet implements Serializable {
         return topSectionSum;
     }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public int getMiddleSectionSum() { 
         int middleSectionSum = 0;
         for (Column column : columnMap.values()) {
@@ -55,6 +47,7 @@ public class Sheet implements Serializable {
         return middleSectionSum;
     }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
         for (Column column : columnMap.values()) {
@@ -63,10 +56,12 @@ public class Sheet implements Serializable {
         return bottomSectionSum;
     }
     
+    @JsonProperty(access = Access.READ_ONLY)
     public int getTotalSum() { 
         return getTopSectionSum() + getMiddleSectionSum() + getBottomSectionSum();
     }
     
+    @JsonProperty(access = Access.READ_ONLY)
     public boolean isCompleted() {
         for (ColumnType columnType : columnMap.keySet()) {
             if (!columnMap.get(columnType).isCompleted()) {

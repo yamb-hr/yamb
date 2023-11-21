@@ -2,17 +2,14 @@ package com.tejko.models;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.tejko.constants.YambConstants;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
 
-@JsonIgnoreProperties(ignoreUnknown = true) 
 public class Column implements Serializable { 
 
     private ColumnType type;
@@ -42,16 +39,11 @@ public class Column implements Serializable {
         this.type = type;
     }
     
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public Map<BoxType, Box> getBoxMap() {
         return boxMap;
     }
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<Box> getBoxList() {
-        return boxMap.values().stream().collect(Collectors.toList());
-    }
-
+    @JsonProperty(access = Access.READ_ONLY)
     public int getTopSectionSum() {
         int topSectionSum = 0;
         for (BoxType boxType : YambConstants.TOP_SECTION) {
@@ -63,6 +55,7 @@ public class Column implements Serializable {
         return topSectionSum;
     }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public int getMiddleSectionSum() {
         int middleSectionSum = 0;
         Box ones = boxMap.get(BoxType.ONES);
@@ -74,6 +67,7 @@ public class Column implements Serializable {
         return middleSectionSum;
     }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
         for (BoxType boxType : YambConstants.BOTTOM_SECTION) {
@@ -82,6 +76,7 @@ public class Column implements Serializable {
         return bottomSectionSum;
     }
 
+    @JsonProperty(access = Access.READ_ONLY)
     public boolean isCompleted() {
         return getNumOfAvailableBoxes() == 0;
     }

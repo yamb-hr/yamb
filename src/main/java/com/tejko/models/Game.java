@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,8 +18,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tejko.constants.YambConstants;
 import com.tejko.exceptions.IllegalMoveException;
 import com.tejko.models.enums.BoxType;
@@ -29,7 +26,6 @@ import com.tejko.utils.ScoreCalculator;
 
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@JsonIgnoreProperties("hibernateLazyInitializer")
 public class Game {
 
     @Id
@@ -76,14 +72,8 @@ public class Game {
         return sheet;
     }
     
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public Map<Integer, Dice> getDiceMap() {
         return diceMap;
-    }
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<Dice> getDiceList() {
-        return diceMap.values().stream().collect(Collectors.toList());
     }
 
     public int getRollCount() {

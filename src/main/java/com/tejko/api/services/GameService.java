@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +16,7 @@ import com.tejko.models.Score;
 import com.tejko.models.Game;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
-import com.tejko.models.payload.GameResponse;
 import com.tejko.repositories.ScoreRepository;
-import com.tejko.utils.ModelMapper;
 import com.tejko.repositories.PlayerRepository;
 import com.tejko.repositories.GameRepository;
 
@@ -30,39 +32,38 @@ public class GameService {
     @Autowired
     ScoreRepository scoreRepository;
 
-    ModelMapper mapper = new ModelMapper();
-
-    public GameResponse getById(UUID id) {
-        return mapper.mapToGameResponse(gameRepository.getById(id));
-    }
-
-    public Game getOtherById(UUID id) {
+    public Game getById(UUID id) {
         return gameRepository.getById(id);
     }
 
-    public GameResponse create() {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        Game game = new Game(playerRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
-        return mapper.mapToGameResponse(gameRepository.save(game));
+    public List<Game> getAll(Integer page, Integer size, String sort, String direction) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.fromString(direction), sort));
+        return gameRepository.findAll(pageable).getContent();
     }
 
-    public GameResponse rollDiceById(UUID id, List<Integer> diceToRoll) throws IllegalMoveException {
+    public Game create() {
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+        Game game = new Game(playerRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
+        return gameRepository.save(game);
+    }
+
+    public Game rollDiceById(UUID id, List<Integer> diceToRoll) throws IllegalMoveException {
         Game game = gameRepository.getById(id);
 
         game.rollDice(diceToRoll);
 
-        return mapper.mapToGameResponse(gameRepository.save(game));
+        return gameRepository.save(game);
     }
 
-    public GameResponse announceById(UUID id, BoxType boxType) throws IllegalMoveException {
+    public Game announceById(UUID id, BoxType boxType) throws IllegalMoveException {
         Game game = gameRepository.getById(id);
 
         game.announce(boxType);
 
-        return mapper.mapToGameResponse(gameRepository.save(game));
+        return gameRepository.save(game);
     }
 
-    public GameResponse fillById(UUID id, ColumnType columnType, BoxType boxType) throws IllegalMoveException {
+    public Game fillById(UUID id, ColumnType columnType, BoxType boxType) throws IllegalMoveException {
         Game game = gameRepository.getById(id);
 
         game.fillBox(columnType, boxType);
@@ -75,13 +76,13 @@ public class GameService {
             scoreRepository.save(score);
         }
 
-        return  mapper.mapToGameResponse(gameRepository.save(game));
+        return  gameRepository.save(game);
     }
 
-    public GameResponse restartById(UUID id) {
+    public Game restartById(UUID id) {
         Game game = gameRepository.getById(id);
         game.restart();
-        return mapper.mapToGameResponse(gameRepository.save(game));
+        return gameRepository.save(game);
     }
 
     public boolean hasPermission(UUID userId, UUID gameId) {
