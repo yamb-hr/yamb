@@ -49,7 +49,6 @@ public class PlayerService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Player player = playerRepo.findByUsername(username).orElseThrow(()-> new ResourceNotFoundException(GameConstants.ERROR_PLAYER_NOT_FOUND));
         
-        // Create and return the Spring Security UserDetails object
         return User.builder()
             .username(player.getUsername())
             .password(player.getPassword())

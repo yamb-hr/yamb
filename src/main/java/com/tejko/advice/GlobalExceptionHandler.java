@@ -20,6 +20,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+        exception.printStackTrace(System.out);
         return new ResponseEntity<>(new ErrorResponse(exception.getClass().getSimpleName(), exception.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
