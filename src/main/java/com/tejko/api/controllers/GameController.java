@@ -50,25 +50,25 @@ public class GameController {
 	}
 
 	@PutMapping("/{id}/roll")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
 	public ResponseEntity<Game> rollDiceById(@PathVariable Long id, @RequestBody List<Integer> diceToRoll) {
 		return new ResponseEntity<>(gameService.rollDiceById(id, diceToRoll), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/announce")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
 	public ResponseEntity<Game> announceById(@PathVariable Long id, @RequestBody BoxType boxType) {
 		return new ResponseEntity<>(gameService.announceById(id, boxType), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/columns/{columnType}/boxes/{boxType}/fill")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
 	public ResponseEntity<Game> fillById(@PathVariable Long id, @PathVariable ColumnType columnType, @PathVariable BoxType boxType) {
 		return new ResponseEntity<>(gameService.fillById(id, columnType, boxType), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/restart")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
 	public ResponseEntity<Game> restartById(@PathVariable Long id) {
 		return new ResponseEntity<>(gameService.restartById(id), HttpStatus.OK);
 	}
