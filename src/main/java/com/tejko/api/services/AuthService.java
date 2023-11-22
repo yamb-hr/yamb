@@ -1,19 +1,22 @@
 package com.tejko.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.tejko.components.JwtComponent;
-import com.tejko.exceptions.UsernameTakenException;
+import com.tejko.constants.GameConstants;
 import com.tejko.models.Player;
 import com.tejko.models.payload.AuthRequest;
 import com.tejko.models.payload.LoginResponse;
 import com.tejko.repositories.PlayerRepository;
+import com.tejko.security.JwtUtil;
 
 @Service
 public class AuthService {
@@ -22,28 +25,36 @@ public class AuthService {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    PlayerRepository playerRepository;
+    PlayerRepository playerRepo;
 
     @Autowired
-    JwtComponent jwtComponent;
+    JwtUtil jwtUtil;
 
     @Autowired
     PasswordEncoder encoder;
 
     public LoginResponse login(AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtComponent.generateJwt(authentication);
-        LoginResponse response = new LoginResponse(jwt);
-        return response;
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Player player = playerRepo.findByUsername(authRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_PLAYER_NOT_FOUND));
+            String token = jwtUtil.generateToken(player);
+            LoginResponse response = new LoginResponse(token);
+            return response;
+        } catch (InternalAuthenticationServiceException exception) {
+            throw new BadCredentialsException(GameConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT);
+        }
     }
 
-    public Player register(AuthRequest authRequest) throws UsernameTakenException {
+    public Player register(AuthRequest authRequest) {
+		if (playerRepo.existsByUsername(authRequest.getUsername())) {
+			throw new BadCredentialsException(GameConstants.ERROR_USER_ALREADY_EXISTS);
+		}
         Player user = Player.getInstance(
-            authRequest.username, 
-            encoder.encode(authRequest.password)
+            authRequest.getUsername(), 
+            encoder.encode(authRequest.getPassword())
         );
-        return playerRepository.save(user);
+        return playerRepo.save(user);
     }
 
 }

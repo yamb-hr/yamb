@@ -2,8 +2,7 @@ package com.tejko.models;
 
 import java.io.Serializable;
 
-import com.tejko.constants.YambConstants;
-import com.tejko.exceptions.IllegalMoveException;
+import com.tejko.constants.GameConstants;
 import com.tejko.models.enums.BoxType;
 
 public class Box implements Serializable {
@@ -51,9 +50,9 @@ public class Box implements Serializable {
 
     private void validateFillAction() {
         if (filled) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_BOX_ALREADY_FILLED);
+            throw new IllegalStateException(GameConstants.ERROR_BOX_ALREADY_FILLED);
         } else if (!available) {
-			throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_BOX_NOT_AVAILABLE);
+			throw new IllegalStateException(GameConstants.ERROR_BOX_NOT_AVAILABLE);
         }
     }
 

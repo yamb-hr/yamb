@@ -1,16 +1,20 @@
 package com.tejko.models.payload;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 public class AuthRequest {
 
-    @NotBlank
-    @Size(min = 5, max = 15)
-    public String username;
+    private final String username;
+    private final String password;
 
-    @NotBlank
-    @Size(min = 10)
-    public String password;
-
+    public AuthRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    public String getPassword() {
+        return password;
+    }
+    
 }

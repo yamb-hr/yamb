@@ -1,7 +1,6 @@
 package com.tejko.api.controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.api.services.GameService;
-import com.tejko.exceptions.IllegalMoveException;
 import com.tejko.models.Game;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
+import com.tejko.security.PermissionManager;
 
 @RestController
 @RequestMapping("/api/games")
@@ -29,6 +28,9 @@ public class GameController {
 	@Autowired
 	GameService gameService;
 
+	@Autowired
+	PermissionManager permissionManager;
+
 	@GetMapping("")
 	public ResponseEntity<List<Game>> getAll(@RequestParam(defaultValue = "0") Integer page,
 	@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort,
@@ -36,39 +38,38 @@ public class GameController {
 		return new ResponseEntity<>(gameService.getAll(page, size, sort, direction), HttpStatus.OK);
 	}
 
-	// @PreAuthorize("isAuthenticated()")
 	@GetMapping("/{id}") 
-	public ResponseEntity<Game> getById(@PathVariable UUID id) {
+	public ResponseEntity<Game> getById(@PathVariable Long id) {
 		return new ResponseEntity<>(gameService.getById(id), HttpStatus.OK);
 	}
 
-	// @PreAuthorize("isAuthenticated()")
 	@PostMapping("")
-	public ResponseEntity<Game> create() {
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<Game> create() { 
 		return new ResponseEntity<>(gameService.create(), HttpStatus.CREATED);
 	}
 
-	@PreAuthorize("@permissionComponent.hasPermission(#id)")
 	@PutMapping("/{id}/roll")
-	public ResponseEntity<Game> rollDiceById(@PathVariable UUID id, @RequestBody List<Integer> diceToRoll) throws IllegalMoveException {
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	public ResponseEntity<Game> rollDiceById(@PathVariable Long id, @RequestBody List<Integer> diceToRoll) {
 		return new ResponseEntity<>(gameService.rollDiceById(id, diceToRoll), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasPermission()")
 	@PutMapping("/{id}/announce")
-	public ResponseEntity<Game> announceById(@PathVariable UUID id, @RequestBody BoxType boxType) throws IllegalMoveException {
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	public ResponseEntity<Game> announceById(@PathVariable Long id, @RequestBody BoxType boxType) {
 		return new ResponseEntity<>(gameService.announceById(id, boxType), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasPermission()")
 	@PutMapping("/{id}/columns/{columnType}/boxes/{boxType}/fill")
-	public ResponseEntity<Game> fillById(@PathVariable UUID id, @PathVariable ColumnType columnType, @PathVariable BoxType boxType) throws IllegalMoveException {
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	public ResponseEntity<Game> fillById(@PathVariable Long id, @PathVariable ColumnType columnType, @PathVariable BoxType boxType) {
 		return new ResponseEntity<>(gameService.fillById(id, columnType, boxType), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasPermission()")
 	@PutMapping("/{id}/restart")
-	public ResponseEntity<Game> restartById(@PathVariable UUID id) throws IllegalMoveException {
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(#id)")
+	public ResponseEntity<Game> restartById(@PathVariable Long id) {
 		return new ResponseEntity<>(gameService.restartById(id), HttpStatus.OK);
 	}
 

@@ -2,36 +2,32 @@ package com.tejko.models;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import com.tejko.constants.YambConstants;
-import com.tejko.exceptions.IllegalMoveException;
+import com.tejko.constants.GameConstants;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
-import com.tejko.utils.ScoreCalculator;
+import com.tejko.util.ScoreCalculator;
 
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Game {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = true)
@@ -43,7 +39,7 @@ public class Game {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private List<Dice> diceList;
+    private List<Dice> dices;
 
     @Column
     private int rollCount = 0;
@@ -53,19 +49,19 @@ public class Game {
 
     private Game() {}
 
-    private Game(Player player, Sheet sheet, List<Dice> diceList, int rollCount, BoxType announcement) {
+    private Game(Player player, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement) {
         this.player = player;
         this.sheet = sheet;
-        this.diceList = diceList;
+        this.dices = dices;
         this.rollCount = rollCount;
         this.announcement = announcement;
     }
 
     public static Game getInstance(Player player) {
-        return new Game(player, Sheet.getInstance(), generateDiceList(), 0, null);
+        return new Game(player, Sheet.getInstance(), generateDices(), 0, null);
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
@@ -77,8 +73,8 @@ public class Game {
         return sheet;
     }
     
-    public List<Dice> getDiceList() {
-        return diceList;
+    public List<Dice> getDices() {
+        return dices;
     }
 
     public int getRollCount() {
@@ -89,12 +85,12 @@ public class Game {
         return announcement;
     }
 
-    private static List<Dice> generateDiceList() {
-        List<Dice> diceList = new ArrayList<>();
-        for (int i = 0; i < YambConstants.DICE_LIMIT; i++) {
-            diceList.add(Dice.getInstance(i));
+    private static List<Dice> generateDices() {
+        List<Dice> dices = new ArrayList<>();
+        for (int i = 0; i < GameConstants.DICE_LIMIT; i++) {
+            dices.add(Dice.getInstance(i));
         }
-        return diceList;
+        return dices;
     }
 
     public boolean isAnnouncementRequired() {
@@ -105,12 +101,12 @@ public class Game {
         validateRollAction();
         // always roll all dice for the first roll
         if (rollCount == 0) {
-            for (Dice dice : diceList) {
+            for (Dice dice : dices) {
                 dice.roll();
             }
         } else {
             for (int index : diceToRoll) {
-                Dice dice = diceList.get(index);
+                Dice dice = dices.get(index);
                 dice.roll();
             }
         }
@@ -119,7 +115,7 @@ public class Game {
     
     public void fillBox(ColumnType columnType, BoxType boxType) {
         validateFillBoxAction(columnType, boxType);
-        sheet.fillBox(columnType, boxType, ScoreCalculator.calculateScore(diceList, boxType));
+        sheet.fillBox(columnType, boxType, ScoreCalculator.calculateScore(boxType, dices));
     }
     
     public void announce(BoxType boxType) {
@@ -132,36 +128,36 @@ public class Game {
         rollCount = 0;
         announcement = null;
         sheet = Sheet.getInstance();
-        diceList = generateDiceList();
+        dices = generateDices();
     }
 
     private void validateRollAction() {
         if (rollCount == 3) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_ROLL_LIMIT_REACHED);
+            throw new IllegalStateException(GameConstants.ERROR_ROLL_LIMIT_REACHED);
         } else if (rollCount == 1 && isAnnouncementRequired()) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_ANNOUNCEMENT_REQUIRED);
+            throw new IllegalStateException(GameConstants.ERROR_ANNOUNCEMENT_REQUIRED);
         }
     }
 
     private void validateFillBoxAction(ColumnType columnType, BoxType boxType) {
         if (rollCount == 0) {
-			throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_DICE_ROLL_REQUIRED);
+			throw new IllegalStateException(GameConstants.ERROR_DICE_ROLL_REQUIRED);
         } else if (announcement != null && (columnType != ColumnType.ANNOUNCEMENT || boxType != announcement)) {
-			throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_BOX_NOT_ANNOUNCED);
+			throw new IllegalStateException(GameConstants.ERROR_BOX_NOT_ANNOUNCED);
         }
     }
 
     private void validateAnnouncementAction(BoxType boxType) {
         if (announcement != null) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_ANNOUNCEMENT_ALREADY_DECLARED);
+            throw new IllegalStateException(GameConstants.ERROR_ANNOUNCEMENT_ALREADY_DECLARED);
         } else if (rollCount > 1) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_ANNOUNCEMENT_NOT_AVAILABLE);
+            throw new IllegalStateException(GameConstants.ERROR_ANNOUNCEMENT_NOT_AVAILABLE);
         }
     }
 
     private void validateRestartAction() {
         if (sheet.isCompleted()) {
-            throw new IllegalMoveException(YambConstants.ERROR_MESSAGE_RESTART_COMPLETED_SHEET);
+            throw new IllegalStateException(GameConstants.ERROR_RESTART_COMPLETED_SHEET);
         }
     }    
 

@@ -1,7 +1,6 @@
 package com.tejko.api.controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ public class ScoreController {
 	ScoreService scoreService;
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Score> getById(@PathVariable UUID id) {
+	public ResponseEntity<Score> getById(@PathVariable Long id) {
 		return new ResponseEntity<>(scoreService.getById(id), HttpStatus.OK);
 	}
 

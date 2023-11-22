@@ -4,12 +4,10 @@ public class ErrorResponse {
 
     public String error;
     public String message;
-    public String detail;
 
-    public ErrorResponse(String error, String message, String detail) {
+    public ErrorResponse(String error, String message) {
         this.error = error;
         this.message = message;
-        this.detail = detail;
     }
 
 }

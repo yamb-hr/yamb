@@ -1,7 +1,6 @@
 package com.tejko.api.controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ public class PlayerController {
 	PlayerService playerService;
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Player> getById(@PathVariable UUID id) {
+	public ResponseEntity<Player> getById(@PathVariable Long id) {
 		return new ResponseEntity<>(playerService.getById(id), HttpStatus.OK);
 	}
 
@@ -36,7 +35,7 @@ public class PlayerController {
 	}
 
 	@GetMapping("/{id}/scores")
-	public ResponseEntity<List<Score>> getScoresByPlayerId(@PathVariable UUID id) {
+	public ResponseEntity<List<Score>> getScoresByPlayerId(@PathVariable Long id) {
 		return new ResponseEntity<>(playerService.getScoresByPlayerId(id), HttpStatus.OK);
 	}
 

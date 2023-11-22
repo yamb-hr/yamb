@@ -1,19 +1,20 @@
 package com.tejko.api.services;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.tejko.exceptions.IllegalMoveException;
 import com.tejko.models.Score;
+import com.tejko.constants.GameConstants;
 import com.tejko.models.Game;
+import com.tejko.models.Player;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
 import com.tejko.repositories.ScoreRepository;
@@ -24,69 +25,58 @@ import com.tejko.repositories.GameRepository;
 public class GameService {
 
     @Autowired
-    GameRepository gameRepository;
+    GameRepository gameRepo;
 
     @Autowired
-    PlayerRepository playerRepository;
+    PlayerRepository playerRepo;
 
     @Autowired
-    ScoreRepository scoreRepository;
+    ScoreRepository scoreRepo;
 
-    public Game getById(UUID id) {
-        return gameRepository.getById(id);
+    public Game getById(Long id) {
+        return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
     }
 
     public List<Game> getAll(Integer page, Integer size, String sort, String direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.fromString(direction), sort));
-        return gameRepository.findAll(pageable).getContent();
+        return gameRepo.findAll(pageable).getContent();
     }
 
     public Game create() {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        Game game = Game.getInstance(playerRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
-        return gameRepository.save(game);
+        Player player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_PLAYER_NOT_FOUND));
+        Game game = Game.getInstance(player);
+        return gameRepo.save(game);
     }
 
-    public Game rollDiceById(UUID id, List<Integer> diceToRoll) throws IllegalMoveException {
-        Game game = gameRepository.getById(id);
-
+    public Game rollDiceById(Long id, List<Integer> diceToRoll) {
+        Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
         game.rollDice(diceToRoll);
-
-        return gameRepository.save(game);
+        return gameRepo.save(game);
     }
 
-    public Game announceById(UUID id, BoxType boxType) throws IllegalMoveException {
-        Game game = gameRepository.getById(id);
-
+    public Game announceById(Long id, BoxType boxType) {
+        Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
         game.announce(boxType);
-
-        return gameRepository.save(game);
+        return gameRepo.save(game);
     }
 
-    public Game fillById(UUID id, ColumnType columnType, BoxType boxType) throws IllegalMoveException {
-        Game game = gameRepository.getById(id);
-
+    public Game fillById(Long id, ColumnType columnType, BoxType boxType) {
+        Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
         game.fillBox(columnType, boxType);
-
         if (game.getSheet().isCompleted()) {
             Score score = Score.getInstance(
                 game.getPlayer(),
                 game.getSheet().getTotalSum()
             );
-            scoreRepository.save(score);
+            scoreRepo.save(score);
         }
-
-        return  gameRepository.save(game);
+        return  gameRepo.save(game);
     }
 
-    public Game restartById(UUID id) {
-        Game game = gameRepository.getById(id);
+    public Game restartById(Long id) {
+        Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
         game.restart();
-        return gameRepository.save(game);
-    }
-
-    public boolean hasPermission(UUID userId, UUID gameId) {
-        return gameRepository.getById(gameId).getPlayer().getId().equals(userId);
+        return gameRepo.save(game);
     }
 
 }

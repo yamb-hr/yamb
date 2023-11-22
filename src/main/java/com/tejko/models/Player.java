@@ -1,19 +1,18 @@
 package com.tejko.models;
 
 import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Player implements UserDetails {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, unique = true)
     @Size(min = 5, max = 15)
@@ -41,16 +38,16 @@ public class Player implements UserDetails {
     
     @OneToMany(mappedBy = "player")
     @JsonIgnore
-    private Set<Score> scores;
+    private List<Score> scores;
 
     @OneToMany(mappedBy = "player")
     @JsonIgnore
-    private Set<Game> games;
+    private List<Game> games;
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;  
 
-    private Player() {}
+    protected Player() {}
 
     private Player(String username, String password) {
         this.username = username;
@@ -61,7 +58,7 @@ public class Player implements UserDetails {
         return new Player(username, password);
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
@@ -81,19 +78,19 @@ public class Player implements UserDetails {
         this.password = password;
     }
 
-    public Set<Score> getScores() {
+    public List<Score> getScores() {
         return scores;
     }
 
-    public void setScores(Set<Score> scores) {
+    public void setScores(List<Score> scores) {
         this.scores = scores;
     }
 
-    public Set<Game> getGames() {
+    public List<Game> getGames() {
         return games;
     }
 
-    public void setGames(Set<Game> games) {
+    public void setGames(List<Game> games) {
         this.games = games;
     }
 

@@ -1,10 +1,9 @@
 package com.tejko.models;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -12,7 +11,6 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 @Entity
@@ -21,10 +19,8 @@ import org.springframework.data.rest.core.annotation.RestResource;
 public class Score {
 
 	@Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column
-    UUID id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@ManyToOne
 	@JsonIncludeProperties({ "id", "username" })
@@ -34,7 +30,7 @@ public class Score {
 	@Column(nullable = false)
 	private int value;
 
-	private Score() {}
+	protected Score() {}
 
 	private Score(Player player, int value) {
 		this.player = player;
@@ -45,7 +41,7 @@ public class Score {
 		return new Score(player, value);
 	}
 
-	public UUID getId() {
+	public Long getId() {
 		return id;
 	}
 
