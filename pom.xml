@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.5.3</version>
 		<relativePath />
 	</parent>
+
 	<groupId>com</groupId>
 	<artifactId>yamb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>yamb</name>
 	<description>Yamb</description>
+
 	<properties>
 		<java.version>11</java.version>
 		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
@@ -71,6 +74,7 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -78,48 +82,61 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/classes/static</outputDirectory>
-							<resources>
-								<resource>
-									<directory>frontend/build</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
+			<groupId>com.github.eirslett</groupId>
+			<artifactId>frontend-maven-plugin</artifactId>
+			<version>${frontend-maven-plugin.version}</version>
+			<configuration>
+				<workingDirectory>frontend</workingDirectory>
+				<installDirectory>target</installDirectory>
+			</configuration>
+			<executions>
+				<execution>
+					<id>install node and npm</id>
+					<goals>
+						<goal>install-node-and-npm</goal>
+					</goals>
+					<configuration>
+						<nodeVersion>${node.version}</nodeVersion>
+						<npmVersion>${npm.version}</npmVersion>
+					</configuration>
+				</execution>
+				<execution>
+					<id>npm install</id>
+					<goals>
+						<goal>npm</goal>
+					</goals>
+					<configuration>
+						<arguments>install</arguments>
+					</configuration>
+				</execution>
+				<execution>
+					<id>npm run build</id>
+					<goals>
+						<goal>npm</goal>
+					</goals>
+					<configuration>
+						<arguments>run build</arguments>
+					</configuration>
+				</execution>
+			</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>${frontend-maven-plugin.version}</version>
-				<configuration>
-					<workingDirectory>frontend</workingDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>...</phase>
-						<configuration>
-							<skip>true</skip>
-							<nodeVersion>...</nodeVersion>
-							<npmVersion>...</npmVersion>
-						</configuration>
-					</execution>
-				</executions>
+			<artifactId>maven-antrun-plugin</artifactId>
+			<executions>
+				<execution>
+					<phase>generate-resources</phase>
+					<configuration>
+						<target>
+						<copy todir="${project.build.directory}/classes/public">
+							<fileset dir="${project.basedir}/frontend/build"/>
+						</copy>
+						</target>
+					</configuration>
+					<goals>
+						<goal>run</goal>
+					</goals>
+				</execution>
+			</executions>
 			</plugin>
 		</plugins>
 
