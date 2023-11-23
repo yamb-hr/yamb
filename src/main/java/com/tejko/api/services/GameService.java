@@ -18,6 +18,7 @@ import com.tejko.models.Player;
 import com.tejko.models.enums.BoxType;
 import com.tejko.models.enums.ColumnType;
 import com.tejko.repositories.ScoreRepository;
+import com.tejko.security.SessionManager;
 import com.tejko.repositories.PlayerRepository;
 import com.tejko.repositories.GameRepository;
 
@@ -33,6 +34,9 @@ public class GameService {
     @Autowired
     ScoreRepository scoreRepo;
 
+    @Autowired
+    SessionManager sessionManager;
+
     public Game getById(Long id) {
         return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_GAME_NOT_FOUND));
     }
@@ -42,10 +46,23 @@ public class GameService {
         return gameRepo.findAll(pageable).getContent();
     }
 
-    public Game create() {
-        Player player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException(GameConstants.ERROR_PLAYER_NOT_FOUND));
+    public Game create() { 
+        Player player;
+        if (isAnonymousUser()) {
+            if (sessionManager.getPlayerFromSession() == null) {
+                player = sessionManager.createPlayerSession();
+            } else {
+                player = sessionManager.getPlayerFromSession();
+            }
+        } else {
+            player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException("Not Found by Username"));
+        }
         Game game = Game.getInstance(player);
         return gameRepo.save(game);
+    }
+
+    private boolean isAnonymousUser() {
+        return SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser");
     }
 
     public Game rollDiceById(Long id, List<Integer> diceToRoll) {

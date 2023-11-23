@@ -9,19 +9,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
-import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "player")
-@RestResource(rel = "players", path = "players")
 public class Player implements UserDetails {
 
     @Id
@@ -32,7 +28,7 @@ public class Player implements UserDetails {
     @Size(min = 5, max = 15)
     private String username;
 
-    @Column(nullable = false)
+    @Column
     @JsonIgnore
     private String password;
     

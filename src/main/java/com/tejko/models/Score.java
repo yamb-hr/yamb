@@ -7,20 +7,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
-import org.springframework.data.rest.core.annotation.RestResource;
-
 @Entity
-@Table(name = "score")
-@RestResource(rel = "scores", path = "scores")
 public class Score {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 	@ManyToOne
 	@JsonIncludeProperties({ "id", "username" })

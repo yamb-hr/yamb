@@ -17,6 +17,7 @@ import com.tejko.models.payload.AuthRequest;
 import com.tejko.models.payload.LoginResponse;
 import com.tejko.repositories.PlayerRepository;
 import com.tejko.security.JwtUtil;
+import com.tejko.security.SessionManager;
 
 @Service
 public class AuthService {
@@ -32,6 +33,9 @@ public class AuthService {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    SessionManager sessionManager;
 
     public LoginResponse login(AuthRequest authRequest) {
         try {
@@ -50,11 +54,18 @@ public class AuthService {
 		if (playerRepo.existsByUsername(authRequest.getUsername())) {
 			throw new BadCredentialsException(GameConstants.ERROR_USER_ALREADY_EXISTS);
 		}
-        Player user = Player.getInstance(
-            authRequest.getUsername(), 
-            encoder.encode(authRequest.getPassword())
-        );
-        return playerRepo.save(user);
+        Player player;
+        if (sessionManager.getPlayerFromSession() == null) {
+            player = Player.getInstance(
+                authRequest.getUsername(), 
+                encoder.encode(authRequest.getPassword())
+            );
+        } else {
+            player = sessionManager.getPlayerFromSession();
+            player.setUsername(authRequest.getUsername());
+            player.setPassword(encoder.encode(authRequest.getPassword()));
+        }
+        return playerRepo.save(player);
     }
 
 }
