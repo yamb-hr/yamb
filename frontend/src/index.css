@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --color-background: white;
+  --color-background-hover: lightgray;
+  --color-background-disabled: gray;
+  --color-border-announcement: red;
+  --color-border-freeze: blue;
+  --color-border: black;
+  --color-border-hover: gray;
+  --color-border-focus: red;
+  --border-radius-small: 4px;
+  --box-height: 32px;
+  --box-width: 64px;
+  --dice-height: 64px;
+  --dice-width: 64px;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+}
+
+button:hover {
+  cursor: pointer;
+}

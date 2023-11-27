@@ -1,0 +1,11 @@
+.roll-button {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-medium);
+	grid-row-start: 1;
+	grid-row-end: 7;
+}
+
+.roll-button:hover:enabled {
+    background-color: var(--color-background-hover);
+}
