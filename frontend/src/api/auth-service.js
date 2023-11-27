@@ -29,14 +29,11 @@ const AuthService = {
                 method: 'POST',
                 mode: 'cors'
             })
-            .then((response) => {
+            .then(response => {
                 if (response.ok) {
-                  return response.json();
+                    return response.json().then(data => data);
                 }
-                throw new Error(response.json()?.message);
-            })
-            .then((data) => {
-                return data
+                return response.json().then(error => { throw new Error(error.message) })
             });
         },
 
@@ -51,14 +48,11 @@ const AuthService = {
             method: 'POST',
             mode: 'cors'
         })
-        .then((response) => {
+        .then(response => {
             if (response.ok) {
-              return response.json();
+                return response.json().then(data => data);
             }
-            throw new Error(response.json()?.message);
-        })
-        .then((data) => {
-            return data
+            return response.json().then(error => { throw new Error(error.message) })
         });
     },
 
@@ -72,14 +66,11 @@ const AuthService = {
             method: 'POST',
             mode: 'cors'
         })
-        .then((response) => {
+        .then(response => {
             if (response.ok) {
-              return response.json();
+                return response.json().then(data => data);
             }
-            throw new Error(response.json()?.message);
-        })
-        .then((data) => {
-            return data
+            return response.json().then(error => { throw new Error(error.message) })
         });
     }
 }

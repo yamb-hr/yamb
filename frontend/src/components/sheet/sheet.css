@@ -48,3 +48,11 @@
 	grid-row-start: 12;
     grid-row-end: 15;
 }
+
+.username {
+	margin: 0;
+	padding: 0;
+	grid-row-start: 18;
+	grid-column-start: 1;
+	grid-column-end: 5;
+}

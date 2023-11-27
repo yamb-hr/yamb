@@ -20,7 +20,7 @@ code {
   --color-border-freeze: blue;
   --color-border: black;
   --color-border-hover: gray;
-  --color-border-focus: red;
+  --color-border-focus: green;
   --border-radius-small: 4px;
   --box-height: 32px;
   --box-width: 64px;
@@ -33,6 +33,6 @@ button {
   padding: 0;
 }
 
-button:hover {
+button:hover:enabled {
   cursor: pointer;
 }

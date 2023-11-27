@@ -15,8 +15,10 @@ class Box extends Component {
     
     render() {
         let value = this.props.value;
+        let boxClass = "box " + (this.props.columnType === "ANNOUNCEMENT" && this.props.type === this.props.announcement ? "announcement" : "");
+        let boxDisabled = this.props.boxDisabled;
         return (
-            <button className="box" onClick={this.handleClick}>
+            <button className={boxClass} onClick={this.handleClick} disabled={boxDisabled}>
                 <strong>{value}</strong>
             </button>
         );

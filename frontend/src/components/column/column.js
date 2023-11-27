@@ -9,15 +9,38 @@ class Column extends Component {
         super(props)
         this.state = {}
         this.handleBoxClick = this.handleBoxClick.bind(this);
+        this.isBoxDisabled = this.isBoxDisabled.bind(this);
     }
 
     handleBoxClick(boxType) {
         this.props.onBoxClick(this.props.type, boxType);
     }
 
+    isBoxDisabled(box) {
+        if (this.props.rollCount === 0) {
+            return true;
+        }
+        if (box.value != null) {
+            return true;
+        }   
+        if (this.props.type === "FREE") {
+            return true;
+        } else if (this.props.type === "DOWNWARDS") {
+            return box.type === "ONES"; // || sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal() - 1).getValue() != null;
+        } else if (this.props.type === "UPWARDS") {
+            return box.type === "YAMB"; // || sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal() + 1).getValue() != null;
+        } else if (this.props.type === "ANNOUNCEMENT") {
+            return box.type === this.props.announcement;
+        }
+        return false;
+
+    }
+
     render() {
         let type = this.props.type;
         let boxes = this.props.boxes;
+        let rollCount = this.props.rollCount;
+        let announcement = this.props.announcement;
         let topSectionSum = this.props.topSectionSum;
         let middleSectionSum = this.props.middleSectionSum;
         let bottomSectionSum = this.props.bottomSectionSum;
@@ -33,6 +56,9 @@ class Column extends Component {
                         key={type+box.type}
                         type={box.type}
                         value={box.value}
+                        columnType={type}
+                        announcement={announcement}
+                        boxDisabled={this.isBoxDisabled(box)}
                         onClick={this.handleBoxClick}>
                     </Box>
                 ))}

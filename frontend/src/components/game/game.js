@@ -13,6 +13,7 @@ class Game extends Component {
         this.handleRollDice = this.handleRollDice.bind(this);
         this.handleDiceClick = this.handleDiceClick.bind(this);
         this.handleBoxClick = this.handleBoxClick.bind(this);
+        this.handleRestart = this.handleRestart.bind(this);
     }
 
     handleDiceClick(index) {
@@ -32,14 +33,25 @@ class Game extends Component {
     }
 
     handleBoxClick(columnType, boxType) {
-        this.props.onBoxClick(columnType, boxType);
+        if (columnType === "ANNOUNCEMENT" && this.props.announcement == null) {
+            this.props.onMakeAnnouncement(boxType);
+        } else {
+            this.props.onFillBox(columnType, boxType);
+        }
+    }
+
+    handleRestart() {
+        this.props.onRestart();
     }
 
     render() {
         let rollCount = this.props.rollCount;
         let sheet = this.props.sheet;
         let dices = this.props.dices;
+        let announcement = this.props.announcement;
+        let player = this.props.player;
         let diceToRoll = this.state.diceToRoll;
+        let diceDisabled = this.props.rollCount === 0;
         return (
             <div className="game">
                 {dices && 
@@ -50,7 +62,8 @@ class Game extends Component {
                                     value={dice.value} 
                                     index={dice.index} 
                                     saved={!diceToRoll.includes(dice.index)}
-                                    onClick={this.handleDiceClick}>
+                                    diceDisabled={diceDisabled}
+                                    onDiceClick={this.handleDiceClick}>
                                 </Dice>
                             </div>
                         ))}
@@ -60,7 +73,14 @@ class Game extends Component {
                     <Sheet 
                         columns={sheet.columns} 
                         rollCount={rollCount}
+                        topSectionSum={sheet.topSectionSum}
+                        middleSectionSum={sheet.middleSectionSum}
+                        bottomSectionSum={sheet.bottomSectionSum}
+                        totalSum={sheet.totalSum}
+                        announcement={announcement}
+                        player={player}
                         onRollDice={this.handleRollDice}
+                        onRestart={this.handleRestart}
                         onBoxClick={this.handleBoxClick}>
                     </Sheet>}
             </div>

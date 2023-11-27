@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './button.css';
 
-class RollButton extends Component {
+class RestartButton extends Component {
 
     constructor(props) {
         super(props)
@@ -10,18 +10,17 @@ class RollButton extends Component {
     }
 
     handleClick() {
-        this.props.onRollDice();
+        this.props.onRestart();
     }
 
     render() {
-        let rollCount = this.props.rollCount;
         return (
-            <button className="roll-button" onClick={this.handleClick}>
-                <img src={"./svg/buttons/roll-" + (3-rollCount) + ".svg"} alt="Roll"></img>
+            <button className="restart-button" onClick={this.handleClick}>
+                <img src={"./svg/buttons/restart.svg"} alt="Restart"></img>
             </button>
                 
         );
     }    
 }
 
-export default RollButton;
+export default RestartButton;

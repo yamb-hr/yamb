@@ -3,6 +3,7 @@ import Column from '../column/column';
 import Label from '../label/label';
 import './sheet.css';
 import RollButton from '../button/roll-button';
+import RestartButton from '../button/restart-button';
 
 class Sheet extends Component {
 
@@ -11,10 +12,15 @@ class Sheet extends Component {
         this.state = {}
         this.handleRollDice = this.handleRollDice.bind(this);
         this.handleBoxClick = this.handleBoxClick.bind(this);
+        this.handleRestart = this.handleRestart.bind(this);
     }
 
     handleRollDice() {
         this.props.onRollDice();
+    }
+
+    handleRestart() {
+        this.props.onRestart();
     }
 
     handleBoxClick(columnType, boxType) {
@@ -27,8 +33,10 @@ class Sheet extends Component {
         let middleSectionSum = this.props.middleSectionSum;
         let bottomSectionSum = this.props.bottomSectionSum;
         let totalSum = this.props.totalSum;
-        let rollDiceButtonDisabled = this.props.rollDiceButtonDisabled;
+        let rollButtonDisabled = this.props.rollButtonDisabled;
         let rollCount = this.props.rollCount;
+        let announcement = this.props.announcement;
+        let player = this.props.player;
         return (
             <div className="sheet">
                 <div className="first-column">
@@ -57,6 +65,8 @@ class Sheet extends Component {
                         <Column 
                             type={column.type} 
                             boxes={column.boxes} 
+                            rollCount={rollCount}
+                            announcement={announcement}
                             topSectionSum={column.topSectionSum}
                             middleSectionSum={column.middleSectionSum}
                             bottomSectionSum={column.bottomSectionSum}
@@ -65,15 +75,17 @@ class Sheet extends Component {
                     </div>
                 ))}
                 <div className="last-column">
-                    <RollButton className="roll-dice-button" 
-                        title="Roll!" 
-                        disabled={rollDiceButtonDisabled} 
-                        onClick={this.handleRollDice}
+                    <RollButton 
+                        disabled={rollButtonDisabled} 
+                        onRollDice={this.handleRollDice}
                         rollCount={rollCount}>
                     </RollButton>
                     <div className="top-section-sum">
                         <Label value={topSectionSum}></Label>
                     </div>
+                    <RestartButton 
+                        onRestart={this.handleRestart}>
+                    </RestartButton>
                     <div className="middle-section-sum">
                         <Label value={middleSectionSum}></Label>
                     </div>
@@ -84,7 +96,9 @@ class Sheet extends Component {
                 <div className="total-sum">
                     <Label value={totalSum}></Label>
                 </div>
-                
+                <div className="username">
+                    <Label value={player.username}></Label>
+                </div>
             </div>
         );
     }    

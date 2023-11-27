@@ -6,6 +6,15 @@
 	grid-row-end: 7;
 }
 
+.restart-button {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-medium);
+	grid-row-start: 8;
+	grid-row-end: 10;
+}
+
+
 .roll-button:hover:enabled {
     background-color: var(--color-background-hover);
 }

@@ -10,15 +10,16 @@ export class Dice extends Component {
     }
 
     handleClick() {
-        this.props.onClick(this.props.index);
+        this.props.onDiceClick(this.props.index);
     }
 
     render() {
         let value = this.props.value;
         let saved = this.props.saved;
         let diceClass = "dice " + (saved ? "saved" : "");
+        let diceDisabled = this.props.diceDisabled;
         return (
-            <button className={diceClass} onClick={this.handleClick}>
+            <button className={diceClass} onClick={this.handleClick} disabled={diceDisabled}>
                 <img src={'./svg/dice/' + value + '.svg'} alt={value}/>
             </button>
         );
