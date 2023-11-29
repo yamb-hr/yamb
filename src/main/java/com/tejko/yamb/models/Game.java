@@ -195,7 +195,9 @@ public class Game {
         if (sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal()).getValue() != null) {
             return false;
         }   
-        if (columnType == ColumnType.FREE) {
+        if (announcement != null) {
+            return columnType == ColumnType.ANNOUNCEMENT && boxType == announcement;
+        } else if (columnType == ColumnType.FREE) {
             return true;
         } else if (columnType == ColumnType.DOWNWARDS) {
             return boxType == BoxType.ONES || sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal() - 1).getValue() != null;

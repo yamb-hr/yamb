@@ -14,8 +14,8 @@ code {
 
 :root {
   --color-background: white;
-  --color-background-hover: lightgray;
-  --color-background-disabled: gray;
+  --color-background-hover: whitesmoke;
+  --color-background-disabled: lightgray;
   --color-border-announcement: red;
   --color-border-freeze: blue;
   --color-border: black;

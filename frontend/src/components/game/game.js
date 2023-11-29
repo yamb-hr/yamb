@@ -17,19 +17,19 @@ class Game extends Component {
     }
 
     handleDiceClick(index) {
-        this.setState(prevState => {
-            let diceToRoll = [...prevState.diceToRoll];
-            if (diceToRoll.includes(index)) {
-                diceToRoll.splice(diceToRoll.indexOf(index), 1);
-            } else {
-                diceToRoll.push(index);
-            }
-            return { diceToRoll };
-        });
+        let diceToRoll = this.state.diceToRoll;
+        if (diceToRoll.includes(index)) {   
+            diceToRoll.splice(diceToRoll.indexOf(index), 1);
+        } else {
+            diceToRoll.push(index);
+        }
+        this.setState({ diceToRoll });
     }
 
     handleRollDice() {
         this.props.onRollDice(this.state.diceToRoll);
+        let diceToRoll = [0, 1, 2, 3, 4];
+        this.setState({ diceToRoll });
     }
 
     handleBoxClick(columnType, boxType) {

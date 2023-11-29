@@ -23,23 +23,25 @@ class Column extends Component {
         if (box.value != null) {
             return true;
         }   
+        if (this.props.announcement != null) {
+            return this.props.type !== "ANNOUNCEMENT" || box.type !== this.props.announcement;
+        } 
         if (this.props.type === "FREE") {
-            return true;
+            return false;
         } else if (this.props.type === "DOWNWARDS") {
-            return box.type === "ONES"; // || sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal() - 1).getValue() != null;
+            // find index of box in columns by box.type
+            return box.type !== "ONES" && this.props.boxes[this.props.boxes.findIndex(x => x.type === box.type) - 1].value == null;
         } else if (this.props.type === "UPWARDS") {
-            return box.type === "YAMB"; // || sheet.getColumns().get(columnType.ordinal()).getBoxes().get(boxType.ordinal() + 1).getValue() != null;
+            return box.type !== "YAMB" && this.props.boxes[this.props.boxes.findIndex(x => x.type === box.type) + 1].value == null;
         } else if (this.props.type === "ANNOUNCEMENT") {
-            return box.type === this.props.announcement;
+            return box.type !== this.props.announcement;
         }
         return false;
-
     }
 
     render() {
         let type = this.props.type;
         let boxes = this.props.boxes;
-        let rollCount = this.props.rollCount;
         let announcement = this.props.announcement;
         let topSectionSum = this.props.topSectionSum;
         let middleSectionSum = this.props.middleSectionSum;
