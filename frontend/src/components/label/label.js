@@ -5,26 +5,22 @@ class Label extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {
-            value: this.props.value,
-            icon: this.props.icon,
-            info: this.props.info
-        }
+        this.state = {}
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick() {
-        console.log(this.props.info);
+        if (this.props.info) console.log(this.props.info);
     }
 
     render() {
-        let value = this.state.value;
-        let icon = this.state.icon;
+        let value = this.props.value;
+        let icon = this.props.icon;
+        let labelClass = "label " + (this.props.variant ? this.props.variant : "");
         return (
-            <button className="label" onClick={this.handleClick}>
+            <button className={labelClass} onClick={this.handleClick}>
                 {icon ? <img src={"./svg/labels/" + icon + ".svg"} alt={value}></img> : <strong>{value}</strong>}
-            </button>
-                
+            </button>                
         );
     }    
 }

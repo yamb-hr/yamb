@@ -1,17 +1,16 @@
 .box {
-    background-color: var(--color-background);
-    border: 1px solid var(--color-border);
-	border-radius: var(--border-radius-small);    
+    color: var(--color-box);
+    background: var(--background-box);
+    border: var(--border-box);
+    border-radius: var(--border-radius-box);
+    width: var(--width-box);
+    height: var(--height-box);
 }
 
 .box:disabled {
-    background-color: var(--color-background-disabled);
-}
-
-.box:hover:enabled {
-    background-color:  var(--color-background-hover) ;
+    border: var(--border-box-alt);
 }
 
 .announcement {
-    border: 1px solid var(--color-border-announcement);
+    border: var(--border-box);
 }

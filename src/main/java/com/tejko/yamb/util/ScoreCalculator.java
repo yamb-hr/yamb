@@ -80,11 +80,20 @@ public class ScoreCalculator {
 	
 	// boat consists of a pair and trips
 	public static int calculateBoat(int[] diceValues) {
-		int pairSum = calculateRecurringValueSum(diceValues, 2);
 		int tripsSum = calculateRecurringValueSum(diceValues, 3);
-        if (pairSum > 0 && tripsSum > 0 && (pairSum / 2) != (tripsSum / 3)) {
-            return pairSum + tripsSum + GameConstants.BONUS_BOAT;
-        }
+		if (tripsSum > 0) {
+			int[] remainingDiceValues = new int[3];
+			int i = 0;
+			for (int value : diceValues) {
+				if (value != tripsSum / 3) {
+					remainingDiceValues[i++] = value;
+				}
+			}
+			int pairSum = calculateRecurringValueSum(remainingDiceValues, 2);
+			if (pairSum > 0) {
+				return pairSum + tripsSum + GameConstants.BONUS_BOAT;
+			}
+		}
         return 0;
 	}
 

@@ -68,6 +68,12 @@ public class ScoreCalculatorTest {
     }
 
     @Test
+    void testCalculateBoatAlt() {
+        int[] diceValues = {4, 4, 5, 5, 4};
+        Assertions.assertEquals(52, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));
+    }
+
+    @Test
     void testCalculateBoatWithFourOfAKind() {
         int[] diceValues = {6, 6, 6, 6, 1};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));

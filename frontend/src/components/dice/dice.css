@@ -1,28 +1,28 @@
 .dice {
-	border-radius: 8px;
-	background-color: none;
-	border: 2px solid var(--color-border);
-	width: var(--dice-width);
-	height: var(--dice-height);
-	margin: 16px;
-	box-shadow: 1px 1px 0px #999,
-                2px 2px 0px #999,
-                3px 3px 0px #999,
-                4px 4px 0px #999,
-                5px 5px 0px #999,
-                6px 6px 0px #999;
+	width: var(--width-dice);
+	height: var(--height-dice);
+	background: var(--background-dice);
+	border-radius: var(--border-radius-dice);
+	border: var(--border-dice);
+	margin: var(--margin-dice);
+	box-shadow: var(--box-shadow-dice);
+	outline: var(--border-dice);
 }
 
-.dice:hover:enabled {
-    background: 2px solid black;
+.dice:hover:enabled img {
+	filter: var(--filter-dice-alt);
+}
+
+.dice img {
+	filter: var(--filter-dice);
 }
 
 .dice:disabled {
-    border: 2px solid var(--color-background-disabled);
+	border-radius: var(--border-radius-dice);
 }
 
 .saved {
-    border: 3px solid var(--color-border-focus);
+	outline: var(--border-dice-alt);
 }
 
 .roll {

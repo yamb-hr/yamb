@@ -14,6 +14,7 @@ class Game extends Component {
         this.handleDiceClick = this.handleDiceClick.bind(this);
         this.handleBoxClick = this.handleBoxClick.bind(this);
         this.handleRestart = this.handleRestart.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     handleDiceClick(index) {
@@ -28,8 +29,6 @@ class Game extends Component {
 
     handleRollDice() {
         this.props.onRollDice(this.state.diceToRoll);
-        let diceToRoll = [0, 1, 2, 3, 4];
-        this.setState({ diceToRoll });
     }
 
     handleBoxClick(columnType, boxType) {
@@ -37,11 +36,18 @@ class Game extends Component {
             this.props.onMakeAnnouncement(boxType);
         } else {
             this.props.onFillBox(columnType, boxType);
+            let diceToRoll = [0, 1, 2, 3, 4];
+            this.setState({ diceToRoll });
         }
     }
 
     handleRestart() {
+        this.setState({ diceToRoll: [0, 1, 2, 3, 4] });
         this.props.onRestart();
+    }
+
+    handleLogout() {
+        this.props.onLogout();
     }
 
     render() {
@@ -51,7 +57,8 @@ class Game extends Component {
         let announcement = this.props.announcement;
         let player = this.props.player;
         let diceToRoll = this.state.diceToRoll;
-        let diceDisabled = this.props.rollCount === 0;
+        let diceDisabled = this.props.rollCount === 0 || this.props.rollCount === 3;
+        let rollDiceButtonDisabled = this.props.rollCount === 3 || this.props.announcementRequired;
         return (
             <div className="game">
                 {dices && 
@@ -68,7 +75,7 @@ class Game extends Component {
                             </div>
                         ))}
                     </div>}
-                    <br/>
+                <br/>
                 {sheet && 
                     <Sheet 
                         columns={sheet.columns} 
@@ -79,9 +86,11 @@ class Game extends Component {
                         totalSum={sheet.totalSum}
                         announcement={announcement}
                         player={player}
+                        rollDiceButtonDisabled={rollDiceButtonDisabled}
                         onRollDice={this.handleRollDice}
                         onRestart={this.handleRestart}
-                        onBoxClick={this.handleBoxClick}>
+                        onBoxClick={this.handleBoxClick}
+                        onLogout={this.handleLogout}>
                     </Sheet>}
             </div>
         );

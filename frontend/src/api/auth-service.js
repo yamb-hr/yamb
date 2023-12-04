@@ -11,7 +11,6 @@ const AuthService = {
             console.error(error);
             this.logout();
         }
-        return null;
     },
 
     logout: function() {

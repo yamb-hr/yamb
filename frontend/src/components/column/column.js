@@ -19,22 +19,18 @@ class Column extends Component {
     isBoxDisabled(box) {
         if (this.props.rollCount === 0) {
             return true;
-        }
-        if (box.value != null) {
+        } else if (box.value != null) {
             return true;
-        }   
-        if (this.props.announcement != null) {
+        } else if (this.props.announcement != null) {
             return this.props.type !== "ANNOUNCEMENT" || box.type !== this.props.announcement;
-        } 
-        if (this.props.type === "FREE") {
+        } else if (this.props.type === "FREE") {
             return false;
         } else if (this.props.type === "DOWNWARDS") {
-            // find index of box in columns by box.type
             return box.type !== "ONES" && this.props.boxes[this.props.boxes.findIndex(x => x.type === box.type) - 1].value == null;
         } else if (this.props.type === "UPWARDS") {
             return box.type !== "YAMB" && this.props.boxes[this.props.boxes.findIndex(x => x.type === box.type) + 1].value == null;
         } else if (this.props.type === "ANNOUNCEMENT") {
-            return box.type !== this.props.announcement;
+            return this.props.rollCount !== 1 && box.type !== this.props.announcement;
         }
         return false;
     }
@@ -60,18 +56,18 @@ class Column extends Component {
                         value={box.value}
                         columnType={type}
                         announcement={announcement}
-                        boxDisabled={this.isBoxDisabled(box)}
+                        disabled={this.isBoxDisabled(box)}
                         onClick={this.handleBoxClick}>
                     </Box>
                 ))}
-                <div className="column-top-section-sum">
-                    <Label value={topSectionSum}></Label>
+                <div className="sum column-top-section-sum">
+                    <Label variant="sum" value={topSectionSum}></Label>
                 </div>
-                <div className="column-middle-section-sum">
-                    <Label value={middleSectionSum}></Label>
+                <div className="sum column-middle-section-sum">
+                    <Label variant="sum" value={middleSectionSum}></Label>
                 </div>
-                <div className="column-bottom-section-sum">
-                    <Label value={bottomSectionSum}></Label>
+                <div className="sum column-bottom-section-sum">
+                    <Label variant="sum" value={bottomSectionSum}></Label>
                 </div>
             </div>
         );

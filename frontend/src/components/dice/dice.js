@@ -15,8 +15,7 @@ export class Dice extends Component {
 
     render() {
         let value = this.props.value;
-        let saved = this.props.saved;
-        let diceClass = "dice " + (saved ? "saved" : "");
+        let diceClass = "dice " + (this.props.saved ? "saved" : "");
         let diceDisabled = this.props.diceDisabled;
         return (
             <button className={diceClass} onClick={this.handleClick} disabled={diceDisabled}>

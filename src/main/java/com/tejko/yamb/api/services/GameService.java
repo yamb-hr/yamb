@@ -47,7 +47,7 @@ public class GameService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Player player = playerRepo.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
         Optional<Game> game = gameRepo.findByPlayerIdAndStatus(player.getId(), GameStatus.IN_PROGRESS);
-        if (game.isPresent()) {
+        if (game.isPresent() && game.get().getStatus() == GameStatus.IN_PROGRESS) {
             return game.get();
         } else {
             return gameRepo.save(Game.getInstance(player));

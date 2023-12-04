@@ -1,3 +1,96 @@
+:root {
+  --color-background: #00000B;
+  --color-blue: #011627;
+  --color-red: #f71735;
+  --color-turq: #41EAD4;
+  --color-gray: #FDFFFC;
+  --color-yellow: #FF9F1C;
+  --filter-blue: invert(5%) sepia(48%) saturate(3773%) hue-rotate(191deg) brightness(91%) contrast(99%);
+  --filter-red: invert(19%) sepia(80%) saturate(6597%) hue-rotate(346deg) brightness(101%) contrast(94%);
+  --filter-turq: invert(67%) sepia(85%) saturate(337%) hue-rotate(119deg) brightness(102%) contrast(90%);
+  --filter-gray: invert(91%) sepia(1%) saturate(1080%) hue-rotate(66deg) brightness(103%) contrast(117%);
+  --filter-yellow: invert(78%) sepia(28%) saturate(5593%) hue-rotate(343deg) brightness(102%) contrast(103%);
+
+  --background-sheet: var(--color-blue);
+  --border-radius-sheet: 5px;
+  --border-sheet: none;
+  --sheet-margin: 40px 0 0 0;
+
+  --color-label: var(--color-yellow);
+  --background-label: var(--color-blue);
+  --border-label: none;
+  --width-label: 100%;
+  --height-label: 100%;
+  --border-radius-label: 4px;
+  --filter-label: var(--filter-yellow);
+  --color-sum: var(--color-gray);
+  --background-sum: var(--color-blue);
+  --border-sum: none;
+
+  --color-box: var(--color-turq);
+  --background-box: var(--color-blue);
+  --border-box: 1px solid var(--color-turq);
+  --border-box-alt: 1px dashed var(--color-red);
+  --width-box: 64px;
+  --height-box: 32px;
+  --border-radius-box: 4px;
+  
+  --background-dice: var(--color-gray);
+  --border-dice: none;
+  --border-dice-alt: 3px solid var(--color-turq);
+  --width-dice: 64px;
+  --height-dice: var(--width-dice);
+  --border-radius-dice: 8px;  
+  --margin-dice: 10px;
+  --filter-dice: var(--filter-blue);
+  --filter-dice-alt: var(--filter-red);
+  --box-shadow-dice: 
+      1px 1px 5px var(--color-blue),
+      2px 2px 0px var(--color-gray),
+      3px 3px 0px var(--color-gray),
+      4px 4px 0px var(--color-gray);
+    
+  --color-username-input: var(--color-gray);
+  --background-username-input: var(--color-blue);
+  --border-username-input: 2px solid var(--color-turq);
+
+  --color-play-button: var(--color-turq);
+  --background-play-button: var(--color-blue);
+  --border-play-button: 2px solid var(--color-red);
+  --padding-play-button: 10px 20px 10px 20px;
+  --margin-play-button: 20px;
+
+  --color-logout-button: var(--color-turq);
+  --background-logout-button: var(--color-blue);
+  --border-logout-button: 2px solid var(--color-red);
+  
+  --color-settings-button: var(--color-turq);
+  --background-settings-button: var(--color-blue);
+  --border-settings-button: none;
+  --filter-settings-button: var(--filter-turq);
+
+  --color-info-button: var(--color-turq);
+  --background-info-button: var(--color-blue);
+  --border-info-button: none;
+  --filter-info-button: var(--filter-turq);
+
+  --color-empty-space: var(--color-turq);
+  --background-empty-space: var(--color-blue);
+  --border-empty-space: 1px solid var(--color-blue);
+
+  --background-restart-button: var(--color-blue);
+  --border-restart-button: 1px solid var(--color-blue);
+  --filter-restart-button: var(--filter-gray);
+  
+  --background-roll-button: var(--color-blue);
+  --border-roll-button: 1px solid var(--color-bue);
+  --filter-roll-button: var(--filter-gray);
+
+  --color-username: var(--color-turq);
+  --background-username: var(--color-turq);
+  --border-username: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,6 +98,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
 }
 
 code {
@@ -12,27 +106,35 @@ code {
     monospace;
 }
 
-:root {
-  --color-background: white;
-  --color-background-hover: whitesmoke;
-  --color-background-disabled: lightgray;
-  --color-border-announcement: red;
-  --color-border-freeze: blue;
-  --color-border: black;
-  --color-border-hover: gray;
-  --color-border-focus: green;
-  --border-radius-small: 4px;
-  --box-height: 32px;
-  --box-width: 64px;
-  --dice-height: 64px;
-  --dice-width: 64px;
-}
-
 button {
+  background: none;
   margin: 0;
   padding: 0;
 }
 
 button:hover:enabled {
   cursor: pointer;
+  filter: brightness(150%);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  filter: brightness(70%);
+  border-radius: 0px;
+  border-style: dashed;
+}
+
+input:focus {
+  outline: none;
+}
+
+@media only screen and (max-width: 480px) {
+  :root {
+    --width-box: 16.3vw;
+    --height-box: 4.9vh;
+    --width-dice: 16vw;
+    --margin-dice: 1.5vw;
+    --height-dice: var(--width-dice);
+    --sheet-margin: 5px;
+  }
 }
