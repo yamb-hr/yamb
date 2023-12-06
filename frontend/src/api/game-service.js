@@ -1,8 +1,6 @@
 import AuthService from "./auth-service";
 
-const API_URL = "http://localhost:8080/api";
-
-const GAMES_URL = API_URL + "/games";
+const GAMES_URL = window.location.href + "/api/games";
 
 const GameService = {
 

@@ -67,6 +67,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("GET", "POST", "PUT");
+				registry.addMapping("/**").allowedOrigins("https://tejko.com").allowedMethods("GET", "POST", "PUT");
+				registry.addMapping("/**").allowedOrigins("https://jamb.com.hr").allowedMethods("GET", "POST", "PUT");
 			}
 		};
 	}
