@@ -50,6 +50,7 @@ class Sheet extends Component {
         let rollCount = this.props.rollCount;
         let announcement = this.props.announcement;
         let player = this.props.player;
+        let currentUser = this.props.currentUser;
         return (
             <div className="sheet">
                 {/* TOP SECTION */}
@@ -57,24 +58,24 @@ class Sheet extends Component {
                     <button className="settings-button" onClick={this.handleSettings}>
                         <img src={"./svg/buttons/cog.svg"} alt="Settings"></img>
                     </button>
-                    <Label icon="ones" info="Number of ones"></Label>
-                    <Label icon="twos" info="Number of twos"></Label>
-                    <Label icon="threes" info="Number of threes"></Label>
-                    <Label icon="fours" info="Number of fours"></Label>
-                    <Label icon="fives" info="Number of fives"></Label>
-                    <Label icon="sixes" info="Number of sixes"></Label>
-                    <Label variant="sum" value="(1-6)" info="Sum of (1-6) + 30 for 60 or higher"></Label>
+                    <Label icon="ones" info="Broj jedinica"></Label>
+                    <Label icon="twos" info="Broj dvica"></Label>
+                    <Label icon="threes" info="Broj trica"></Label>
+                    <Label icon="fours" info="Broj četvorki"></Label>
+                    <Label icon="fives" info="Broj petica"></Label>
+                    <Label icon="sixes" info="Broj šestica"></Label>
+                    <Label variant="sum" value="Σ (1, 6)" info="Zbroj od jedinica do šestica + 30 za 60 ili više"></Label>
                     {/* MID SECTION */}
-                    <Label value="Max" info="Sum of all dice"></Label>
-                    <Label value="Min" info="Sum of all dice"></Label>
-                    <Label variant="sum" value="∆ x 1s"></Label>
+                    <Label value="Max" info="Zbroj svih kockica"></Label>
+                    <Label value="Min" info="Zbroj svih kockica"></Label>
+                    <Label variant="sum" value="∆ x 1-ice" info="(Max - Min) x broj jedinica"></Label>
                     {/* BOTTOM SECTION */}
-                    <Label value="Trips" info="Three of a kind"></Label>
-                    <Label value="Straight" info="Five consecutive numbers"></Label>
-                    <Label value="Boat" info="Three of a kind and two of a kind"></Label>
-                    <Label value="Carriage" info="Four of a kind"></Label>
-                    <Label value="Yamb" info="Five of a kind"></Label>
-                    <Label variant="sum" value="Σ" info="Sum of (Trips-Yamb)"></Label>
+                    <Label value="Tris" info="Tri iste kockice"></Label>
+                    <Label value="Skala" info="Pet uzastopnih kockica"></Label>
+                    <Label value="Ful" info="Tris i par"></Label>
+                    <Label value="Poker" info="Četiri iste kockice"></Label>
+                    <Label value="Jamb" info="Pet istih kockica"></Label>
+                    <Label variant="sum" value="Σ (T, J)" info="Zbroj od Trisa do Jamba"></Label>
                 </div>
                 {columns.map((column) => (
                     <div className="column" key={column.type}>
@@ -112,13 +113,10 @@ class Sheet extends Component {
                     </div>
                 </div>
                 <div className="last-row">
-                    <div className="username">
-                        <Label value={player.username}></Label>
-                    </div>
-                    <button className="logout-button" onClick={this.handleLogout}>Logout</button>
-                    <div className="total-sum">
-                        <Label variant="sum" value={totalSum}></Label>
-                    </div>
+                    <button className="username-button">{player.username}</button>
+                    {currentUser.tempUser ? <a className="register-sheet-button" href="/register">Registracija</a> : 
+                    <button className="logout-button" onClick={this.handleLogout}>Odjava</button>}
+                    <Label variant="total-sum" value={totalSum}></Label>
                 </div>
             </div>
         );

@@ -4,7 +4,7 @@
 	border: var(--border-sheet);
 	border-radius: var(--border-radius-sheet);
 	grid-template-columns: repeat(6, var(--width-box));
-	margin: var(--sheet-margin);
+	margin: var(--margin-sheet);
 }
 
 .column {
@@ -40,16 +40,16 @@
 	background: var(--background-empty-space);
 	color: var(--color-empty-space);
 	border: var(--border-empty-space);
-	grid-row-start: 2;
-	grid-row-end: 8;	
+	grid-row-start: 9;
+	grid-row-end: 11;
 }
 
 .roll-button {
 	background: var(--background-roll-button);
     border: var(--border-roll-button);
 	border-radius: var(--border-radius-box);
-	grid-row-start: 9;
-	grid-row-end: 11;
+	grid-row-start: 2;
+	grid-row-end: 8;	
 }
 
 .roll-button img {
@@ -66,8 +66,7 @@
     border: var(--border-restart-button);
 	border-radius: var(--border-radius-box);
 	grid-row-start: 12;
-	grid-row-end: 17;	
-	display: none;
+	grid-row-end: 17;
 }
 
 .restart-button img {
@@ -89,18 +88,30 @@
 	height: var(--height-box);
 }
 
-.username {
-	border: var(--border-username);
+.username-button {
+	font-weight: bold;
+	font-size: medium;
+	color: var(--color-username-button);
+	border: var(--border-username-button);
+	background: var(--background-username-button);
 }
 
 .logout-button {
+	font-weight: bold;
     background: var(--background-logout-button);
     color: var(--color-logout-button);
     border: var(--border-logout-button);
     border-radius: var(--border-radius-box);
 }
 
-.total-sum {
-	border: var(--border-total-sum);
+.register-sheet-button {
+	margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-register-button);
+    color: var(--color-register-button);
+    border: var(--border-register-button);
+    border-radius: var(--border-radius-box);
 }
 

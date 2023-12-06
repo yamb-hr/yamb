@@ -34,7 +34,7 @@ public class AuthController {
     }
 
 	@PostMapping("/temp-player")
-	public ResponseEntity<LoginResponse> createTempPlayer(@RequestBody TempPlayerRequest tempPlayerRequest) {
+	public ResponseEntity<LoginResponse> createTempPlayer(@Valid @RequestBody TempPlayerRequest tempPlayerRequest) {
 		return new ResponseEntity<>(authService.createTempPlayer(tempPlayerRequest), HttpStatus.OK);
 	}
 

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Game from './game/game';
 import AuthService from '../api/auth-service';
 import GameService from '../api/game-service';
+import { withRouter } from '../withRouter';
+import { withTranslation } from 'react-i18next';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './yamb.css';
@@ -11,7 +13,7 @@ class Yamb extends Component {
     constructor(props) {
 		super(props);
 		this.state = {
-            username: "",
+            username: "Player" + Math.round(Math.random() * 10000),
 			currentUser: AuthService.getCurrentPlayer(),
         }
         this.handleRollDice = this.handleRollDice.bind(this);
@@ -20,7 +22,7 @@ class Yamb extends Component {
         this.handleMakeAnnouncement = this.handleMakeAnnouncement.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleStart = this.handleStart.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.play = this.play.bind(this);
     }
 
@@ -30,7 +32,7 @@ class Yamb extends Component {
         }
 	}
 
-    handleStart() {
+    handleSubmit() {
         AuthService.createTempPlayer({ 
             username: this.state.username
         })
@@ -48,8 +50,8 @@ class Yamb extends Component {
     handleFinish(totalSum) {
         toast(
             <div>
-                <h3>Congratulations!</h3><h4>Your final score is:</h4><h2>{totalSum}</h2>
-                <button onClick={this.play} className="new-game-button">New Game</button>
+                <h3>Čestitamo!</h3><h4>Vaš konačan rezultat je:</h4><h2>{totalSum}</h2>
+                <button onClick={this.play} className="new-game-button">Nova Igra</button>
             </div>, {
                 position: "top-center",
                 autoClose: false,
@@ -134,6 +136,7 @@ class Yamb extends Component {
 
     handleLogout() {
         AuthService.logout();
+        window.location.reload();
     }
 
     handleChange(event) {
@@ -156,17 +159,22 @@ class Yamb extends Component {
     }
 
     render() {
+        const { t } = this.props;
         let currentUser = this.state.currentUser;
         let game = this.state.game;
         let username = this.state.username;
-        let playDisabled = !username;
+        let playDisabled = username.length < 5 || username.length > 15;
         return (
             <div className="yamb">
                 {!currentUser && 
-                    <div>
-                        <input className="username-input" type="text" value={username} onChange={this.handleChange} placeholder="Name..."/>
+                    <div className="form">
+                        <input className="username-input" type="text" value={username} onChange={this.handleChange} placeholder="Ime..."/>
                         <br/>
-                        <button className="play-button" type="submit" disabled={playDisabled} onClick={this.handleStart}>Play</button>
+                        <button className="play-button" disabled={playDisabled} onClick={this.handleSubmit}>Igraj</button>
+                        <br/>
+                        <span style={{"float":"left"}}><a href="/login" >Prijava</a></span>
+                        <span style={{"float":"right"}}><a href="/register" >Registracija</a></span>
+                        <br/>
                     </div>}
                 {game && 
                 <Game 
@@ -180,6 +188,7 @@ class Yamb extends Component {
                     bottomSectionSum={game.bottomSectionSum}
                     totalSum={game.totalSum}
                     player={game.player}
+                    currentUser={currentUser}
                     onRollDice={this.handleRollDice}
                     onFillBox={this.handleFillBox}
                     onMakeAnnouncement={this.handleMakeAnnouncement}
@@ -193,4 +202,4 @@ class Yamb extends Component {
     
 }
 
-export default Yamb;
+export default withRouter(withTranslation()(Yamb));

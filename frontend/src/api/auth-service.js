@@ -15,7 +15,6 @@ const AuthService = {
 
     logout: function() {
         localStorage.clear();
-        window.location.reload();
     },
 
     login: function(authRequest) {
@@ -41,7 +40,7 @@ const AuthService = {
             body: JSON.stringify(authRequest),
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token, // in case a user was already logged in as a temp player
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token, // in case a user was already logged in as a temp player
                 'content-type': 'application/json'
             },
             method: 'POST',

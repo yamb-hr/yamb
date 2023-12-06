@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.models.Score;
+import com.tejko.yamb.models.payload.DateTimeInterval;
 import com.tejko.yamb.repositories.ScoreRepository;
 
 @Service
@@ -27,6 +28,10 @@ public class ScoreService {
 	public List<Score> getAll(Integer page, Integer size, String sort, String direction) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.fromString(direction), sort));
 		return scoreRepo.findAll(pageable).getContent();
+	}
+
+	public List<Score> getByInterval(DateTimeInterval interval) {
+		return scoreRepo.findByDateBetween(interval.getFrom(), interval.getTo());
 	}
 
 }

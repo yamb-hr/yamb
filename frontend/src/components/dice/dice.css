@@ -25,12 +25,13 @@
 	outline: var(--border-dice-alt);
 }
 
-.roll {
+.rolling {
 	animation-timing-function: ease-out;
 	-webkit-animation-timing-function: ease-out;
 	-moz-animation-timing-function: ease-out;
 	-ms-animation-timing-function: ease-out;
 	-o-animation-timing-function: ease-out;
+	animation-iteration-count: 1;
 }
 
 .clockwise {

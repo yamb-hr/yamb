@@ -24,16 +24,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(exception.getClass().getSimpleName(), exception.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({ BadCredentialsException.class, IllegalArgumentException.class, IllegalStateException.class, ResourceNotFoundException.class })
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {
+    @ExceptionHandler({ BadCredentialsException.class })
+    public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
         exception.printStackTrace(System.out);        
-        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, exception.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT), HttpStatus.BAD_REQUEST);
     }
-
+    
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
         return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_FORBIDDEN, exception.getLocalizedMessage()), HttpStatus.FORBIDDEN);
     }
-    
+
+    @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class, ResourceNotFoundException.class })
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {
+        exception.printStackTrace(System.out);        
+        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, exception.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+    }
     
 }

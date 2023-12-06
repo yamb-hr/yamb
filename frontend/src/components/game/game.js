@@ -8,7 +8,8 @@ class Game extends Component {
     constructor(props){
         super(props)
         this.state = {
-            diceToRoll: [0, 1, 2, 3, 4]
+            diceToRoll: [0, 1, 2, 3, 4],
+            rolling: false
         }
         this.handleRollDice = this.handleRollDice.bind(this);
         this.handleDiceClick = this.handleDiceClick.bind(this);
@@ -24,11 +25,17 @@ class Game extends Component {
         } else {
             diceToRoll.push(index);
         }
-        this.setState({ diceToRoll });
+        this.setState({ diceToRoll, rolling: false });
     }
 
     handleRollDice() {
         this.props.onRollDice(this.state.diceToRoll);
+        this.setState({ rolling: true });
+        setTimeout(() => {
+            if (this.state.rolling) {
+                this.setState({ rolling: false });
+            }
+        }, 3000);
     }
 
     handleBoxClick(columnType, boxType) {
@@ -36,13 +43,12 @@ class Game extends Component {
             this.props.onMakeAnnouncement(boxType);
         } else {
             this.props.onFillBox(columnType, boxType);
-            let diceToRoll = [0, 1, 2, 3, 4];
-            this.setState({ diceToRoll });
+            this.setState({ diceToRoll: [0, 1, 2, 3, 4], rolling: false });
         }
     }
 
     handleRestart() {
-        this.setState({ diceToRoll: [0, 1, 2, 3, 4] });
+        this.setState({ diceToRoll: [0, 1, 2, 3, 4], rolling: false });
         this.props.onRestart();
     }
 
@@ -56,9 +62,11 @@ class Game extends Component {
         let dices = this.props.dices;
         let announcement = this.props.announcement;
         let player = this.props.player;
-        let diceToRoll = this.state.diceToRoll;
+        let currentUser = this.props.currentUser;
         let diceDisabled = this.props.rollCount === 0 || this.props.rollCount === 3;
         let rollDiceButtonDisabled = this.props.rollCount === 3 || this.props.announcementRequired;
+        let diceToRoll = this.state.diceToRoll;
+        let rolling = this.state.rolling;
         return (
             <div className="game">
                 {dices && 
@@ -69,13 +77,13 @@ class Game extends Component {
                                     value={dice.value} 
                                     index={dice.index} 
                                     saved={!diceToRoll.includes(dice.index)}
+                                    rolling={rolling}
                                     diceDisabled={diceDisabled}
                                     onDiceClick={this.handleDiceClick}>
                                 </Dice>
                             </div>
                         ))}
                     </div>}
-                <br/>
                 {sheet && 
                     <Sheet 
                         columns={sheet.columns} 
@@ -85,6 +93,7 @@ class Game extends Component {
                         bottomSectionSum={sheet.bottomSectionSum}
                         totalSum={sheet.totalSum}
                         announcement={announcement}
+                        currentUser={currentUser}
                         player={player}
                         rollDiceButtonDisabled={rollDiceButtonDisabled}
                         onRollDice={this.handleRollDice}

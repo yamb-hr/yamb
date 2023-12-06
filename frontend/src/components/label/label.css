@@ -20,6 +20,22 @@
 	border: var(--border-sum);
 }
 
+.total-sum {
+	font-size: large;
+	color: var(--color-total-sum);
+	background: var(--background-total-sum);
+	border: var(--border-total-sum);
+}
+
+.column-symbol {
+	background: var(--background-column-symbol);
+	border: var(--border-column-symbol);
+}
+
+.column-symbol img {
+    filter: var(--filter-column-symbol);
+}
+
 img {
     filter: var(--filter-label);
 }

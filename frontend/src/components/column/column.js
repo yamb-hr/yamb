@@ -35,6 +35,21 @@ class Column extends Component {
         return false;
     }
 
+    getInfo() {
+        switch (this.props.type) {
+            case "FREE":
+                return "Stupac se popunjava u bilo kojem redoslijedu";
+            case "DOWNWARDS":
+                return "Stupac se popunjava od vrha prema dnu";
+            case "UPWARDS":
+                return "Stupac se popunjava od dna prema vrhu";
+            case "ANNOUNCEMENT":
+                return "Stupac se mora prethodno najaviti";
+            default:
+                return null;
+        }
+    }
+
     render() {
         let type = this.props.type;
         let boxes = this.props.boxes;
@@ -42,12 +57,14 @@ class Column extends Component {
         let topSectionSum = this.props.topSectionSum;
         let middleSectionSum = this.props.middleSectionSum;
         let bottomSectionSum = this.props.bottomSectionSum;
+        let info = this.getInfo();
         return (
             <div className="column">    
                 <Label 
                     icon={type} 
                     value={type}
-                    info={type}>
+                    info={info}
+                    variant="column-symbol">
                 </Label>
                 {boxes.map((box) => (
                     <Box 

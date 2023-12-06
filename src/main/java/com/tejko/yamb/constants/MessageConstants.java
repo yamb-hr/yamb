@@ -19,5 +19,6 @@ public class MessageConstants {
     public static final String ERROR_DICE_ROLL_REQUIRED = "A dice roll is required before filling boxes!";
     public static final String ERROR_BOX_NOT_ANNOUNCED = "The box is different from announcement!";
     public static final String ERROR_RESTART_COMPLETED_SHEET = "A completed sheet cannot be restarted!";
+    public static final String ERROR_INVALID_USERNAME_SIZE = "Username must be between 5 and 15 characters long!";
 
 }

@@ -28,12 +28,16 @@ public class Player implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @Size(min = 5, max = 15)
+    @Size(min = SecurityConstants.MIN_USERNAME_SIZE, max = SecurityConstants.MAX_USERNAME_SIZE)
     private String username;
 
     @Column
     @JsonIgnore
     private String password;
+    
+    @Column
+    @JsonIgnore
+    private Boolean tempUser;
     
     @OneToMany(mappedBy = "player")
     @JsonIgnore
@@ -48,9 +52,10 @@ public class Player implements UserDetails {
 
     protected Player() {}
 
-    private Player(String username, String password) {
+    private Player(String username, String password, boolean tempUser) {
         this.username = username;
         this.password = password;
+		this.tempUser = tempUser;
     }
 
     private Player(Long id, String username, String password, Set<GrantedAuthority> authorities) {
@@ -60,8 +65,8 @@ public class Player implements UserDetails {
 		this.authorities = authorities;
 	}
 
-    public static Player getInstance(String username, String password) {
-        return new Player(username, password);
+    public static Player getInstance(String username, String password, boolean tempUser) {
+        return new Player(username, password, tempUser);
     }
 
     public static Player build(Player player) {
@@ -88,6 +93,14 @@ public class Player implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isTempUser() {   
+        return tempUser;
+    }
+
+    public void setTempUser(boolean tempUser) {
+        this.tempUser = tempUser;
     }
 
     public List<Score> getScores() {

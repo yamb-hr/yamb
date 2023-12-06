@@ -35,7 +35,6 @@ public class PlayerController {
 		return new ResponseEntity<>(playerService.getAll(page, size, sort, direction), HttpStatus.OK);
 	}
 
-
 	@GetMapping("/{id}/scores")
 	public ResponseEntity<List<Score>> getScoresByPlayerId(@PathVariable Long id) {
 		return new ResponseEntity<>(playerService.getScoresByPlayerId(id), HttpStatus.OK);

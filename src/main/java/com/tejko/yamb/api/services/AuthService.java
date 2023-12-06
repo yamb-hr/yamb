@@ -41,20 +41,25 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Player player = playerRepo.findByUsername(authRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()));
+        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser());
     }
 
     public Player register(AuthRequest authRequest) {
-		if (playerRepo.existsByUsername(authRequest.getUsername())) {
+        String usernameFromAuth = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(usernameFromAuth);
+		if (playerRepo.existsByUsername(authRequest.getUsername()) && !authRequest.getUsername().equals(usernameFromAuth)) {
 			throw new BadCredentialsException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
-		}
-        Player player = Player.getInstance(authRequest.getUsername(), encoder.encode(authRequest.getPassword()));
-        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals(SecurityConstants.ANONYMOUS_USER)) { // in case a user is already a temp player
-            Optional<Player> optionalPlayer = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		} else if (authRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || authRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
+            throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
+        }
+        Player player = Player.getInstance(authRequest.getUsername(), encoder.encode(authRequest.getPassword()), false);
+        if (usernameFromAuth != SecurityConstants.ANONYMOUS_USER) {
+            Optional<Player> optionalPlayer = playerRepo.findByUsername(usernameFromAuth);
             if (optionalPlayer.isPresent()) {
                 player = optionalPlayer.get();
                 player.setUsername(authRequest.getUsername());
                 player.setPassword(encoder.encode(authRequest.getPassword()));
+                player.setTempUser(false);
             }
         }
         return playerRepo.save(player);
@@ -63,8 +68,10 @@ public class AuthService {
     public LoginResponse createTempPlayer(TempPlayerRequest tempPlayerRequest) {
         if (playerRepo.existsByUsername(tempPlayerRequest.getUsername())) {
             throw new IllegalArgumentException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
-        } 
-        Player player = Player.getInstance(tempPlayerRequest.getUsername(),  encoder.encode(UUID.randomUUID().toString()));
+        } else if (tempPlayerRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || tempPlayerRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
+            throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
+        }   
+        Player player = Player.getInstance(tempPlayerRequest.getUsername(),  encoder.encode(UUID.randomUUID().toString()), true);
         // Cookie cookie = new Cookie(SecurityConstants.COOKIE_TOKEN, jwtUtil.generateToken(player.getUsername()));
         // cookie.setMaxAge(365 * 24 * 60 * 60); // expires in 1 year
         // cookie.setSecure(true);
@@ -72,7 +79,7 @@ public class AuthService {
         // cookie.setPath("/"); // global cookie accessible every where
         // response.addCookie(cookie);
         player = playerRepo.save(player);
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()));
+        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser());
     }
 
 }
