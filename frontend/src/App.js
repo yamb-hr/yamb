@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/auth/login';
 import Register from './components/auth/register';
-import Games from './components/games/games';
-import Players from './components/players/players';
-import Scores from './components/scores/scores';
-import Yamb from './components/yamb';
+import Games from './components/lists/games';
+import Players from './components/lists/players';
+import Scores from './components/lists/scores';
+import Yamb from './components/yamb/yamb';
 import './App.css';
 
 function App() {
@@ -13,7 +13,6 @@ function App() {
 		<div className="App">
 			<header className="App-header">
 			<Router>
-				<title>Jamb</title>
 				<Routes>
 					<Route path="/" element={<Yamb />} />
 					<Route path="/login" element={<Login />} />

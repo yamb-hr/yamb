@@ -1,13 +1,11 @@
 import AuthService from "./auth-service";
 
-const API_URL = "http://localhost:8080/api";
-
-const SCORES_URL = API_URL + "/scores";
+const API_URL = process.env.REACT_APP_API_URL + "/scores";
 
 const ScoreService = {
 
     getByInterval: function(interval) {
-        return fetch(SCORES_URL + '/interval', {
+        return fetch(API_URL + '/interval', {
             body: JSON.stringify({ interval: interval }),
             credentials: 'same-origin',
             headers: {

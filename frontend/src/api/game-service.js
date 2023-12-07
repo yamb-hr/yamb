@@ -1,11 +1,11 @@
 import AuthService from "./auth-service";
 
-const GAMES_URL = window.location.href + "/api/games";
+const API_URL = process.env.REACT_APP_API_URL + "/games";
 
 const GameService = {
 
     play: function() {
-        return fetch(GAMES_URL + '/play', {
+        return fetch(API_URL + '/play', {
             body: null,
             credentials: 'same-origin',
             headers: {
@@ -23,7 +23,7 @@ const GameService = {
     },
 
     rollDiceById: function(gameId, diceToRoll) {
-        return fetch(GAMES_URL + '/' + gameId + '/roll', {
+        return fetch(API_URL + '/' + gameId + '/roll', {
             body: JSON.stringify({ diceToRoll: diceToRoll }),
             credentials: 'same-origin',
             headers: {
@@ -42,7 +42,7 @@ const GameService = {
     },
 
     fillBoxById: function(gameId, columnType, boxType) {
-        return fetch(GAMES_URL + '/' + gameId + '/fill', {
+        return fetch(API_URL + '/' + gameId + '/fill', {
             body: JSON.stringify({ columnType: columnType, boxType: boxType }),
             credentials: 'same-origin',
             headers: {
@@ -61,7 +61,7 @@ const GameService = {
     },
 
     makeAnnouncementById: function(gameId, boxType) {
-        return fetch(GAMES_URL + '/' + gameId + '/announce', {
+        return fetch(API_URL + '/' + gameId + '/announce', {
             body: JSON.stringify({ boxType: boxType }),
             credentials: 'same-origin',
             headers: {
@@ -80,7 +80,7 @@ const GameService = {
     },
 
     restartById: async function(gameId) {
-        return fetch(GAMES_URL + '/' + gameId + '/restart', {
+        return fetch(API_URL + '/' + gameId + '/restart', {
             body: null,
             credentials: 'same-origin',
             headers: {

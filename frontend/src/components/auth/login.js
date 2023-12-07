@@ -1,45 +1,38 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import AuthService from '../../api/auth-service';
-import { withRouter } from '../../withRouter';
 import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
-export class Login extends Component {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            username: "",
-            password: ""
-        }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleUsernameChange = this.handleUsernameChange.bind(this);
-        this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    }
+function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-    handleSubmit() {
-        AuthService.login({ 
-            username: this.state.username,
-            password: this.state.password
+    function handleSubmit() {
+        AuthService.login({
+            username: username,
+            password: password
         })
         .then((player) => {
             console.log(player);
             localStorage.setItem("player", JSON.stringify(player)); 
-            this.props.navigate("/");
+            navigate("/");
         })
         .catch((error) => {
-            this.handleError(error.message); 
+            handleError(error.message); 
         });
-    }
+    };
 
-    handleUsernameChange(event) {
-        this.setState({username: event.target.value});
-    }
+    function handleUsernameChange(event) {
+        setUsername(event.target.value);
+    };
 
-    handlePasswordChange(event) {
-        this.setState({password: event.target.value});
-    }
+    function handlePasswordChange(event) {
+        setPassword(event.target.value);
+    };
 
-    handleError(message) {
+    function handleError(message) {
         console.error(message);
         toast.error(message, {
             position: "top-center",
@@ -52,29 +45,48 @@ export class Login extends Component {
             progress: undefined,
             theme: "dark"
         });
-    }
+    };
 
-    render() {
-        let username = this.state.username;
-        let password = this.state.password;
-        let loginDisabled = (username.length < 5 || username.length > 15) || !password;
-        return (
-            <div className="login">
-                <div className="form">
-                    <input className="username-input"type="text" value={username} onChange={this.handleUsernameChange} placeholder="Ime..."/>
-                    <br/>
-                    <input className="password-input" type="password" value={password} onChange={this.handlePasswordChange} placeholder="Lozinka..."/>
-                    <br/>
-                    <button className="login-button" disabled={loginDisabled} onClick={this.handleSubmit}>Prijava</button>
-                    <br/>
-                    <span style={{"float":"left"}}><a href="/" >Igra</a></span>
-                    <span style={{"float":"right"}}><a href="/register" >Registracija</a></span>
-                    <br/>
-                </div>
-                <ToastContainer limit={5} style={{ fontSize: "14px"}}/>
+    const loginDisabled = username.length < 5 || username.length > 15 || !password;
+
+    return (
+        <div className="login">
+            <div className="form">
+                <input
+                    className="username-input"
+                    type="text"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    placeholder="Ime..."
+                />
+                <br />
+                <input
+                    className="password-input"
+                    type="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    placeholder="Lozinka..."
+                />
+                <br />
+                <button
+                    className="login-button"
+                    disabled={loginDisabled}
+                    onClick={handleSubmit}
+                >
+                    Prijava
+                </button>
+                <br />
+                <span style={{ float: "left" }}>
+                    <a href="/">Igra</a>
+                </span>
+                <span style={{ float: "right" }}>
+                    <a href="/register">Registracija</a>
+                </span>
+                <br />
             </div>
-        );
-    }    
-}
+            <ToastContainer limit={5} style={{ fontSize: "14px"}} />
+        </div>
+    );
+};
 
-export default withRouter(Login);
+export default Login;

@@ -57,7 +57,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/**").permitAll()
 			.antMatchers("/**").permitAll();
-				
 		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
@@ -66,9 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("GET", "POST", "PUT");
-				registry.addMapping("/**").allowedOrigins("https://tejko.com").allowedMethods("GET", "POST", "PUT");
-				registry.addMapping("/**").allowedOrigins("https://jamb.com.hr").allowedMethods("GET", "POST", "PUT");
+				registry.addMapping("/**")
+					.allowedOrigins("http://localhost:3000", "https://tejko.com", "https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
+					.allowedMethods("GET", "POST", "PUT");
 			}
 		};
 	}

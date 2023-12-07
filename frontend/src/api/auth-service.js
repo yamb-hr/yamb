@@ -1,4 +1,4 @@
-const AUTH_URL = window.location.href + "/api/games";
+const API_URL = process.env.REACT_APP_API_URL + "/auth";
 
 const AuthService = {
 
@@ -16,7 +16,7 @@ const AuthService = {
     },
 
     login: function(authRequest) {
-        return fetch(AUTH_URL + '/login', {
+        return fetch(API_URL + '/login', {
                 body: JSON.stringify(authRequest),
                 credentials: 'same-origin',
                 headers: {
@@ -34,7 +34,7 @@ const AuthService = {
         },
 
     register: function(authRequest) {
-        return fetch(AUTH_URL + '/register', {
+        return fetch(API_URL + '/register', {
             body: JSON.stringify(authRequest),
             credentials: 'same-origin',
             headers: {
@@ -53,7 +53,7 @@ const AuthService = {
     },
 
     createTempPlayer: function(tempPlayerRequest) {
-        return fetch(AUTH_URL + '/temp-player', {
+        return fetch(API_URL + '/temp-player', {
             body: JSON.stringify(tempPlayerRequest),
             credentials: 'same-origin',
             headers: {

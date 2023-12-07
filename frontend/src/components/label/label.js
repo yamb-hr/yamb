@@ -1,19 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './label.css';
 import { ToastContainer, toast } from 'react-toastify';
 
-class Label extends Component {
+function Label(props) {
 
-    constructor(props) {
-        super(props)
-        this.state = {}
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        if (this.props.info)  {
-            console.log(this.props.info);
-            toast.info(this.props.info, {
+    function handleClick() {
+        if (props.info) {
+            console.log(props.info);
+            toast.info(props.info, {
                 position: "top-center",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -25,22 +19,20 @@ class Label extends Component {
                 theme: "dark"
             });
         }
-    }
+    };
 
-    render() {
-        let value = this.props.value;
-        let icon = this.props.icon;
-        let labelClass = "label " + (this.props.variant ? this.props.variant : "");
-        return (
-            <div className={labelClass}>
-                <button className={labelClass} onClick={this.handleClick}>
-                    {icon ? <img src={"./svg/labels/" + icon + ".svg"} alt={value}></img> : <strong>{value}</strong>}
+    const value = props.value;
+    const icon = props.icon;
+    const labelClass = `label ${props.variant ? props.variant : ""}`;
 
-                </button>   
-                <ToastContainer limit={10} />
-            </div>   
-        );
-    }    
-}
+    return (
+        <div className={labelClass}>
+            <button className={labelClass} onClick={handleClick}>
+                {icon ? <img src={`./svg/labels/${icon}.svg`} alt={value} /> : <strong>{value}</strong>}
+            </button>
+            <ToastContainer limit={10} />
+        </div>
+    );
+};
 
 export default Label;
