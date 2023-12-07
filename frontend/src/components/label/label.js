@@ -22,7 +22,7 @@ function Label(props) {
     };
 
     const value = props.value;
-    const icon = props.icon;
+    const icon = props.icon?.toLowerCase();
     const labelClass = `label ${props.variant ? props.variant : ""}`;
 
     return (
