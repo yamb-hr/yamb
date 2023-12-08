@@ -9,8 +9,8 @@
 	outline: var(--border-dice);
 }
 
-.dice:hover:enabled img {
-	filter: var(--filter-dice-alt);
+.dice:hover:enabled {
+	filter: brightness(50%);
 }
 
 .dice img {
@@ -21,33 +21,24 @@
 	border-radius: var(--border-radius-dice);
 }
 
-.saved {
+/* .saved {
 	outline: var(--border-dice-alt);
+} */
+
+.saved img {
+	filter: var(--filter-dice-alt);
 }
 
 .rolling {
-	animation-timing-function: ease-out;
-	-webkit-animation-timing-function: ease-out;
-	-moz-animation-timing-function: ease-out;
-	-ms-animation-timing-function: ease-out;
-	-o-animation-timing-function: ease-out;
-	animation-iteration-count: 1;
+	will-change: transform;
 }
 
 .clockwise {
-	animation: rotation;
-	-webkit-animation: rotation;
-	-moz-animation: rotation;
-	-ms-animation: rotation;
-	-o-animation: rotation;
+    animation: rotation 1s ease-out 1;
 }
 
 .counter-clockwise {
-	animation: anti-rotation;
-	-webkit-animation: anti-rotation;
-	-moz-animation: anti-rotation;
-	-ms-animation: anti-rotation;
-	-o-animation: anti-rotation;
+    animation: anti-rotation 1s ease-out 1;
 }
 	
 @keyframes rotation {

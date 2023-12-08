@@ -1,50 +1,39 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './dice.css';
 
-export class Dice extends Component {
+function Dice(props) {
+    function handleClick() {
+        props.onDiceClick(props.index);
+    };
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            diceClass: "dice " + (this.props.saved ? "saved " : " "),
-            diceStyle: {}
-        }
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        this.props.onDiceClick(this.props.index);
-    }
-
-    getDiceClass() {
-        let diceClass = "dice " + (this.props.saved ? "saved " : " ");
-        if (this.props.rolling && !this.props.saved) {
+    function getDiceClass() {
+        let diceClass = "dice " + (props.saved ? "saved " : " ");
+        if (props.rolling && !props.saved) {
             diceClass += "rolling ";
             diceClass += Math.random() > 0.5 ? "clockwise" : "counter-clockwise";
         }
         return diceClass;
-    }
+    };
 
-    getDiceStyle() {
-        if (this.props.rolling && !this.props.saved) {
+    function getDiceStyle() {
+        if (props.rolling && !props.saved) {
             let time = Math.round(800 + Math.random() * 1000);
             return {
                 animationDuration: time + "ms"
             }
         }
-    }
+    };
 
-    render() {
-        let value = this.props.value;
-        let diceClass = this.getDiceClass();
-        let diceStyle = this.getDiceStyle();
-        let diceDisabled = this.props.diceDisabled;
-        return (
-            <button className={diceClass} style={diceStyle} onClick={this.handleClick} disabled={diceDisabled}>
-                <img src={'./svg/dice/' + value + '.svg'} alt={value}/>
-            </button>
-        );
-    }    
+    let value = props.value;
+    let diceClass = getDiceClass();
+    let diceStyle = getDiceStyle();
+    let diceDisabled = props.diceDisabled;
+
+    return (
+        <button className={diceClass} style={diceStyle} onClick={handleClick} disabled={diceDisabled}>
+            <img src={'./svg/dice/' + value + '.svg'} alt={value}/>
+        </button>
+    );
 }
 
 export default Dice;
