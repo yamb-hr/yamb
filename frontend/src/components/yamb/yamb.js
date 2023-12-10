@@ -31,7 +31,8 @@ function Yamb(props) {
                 setGame(data);
             })
             .catch((error) => {
-                props.onError(error)
+                props.onError(error);
+                AuthService.logout();
             });
         }
     }, [currentUser, id, props]);
