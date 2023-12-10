@@ -31,7 +31,7 @@ function Dice(props) {
 
     return (
         <button className={diceClass} style={diceStyle} onClick={handleClick} disabled={diceDisabled}>
-            <img src={'./svg/dice/' + value + '.svg'} alt={value}/>
+            <img src={'../svg/dice/' + value + '.svg'} alt={value}/>
         </button>
     );
 }

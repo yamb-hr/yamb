@@ -130,6 +130,97 @@
   --border-username-button: none;
 }
 
+[theme="light"] {
+  --color-gray: #EEEEEE;
+
+  --color-background: #FFFFFB;
+  --background-sheet: var(--color-gray);
+
+  --color-label: var(--color-blue);
+  --background-label: var(--color-gray);
+  --filter-label: var(--filter-blue);
+
+  --color-sum: var(--color-red);
+  --background-sum: var(--color-gray);
+  
+  --color-total-sum: var(--color-red);
+  --background-total-sum: var(--color-gray);
+
+  --background-column-symbol: var(--color-gray);
+  --filter-column-symbol: var(--filter-red);
+
+  --color-box: var(--color-blue);
+  --background-box: var(--color-gray);
+  --border-box: 1px solid var(--color-turq);
+  --border-box-alt: 1px dashed var(--color-red);
+  
+  --background-dice: var(--color-yellow);
+  --border-dice-alt: 3px solid var(--color-red);
+  --filter-dice: var(--filter-blue);
+  --filter-dice-alt: var(--filter-red);
+  --box-shadow-dice: 
+      1px 1px 5px var(--color-blue),
+      2px 2px 0px var(--color-yellow),
+      3px 3px 0px var(--color-yellow),
+      4px 4px 0px var(--color-yellow),
+      5px 5px 0px var(--color-yellow);
+
+  --color-form: var(--color-blue);
+  --background-form: var(--color-gray);
+    
+  --color-username-input: var(--color-blue);
+  --background-username-input: var(--color-gray);
+  --border-username-input: 2px solid var(--color-blue);
+
+  --color-password-input: var(--color-red);
+  --background-password-input: var(--color-gray);
+  --border-password-input: 2px solid var(--color-blue);
+  
+  --color-register-button: var(--color-blue);
+  --background-register-button: var(--color-gray);
+  --border-register-button: 2px solid var(--color-turq);
+
+  --color-login-button: var(--color-blue);
+  --background-login-button: var(--color-gray);
+  --border-login-button: 2px solid var(--color-turq);
+
+  --color-play-button: var(--color-blue);
+  --background-play-button: var(--color-gray);
+  --border-play-button: 2px solid var(--color-turq);
+
+  --color-logout-button: var(--color-red);
+  --background-logout-button: var(--color-gray);
+  --border-logout-button: 2px solid var(--color-turq);
+
+  --color-register-button: var(--color-blue);
+  --background-register-button: var(--color-gray);
+  --border-register-button: 2px solid var(--color-turq);
+  
+  --color-settings-button: var(--color-blue);
+  --background-settings-button: var(--color-gray);
+  --filter-settings-button: var(--filter-blue);
+
+  --color-info-button: var(--color-blue);
+  --background-info-button: var(--color-gray);
+  --filter-info-button: var(--filter-blue);
+
+  --color-empty-space: var(--color-blue);
+  --background-empty-space: var(--color-gray);
+  --border-empty-space: 1px solid var(--color-gray);
+
+  --background-restart-button: var(--color-gray);
+  --border-restart-button: 1px solid var(--color-gray);
+  --filter-restart-button: var(--filter-blue);
+  
+  --background-roll-button: var(--color-gray);
+  --border-roll-button: 1px solid var(--color-gray);
+  --filter-roll-button: var(--filter-blue);
+
+  --color-username-button: var(--color-blue);
+  --background-username-button: var(--color-gray);
+
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -153,14 +244,33 @@ button {
 
 button:hover:enabled {
   cursor: pointer;
+}
+
+[theme="dark"] button:hover:enabled {
   filter: brightness(150%);
+}
+
+
+[theme="light"] button:hover:enabled {
+  filter: brightness(70%);
+}
+
+button:focus {
+  outline: none;
 }
 
 button:disabled {
   cursor: not-allowed;
-  filter: brightness(70%);
   border-radius: 0px;
   border-style: dashed;
+}
+
+[theme="dark"] button:disabled {
+  filter: brightness(80%);
+}
+
+[theme="light"] button:disabled {
+  filter: brightness(90%);
 }
 
 input {

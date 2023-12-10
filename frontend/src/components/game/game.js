@@ -4,6 +4,7 @@ import Sheet from '../sheet/sheet';
 import './game.css';
 
 function Game(props) {
+
     const [state, setState] = useState({
         diceToRoll: [0, 1, 2, 3, 4],
         rolling: false
@@ -52,9 +53,9 @@ function Game(props) {
     let dices = props.dices;
     let announcement = props.announcement;
     let player = props.player;
-    let currentUser = props.currentUser;
     let diceDisabled = props.rollCount === 0 || props.rollCount === 3;
     let rollDiceButtonDisabled = props.rollCount === 3 || props.announcementRequired;
+    let currentUser = props.currentUser;
 
     return (
         <div className="game">
@@ -81,8 +82,8 @@ function Game(props) {
                 bottomSectionSum={sheet.bottomSectionSum}
                 totalSum={sheet.totalSum}
                 announcement={announcement}
-                currentUser={currentUser}
                 player={player}
+                currentUser={currentUser}
                 rollDiceButtonDisabled={rollDiceButtonDisabled}
                 onRollDice={handleRollDice}
                 onRestart={handleRestart}

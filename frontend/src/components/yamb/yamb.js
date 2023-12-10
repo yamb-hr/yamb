@@ -1,43 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import GameService from '../../api/game-service';
 import Game from '../game/game';
 import AuthService from '../../api/auth-service';
-import GameService from '../../api/game-service';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import './yamb.css';
 
-function Yamb() {
-    const [username, setUsername] = useState("Player" + Math.round(Math.random() * 10000));
-    const [currentUser, setCurrentUser] = useState(AuthService.getCurrentPlayer());
-    const [game, setGame] = useState(null);
+function Yamb(props) {
 
-    useEffect(() => {
-        if (currentUser) {
+    const { t } = useTranslation();
+    const { id } = useParams();
+    const [game, setGame] = useState(null);
+    const [currentUser] = useState(AuthService.getCurrentPlayer());
+
+    useEffect(() => {   
+        if (id) {
+            GameService.getGameById(id)
+            .then((data) => {
+                console.log(data);
+                setGame(data);
+            })
+            .catch((error) => {
+                props.onError(error)
+            });
+        } else if (currentUser) {
             GameService.play()
             .then((data) => {
                 console.log(data);
                 setGame(data);
             })
             .catch((error) => {
-                console.error(error);
-                AuthService.logout();
+                props.onError(error)
             });
         }
-        console.log(process.env.REACT_APP_API_URL);
-    }, [currentUser]);
-
-    function handleSubmit() {
-        AuthService.createTempPlayer({ 
-            username: username
-        })
-        .then((player) => {
-            localStorage.setItem("player", JSON.stringify(player)); 
-            setCurrentUser(player);
-        })
-        .catch((error) => {
-            handleError(error.message); 
-        });
-    };    
+    }, [currentUser, id, props]);
 
     function handleRollDice(diceToRoll) {
         GameService.rollDiceById(game.id, diceToRoll)
@@ -46,7 +43,7 @@ function Yamb() {
             setGame(data);
         })
         .catch((error) => {
-            handleError(error);
+            props.onError(error)
         });
     };
 
@@ -62,7 +59,7 @@ function Yamb() {
             }
         })
         .catch((error) => {
-            handleError(error);
+            props.onError(error)
         });
     }
 
@@ -73,29 +70,9 @@ function Yamb() {
             setGame(data);
         })
         .catch((error) => {
-            console.error(error);
-            AuthService.logout();
+            props.onError(error)
         });
     }
-
-    function handleFinish() {
-		toast(
-			<div>
-				<h3>Čestitamo!</h3><h4>Vaš konačan rezultat je:</h4><h2>{game?.totalSum}</h2>
-				<button onClick={handleNewGame} className="new-game-button">Nova Igra</button>
-			</div>, {
-				position: "top-center",
-				autoClose: false,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				pauseOnFocusLoss: true,
-				draggable: true,
-				progress: undefined,
-				theme: "dark"
-			}
-		);
-	};
 
     function handleMakeAnnouncement(type) {
         GameService.makeAnnouncementById(
@@ -106,7 +83,7 @@ function Yamb() {
             setGame(data);
         })
         .catch((error) => {
-            handleError(error);
+            props.onError(error)
         });
 
     }
@@ -120,47 +97,36 @@ function Yamb() {
             setGame(data);
         })
         .catch((error) => {
-            handleError(error);
+            props.onError(error)
         });
+    }
+
+    function handleFinish(totalSum) {
+        toast(
+			<div>
+				<h4>{t('congratulations')}</h4><h2>{totalSum}</h2>
+				<button onClick={handleNewGame} className="new-game-button">{t('new-game')}</button>
+			</div>, {
+				position: "top-center",
+				autoClose: false,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				pauseOnFocusLoss: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark"
+			}
+		);
     }
 
     function handleLogout() {
         AuthService.logout();
         window.location.reload();
     }
-
-    function handleUsernameChange(event) {
-        setUsername(event.target.value);
-    }
-
-    function handleError(error) {
-		console.error(error?.message);
-		toast.error(error?.message, {
-			position: "top-center",
-			autoClose: 2000,
-			hideProgressBar: true,
-			closeOnClick: true,
-			pauseOnHover: true,
-			pauseOnFocusLoss: true,
-			draggable: true,
-			progress: undefined,
-			theme: "dark"
-		});
-	}
-
-    let playDisabled = username.length < 5 || username.length > 15;
-
+   
     return (
         <div className="yamb">
-            {!currentUser && <div className="form">
-                <input className="username-input" type="text" value={username} onChange={handleUsernameChange} placeholder="Ime..."/>
-                <br/>
-                <button className="play-button" disabled={playDisabled} onClick={handleSubmit}>Igraj</button>
-                <br/>
-                <span style={{"float":"left"}}><a href="/login" >Prijava</a></span>
-                <span style={{"float":"right"}}><a href="/register" >Registracija</a></span>
-                <br/>
-            </div>}
             {game && <Game 
                 sheet={game.sheet}
                 dices={game.dices}
@@ -179,9 +145,9 @@ function Yamb() {
                 onRestart={handleRestart}
                 onLogout={handleLogout}>
             </Game>}
-            <ToastContainer />
         </div>
     );
 };
 
 export default Yamb;
+

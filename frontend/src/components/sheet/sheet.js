@@ -1,33 +1,41 @@
-import React from 'react';
+import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LanguageContext, ThemeContext } from '../../App';
 import Column from '../column/column';
 import Label from '../label/label';
 import './sheet.css';
 
 function Sheet(props) {
 
-    const handleSettings = () => {
-        console.log("Settings");
-    };
+    const {theme, toggleTheme} = useContext(ThemeContext);
 
-    const handleInfo = () => {
-        console.log("Info");
-    };
+    const {language, toggleLanguage} = useContext(LanguageContext);
 
-    const handleLogout = () => {
+    const { t } = useTranslation();
+
+    function handleSettings() {
+        toggleLanguage();
+    }
+
+    function handleInfo() {
+        toggleTheme();
+    }
+
+    function handleLogout() {
         props.onLogout();
-    };
+    }
 
-    const handleRollDice = () => {
+    function handleRollDice() {
         props.onRollDice();
-    };
+    }
 
-    const handleRestart = () => {
+    function handleRestart() {
         props.onRestart();
-    };
+    }
 
-    const handleBoxClick = (columnType, boxType) => {
+    function handleBoxClick(columnType, boxType) {
         props.onBoxClick(columnType, boxType);
-    };
+    }
 
     const {
         columns,
@@ -46,26 +54,26 @@ function Sheet(props) {
         <div className="sheet">
             <div className="column">
                 <button className="settings-button" onClick={handleSettings}>
-                    <img src={"./svg/buttons/cog.svg"} alt="Settings"></img>
+                    <img src="../svg/buttons/language.svg" alt="Language"></img>
                 </button>
-                <Label icon="ones" info="Broj jedinica"></Label>
-                <Label icon="twos" info="Broj dvica"></Label>
-                <Label icon="threes" info="Broj trica"></Label>
-                <Label icon="fours" info="Broj četvorki"></Label>
-                <Label icon="fives" info="Broj petica"></Label>
-                <Label icon="sixes" info="Broj šestica"></Label>
-                <Label variant="sum" value="Σ (1, 6)" info="Zbroj od jedinica do šestica + 30 za 60 ili više"></Label>
+                <Label icon="ones" info={t('ones')}></Label>
+                <Label icon="twos" info={t('twos')}></Label>
+                <Label icon="threes" info={t('threes')}></Label>
+                <Label icon="fours" info={t('fours')}></Label>
+                <Label icon="fives" info={t('fives')}></Label>
+                <Label icon="sixes" info={t('sixes')}></Label>
+                <Label variant="sum" value="Σ (1, 6)" info={t('top-section-sum')}></Label>
                 {/* MID SECTION */}
-                <Label value="Max" info="Zbroj svih kockica"></Label>
-                <Label value="Min" info="Zbroj svih kockica"></Label>
-                <Label variant="sum" value="∆ x 1-ice" info="(Max - Min) x broj jedinica"></Label>
+                <Label value={t('max')} info="Zbroj svih kockica"></Label>
+                <Label value={t('min')} info="Zbroj svih kockica"></Label>
+                <Label variant="sum" value="∆ x 1" info={t('middle-section-sum')}></Label>
                 {/* BOTTOM SECTION */}
-                <Label value="Tris" info="Tri iste kockice"></Label>
-                <Label value="Skala" info="Pet uzastopnih kockica"></Label>
-                <Label value="Ful" info="Tris i par"></Label>
-                <Label value="Poker" info="Četiri iste kockice"></Label>
-                <Label value="Jamb" info="Pet istih kockica"></Label>
-                <Label variant="sum" value="Σ (T, J)" info="Zbroj od Trisa do Jamba"></Label>
+                <Label value={t('trips')} info={t('trips-info')}></Label>
+                <Label value={t('straight')} info={t('straight-info')}></Label>
+                <Label value={t('boat')} info={t('boat-info')}></Label>
+                <Label value={t('carriage')} info={t('carriage-info')}></Label>
+                <Label value={t('yamb')} info={t('yamb-info')}></Label>
+                <Label variant="sum" value="Σ (T, J)" info={t('bottom-section-sum')}></Label>
             </div>
             {columns.map((column) => (
                 <div className="column" key={column.type}>
@@ -83,17 +91,17 @@ function Sheet(props) {
             ))}
             <div className="column">
                 <button className="info-button" onClick={handleInfo}>
-                    <img src={"./svg/buttons/info.svg"} alt="Info"></img>
+                    <img src={"../svg/buttons/" + (theme === "dark" ? "sun" : "moon") + ".svg"} alt="Language"></img>
                 </button>
                 <div className="empty-space"></div>
                 <button className="roll-button" onClick={handleRollDice} disabled={rollDiceButtonDisabled}>
-                    <img src={"./svg/buttons/roll-" + (3-rollCount) + ".svg"} alt="Roll"></img>
+                    <img src={"../svg/buttons/roll-" + (3-rollCount) + ".svg"} alt="Roll"></img>
                 </button>                    
                 <div className="top-section-sum">
                     <Label variant="sum" value={topSectionSum}></Label>
                 </div>
                 <button className="restart-button" onClick={handleRestart}>
-                    <img src={"./svg/buttons/restart.svg"} alt="Restart"></img>
+                    <img src={"../svg/buttons/restart.svg"} alt="Restart"></img>
                 </button>
                 <div className="middle-section-sum">
                     <Label variant="sum" value={middleSectionSum}></Label>
@@ -104,8 +112,8 @@ function Sheet(props) {
             </div>
             <div className="last-row">
                 <button className="username-button">{player.username}</button>
-                {currentUser.tempUser ? <a className="register-sheet-button" href="/register">Registracija</a> : 
-                <button className="logout-button" onClick={handleLogout}>Odjava</button>}
+                {currentUser.tempUser ? <a className="register-sheet-button" href="/register">{t('register')}</a> : 
+                <button className="logout-button" onClick={handleLogout}>{t('logout')}</button>}
                 <Label variant="total-sum" value={totalSum}></Label>
             </div>
         </div>

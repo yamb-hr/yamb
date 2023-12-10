@@ -4,12 +4,33 @@ const API_URL = process.env.REACT_APP_API_URL + "/games";
 
 const GameService = {
 
+    getGameById: function(gameId) {
+        return fetch(API_URL + '/' + gameId, {
+            body: null,
+            credentials: 'same-origin',
+            headers: {
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token
+            },
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().then(data => data);
+            }
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
+        });
+    },
+
     play: function() {
         return fetch(API_URL + '/play', {
             body: null,
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token
             },
             method: 'POST',
             mode: 'cors'
@@ -18,7 +39,10 @@ const GameService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -27,7 +51,7 @@ const GameService = {
             body: JSON.stringify({ diceToRoll: diceToRoll }),
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token,
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token,
                 'content-type': 'application/json'
             },
             method: 'PUT',
@@ -37,7 +61,10 @@ const GameService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -46,7 +73,7 @@ const GameService = {
             body: JSON.stringify({ columnType: columnType, boxType: boxType }),
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token,
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token,
                 'content-type': 'application/json'
             },
             method: 'PUT',
@@ -56,7 +83,10 @@ const GameService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -65,7 +95,7 @@ const GameService = {
             body: JSON.stringify({ boxType: boxType }),
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token,
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token,
                 'content-type': 'application/json'
             },
             method: 'PUT',
@@ -75,7 +105,10 @@ const GameService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -84,7 +117,7 @@ const GameService = {
             body: null,
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token,
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token,
             },
             method: 'PUT',
             mode: 'cors'
@@ -93,7 +126,10 @@ const GameService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     }
 }

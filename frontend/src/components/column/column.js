@@ -1,9 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Box from '../box/box';
 import Label from '../label/label';
 import './column.css';
 
 function Column(props) {
+
+    const { t } = useTranslation();
+
     const handleBoxClick = (boxType) => {
         props.onBoxClick(props.type, boxType);
     };
@@ -27,29 +31,12 @@ function Column(props) {
         return false;
     };
 
-    function getInfo() {
-        switch (props.type) {
-            case "FREE":
-                return "Stupac se popunjava u bilo kojem redoslijedu";
-            case "DOWNWARDS":
-                return "Stupac se popunjava od vrha prema dnu";
-            case "UPWARDS":
-                return "Stupac se popunjava od dna prema vrhu";
-            case "ANNOUNCEMENT":
-                return "Stupac se mora prethodno najaviti";
-            default:
-                return null;
-        }
-    };
-
-    const info = getInfo();
-
     return (
         <div className="column">    
             <Label 
-                icon={props.type} 
+                icon={props.type.toLowerCase()} 
                 value={props.type}
-                info={info}
+                info={t(props.type.toLowerCase() + '-info')}
                 variant="column-symbol">
             </Label>
             {props.boxes.map((box) => (

@@ -17,21 +17,24 @@ const AuthService = {
 
     login: function(authRequest) {
         return fetch(API_URL + '/login', {
-                body: JSON.stringify(authRequest),
-                credentials: 'same-origin',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                method: 'POST',
-                mode: 'cors'
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json().then(data => data);
-                }
-                return response.json().then(error => { throw new Error(error.message) })
+            body: JSON.stringify(authRequest),
+            credentials: 'same-origin',
+            headers: {
+                'content-type': 'application/json'
+            },
+            method: 'POST',
+            mode: 'cors'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().then(data => data);
+            }
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
             });
-        },
+        });
+    },
 
     register: function(authRequest) {
         return fetch(API_URL + '/register', {
@@ -48,7 +51,10 @@ const AuthService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -66,7 +72,10 @@ const AuthService = {
             if (response.ok) {
                 return response.json().then(data => data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     }
 }
