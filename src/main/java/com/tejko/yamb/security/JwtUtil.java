@@ -2,6 +2,7 @@ package com.tejko.yamb.security;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -12,8 +13,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtil {
 
-	//@Value("${com.tejko.yamb.jwtSecret}")
-	private final String secret = "secret";	
+	@Value("${JWT_SECRET}")
+    private String jwtSecret;
 
 	public String generateToken(String username) {
 
@@ -21,12 +22,12 @@ public class JwtUtil {
 			.setSubject(username)
 			.setIssuedAt(new Date())
 			.setExpiration(null)
-			.signWith(SignatureAlgorithm.HS512, secret)
+			.signWith(SignatureAlgorithm.HS512, jwtSecret)
 			.compact();
 	}
 
 	public Jws<Claims> parseToken(String token) {
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
 	}
 
 	public boolean validateToken(String token) {
