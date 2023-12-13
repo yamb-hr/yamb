@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import AuthService from '../../api/auth-service';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import AuthService from '../../api/auth-service';
+import { Slide, toast } from 'react-toastify';
+import { ThemeContext } from '../../App';
+import './auth.css';
 
 function Login() {
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const theme = useContext(ThemeContext);
     const navigate = useNavigate();
 
     function handleSubmit() {
@@ -37,13 +40,14 @@ function Login() {
         toast.error(message, {
             position: "top-center",
             autoClose: 2000,
+            transition: Slide,
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
             pauseOnFocusLoss: true,
             draggable: true,
             progress: undefined,
-            theme: "dark"
+            theme: theme
         });
     };
 
@@ -84,7 +88,6 @@ function Login() {
                 </span>
                 <br />
             </div>
-            <ToastContainer limit={5} style={{ fontSize: "14px"}} />
         </div>
     );
 };

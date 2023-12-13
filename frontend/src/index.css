@@ -113,9 +113,9 @@
   --border-info-button: none;
   --filter-info-button: var(--filter-turq);
 
-  --color-empty-space: var(--color-turq);
-  --background-empty-space: var(--color-blue);
-  --border-empty-space: 1px solid var(--color-blue);
+  --color-admin-button: var(--color-turq);
+  --background-admin-button: var(--color-blue);
+  --border-admin-button: 1px solid var(--color-blue);
 
   --background-restart-button: var(--color-blue);
   --border-restart-button: 1px solid var(--color-blue);
@@ -204,9 +204,9 @@
   --background-info-button: var(--color-gray);
   --filter-info-button: var(--filter-blue);
 
-  --color-empty-space: var(--color-blue);
-  --background-empty-space: var(--color-gray);
-  --border-empty-space: 1px solid var(--color-gray);
+  --color-admin-button: var(--color-blue);
+  --background-admin-button: var(--color-gray);
+  --border-admin-button: 1px solid var(--color-gray);
 
   --background-restart-button: var(--color-gray);
   --border-restart-button: 1px solid var(--color-gray);

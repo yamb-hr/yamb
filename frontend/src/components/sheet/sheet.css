@@ -36,10 +36,10 @@
 	filter: var(--filter-info-button);
 }
 
-.empty-space {
-	background: var(--background-empty-space);
-	color: var(--color-empty-space);
-	border: var(--border-empty-space);
+.admin-button {
+	background: var(--background-admin-button);
+	color: var(--color-admin-button);
+	border: var(--border-admin-button);
 	grid-row-start: 9;
 	grid-row-end: 11;
 }

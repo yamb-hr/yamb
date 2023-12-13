@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import AuthService from '../../api/auth-service';
-import { ToastContainer, toast } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './auth.css';
+import { ThemeContext } from '../../App';
 
 function Register() {
+    const t = useTranslation();
+    const theme = useContext(ThemeContext);
     const [username, setUsername] = useState(
         AuthService.getCurrentPlayer() ? AuthService.getCurrentPlayer().username : "Player" + Math.round(Math.random() * 10000)
     );
@@ -19,6 +23,18 @@ function Register() {
         })
         .then((player) => {
             console.log(player);
+            toast.success(t('registration-success'), {
+                position: "top-center",
+                autoClose: 2000,
+				transition: Slide,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                pauseOnFocusLoss: true,
+                draggable: true,
+                progress: undefined,
+                theme: theme
+            });
             navigate('/login');
         })
         .catch((error) => {
@@ -43,13 +59,14 @@ function Register() {
         toast.error(error?.message, {
             position: "top-center",
             autoClose: 2000,
+            transition: Slide,
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
             pauseOnFocusLoss: true,
             draggable: true,
             progress: undefined,
-            theme: "dark"
+            theme: theme
         });
     };
 
@@ -88,7 +105,6 @@ function Register() {
                 <span style={{ float: "right" }}><a href="/login">Prijava</a></span>
                 <br />
             </div>
-            <ToastContainer limit={5} style={{ fontSize: "14px" }} />
         </div>
     );
 };

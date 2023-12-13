@@ -1,5 +1,5 @@
 import React from 'react';
-import { toast } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 import './label.css';
 
 function Label(props) {
@@ -10,6 +10,7 @@ function Label(props) {
             toast.info(props.info, {
                 position: "top-center",
                 autoClose: 2000,
+				transition: Slide,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

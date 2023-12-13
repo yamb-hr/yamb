@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.constants.MessageConstants;
+import com.tejko.yamb.interfaces.RestService;
 import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.models.enums.GameStatus;
@@ -23,7 +24,7 @@ import com.tejko.yamb.repositories.PlayerRepository;
 import com.tejko.yamb.repositories.GameRepository;
 
 @Service
-public class GameService {
+public class GameService implements RestService<Game> {
 
     @Autowired
     GameRepository gameRepo;
@@ -83,6 +84,12 @@ public class GameService {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.restart();
         return gameRepo.save(game);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
     }
 
 }

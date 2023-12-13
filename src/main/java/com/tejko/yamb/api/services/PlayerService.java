@@ -18,13 +18,14 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.constants.MessageConstants;
+import com.tejko.yamb.interfaces.RestService;
 import com.tejko.yamb.repositories.ScoreRepository;
 
 
 import com.tejko.yamb.repositories.PlayerRepository;
 
 @Service
-public class PlayerService implements UserDetailsService {
+public class PlayerService implements UserDetailsService, RestService<Player> {
 
     @Autowired
     PlayerRepository playerRepo;
@@ -52,5 +53,10 @@ public class PlayerService implements UserDetailsService {
 		Player player = playerRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User " + username + " is not found!"));
 		return Player.build(player);
 	}
+
+    @Override
+    public void deleteById(Long id) {
+        playerRepo.deleteById(id);
+    }
 
 }

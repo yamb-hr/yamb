@@ -13,39 +13,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.services.PlayerService;
-import com.tejko.yamb.models.Score;
-
-import com.tejko.yamb.models.Player;
+import com.tejko.yamb.api.services.RoleService;
+import com.tejko.yamb.models.Role;
 
 @RestController
-@RequestMapping("/api/players")
-public class PlayerController {
+@RequestMapping("/api/roles")
+public class RoleController {
 
 	@Autowired
-	PlayerService playerService;
+	RoleService roleService;
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Player> getById(@PathVariable Long id) {
-		return new ResponseEntity<>(playerService.getById(id), HttpStatus.OK);
+	public ResponseEntity<Role> getById(@PathVariable Long id) {
+		return new ResponseEntity<>(roleService.getById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("")
-	public ResponseEntity<List<Player>> getAll(@RequestParam(defaultValue = "0") Integer page,
+	public ResponseEntity<List<Role>> getAll(@RequestParam(defaultValue = "0") Integer page,
 	@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort,
 	@RequestParam(defaultValue = "desc") String direction) {
-		return new ResponseEntity<>(playerService.getAll(page, size, sort, direction), HttpStatus.OK);
-	}
-
-	@GetMapping("/{id}/scores")
-	public ResponseEntity<List<Score>> getScoresByPlayerId(@PathVariable Long id) {
-		return new ResponseEntity<>(playerService.getScoresByPlayerId(id), HttpStatus.OK);
+		return new ResponseEntity<>(roleService.getAll(page, size, sort, direction), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public void deleteById(@PathVariable Long id) {
-		playerService.deleteById(id);
+		roleService.deleteById(id);
 	}
 
 }

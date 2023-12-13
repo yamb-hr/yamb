@@ -1,32 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './dice.css';
 
 function Dice(props) {
+
+    const [isRolling, setRolling] = useState(false);
+    const [rollCount, setRollCount] = useState(props.rollCount); 
+    const [diceClass, setDiceClass] = useState("dice");
+    const [diceStyle, setDiceStyle] = useState({});
+
     function handleClick() {
         props.onDiceClick(props.index);
     };
 
-    function getDiceClass() {
-        let diceClass = "dice " + (props.saved ? "saved " : " ");
-        if (props.rolling && !props.saved) {
-            diceClass += "rolling ";
-            diceClass += Math.random() > 0.5 ? "clockwise" : "counter-clockwise";
+    useEffect(() => {
+        let newDiceClass = "dice " + (props.saved ? "saved " : " ");
+        let newDiceStyle = {};
+        if (isRolling) {
+            newDiceClass += "rolling ";
+            newDiceClass += Math.random() > 0.5 ? "clockwise" : "counter-clockwise";
+            let time = Math.round(800 + Math.random() * 1000)
+            newDiceStyle = { animationDuration: time + "ms" }
+            setTimeout(() => {
+                setRolling(false);
+            }, time);
         }
-        return diceClass;
-    };
+        setDiceClass(newDiceClass);
+        setDiceStyle(newDiceStyle);
+    }, [isRolling, props.saved]);
 
-    function getDiceStyle() {
-        if (props.rolling && !props.saved) {
-            let time = Math.round(800 + Math.random() * 1000);
-            return {
-                animationDuration: time + "ms"
-            }
+    useEffect(() => {
+        if ((rollCount !== props.rollCount && !props.saved) && props.rollCount !== 0) {
+            setRolling(true);
         }
-    };
+        setRollCount(props.rollCount);
+    }, [props.rollCount, props.saved]);
 
     let value = props.value;
-    let diceClass = getDiceClass();
-    let diceStyle = getDiceStyle();
     let diceDisabled = props.diceDisabled;
 
     return (

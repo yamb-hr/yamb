@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.tejko.yamb.api.services.PlayerService;
 import com.tejko.yamb.constants.SecurityConstants;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
@@ -23,7 +23,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	JwtUtil jwtUtil;
 
 	@Autowired
-	UserDetailsService userDetailsService;
+	PlayerService playerService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,7 +34,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (Exception e) {
-				System.out.println(e.getLocalizedMessage());
+				System.out.println(e.getMessage());
 			}
 		}
 		filterChain.doFilter(request, response);
@@ -44,7 +44,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	private UserDetails extractUserFromRequest(HttpServletRequest request) {
 		String token = extractTokenFromAuthHeader(request);
 		try {
-			return userDetailsService.loadUserByUsername(extractUsernameFromToken(token));
+			return playerService.loadUserByUsername(extractUsernameFromToken(token));
 		} catch (Exception e) {
 			// ignore
 		}

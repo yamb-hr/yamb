@@ -8,6 +8,8 @@ public class MessageConstants {
 	public static final String ERROR_USERNAME_OR_PASSWORD_INCORRECT = "The username or password is incorrect!";
 	public static final String ERROR_USERNAME_ALREADY_TAKEN = "That username is already taken!";
 	public static final String ERROR_PLAYER_NOT_FOUND = "Player not found!";
+	public static final String ERROR_ROLE_NOT_FOUND = "Role not found!";
+	public static final String ERROR_LOG_NOT_FOUND = "Log not found!";
 	public static final String ERROR_SCORE_NOT_FOUND = "Score not found!";
 	public static final String ERROR_GAME_NOT_FOUND = "Game not found!";
 	public static final String ERROR_ROLL_LIMIT_EXCEEDED = "The roll limit has been reached!";

@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, Slide } from 'react-toastify';
 import { createContext, useState } from 'react';
 import i18n from './i18n';
-import ErrorBoundary from './components/error/error-boundary';
 import Home from './components/home/home';
 import Login from './components/auth/login';
 import Register from './components/auth/register';
@@ -13,6 +12,7 @@ import Yamb from './components/yamb/yamb';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { useTranslation } from 'react-i18next';
+import Admin from './components/admin/admin';
 
 export const ThemeContext = createContext(null);
 export const LanguageContext = createContext(null);
@@ -30,13 +30,14 @@ function App() {
 		toast.info(t('theme-changed') + newTheme, {
             position: "top-center",
 				autoClose: 1000,
+				transition: Slide,
 				hideProgressBar: true,
 				closeOnClick: true,
 				pauseOnHover: false,
 				pauseOnFocusLoss: false,
 				draggable: true,
 				progress: undefined,
-				theme: "dark"
+				theme: theme
         });
 		document.documentElement.setAttribute("theme", newTheme);
 		localStorage.setItem("nextTheme", newTheme === "dark" ? "light" : "dark");
@@ -82,13 +83,14 @@ function App() {
         toast.info(t('language-changed') + language, {
             position: "top-center",
 				autoClose: 1000,
+				transition: Slide,
 				hideProgressBar: true,
 				closeOnClick: true,
 				pauseOnHover: false,
 				pauseOnFocusLoss: false,
 				draggable: true,
 				progress: undefined,
-				theme: "dark"
+				theme: theme
         });
         i18n.changeLanguage(language);
     }
@@ -98,13 +100,14 @@ function App() {
 		toast.error(error?.message, {
 			position: "top-center",
 			autoClose: 2000,
+			transition: Slide,
 			hideProgressBar: true,
 			closeOnClick: true,
 			pauseOnHover: true,
 			pauseOnFocusLoss: true,
 			draggable: true,
 			progress: undefined,
-			theme: "dark"
+			theme: theme
 		});
 	}
 
@@ -113,7 +116,6 @@ function App() {
 			<header className="App-header">
 				<ThemeContext.Provider value={{ theme, toggleTheme}}>
 					<LanguageContext.Provider value={{ language, toggleLanguage}}>
-						<ErrorBoundary>
 							<Router>
 								<Routes>
 									<Route path="/" element={<Home onError={handleError}/>} />
@@ -123,9 +125,9 @@ function App() {
 									<Route path="/scores" element={<Scores onError={handleError}/>} />
 									<Route path="/games" element={<Games onError={handleError}/>} />
 									<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
+									<Route path="/admin" element={<Admin onError={handleError}/>} />
 								</Routes>
 							</Router>
-						</ErrorBoundary>
 					</LanguageContext.Provider>
 				</ThemeContext.Provider>
 				<ToastContainer limit={5} style={{fontSize:"medium"}}/>

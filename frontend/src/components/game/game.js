@@ -1,47 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dice from '../dice/dice';
 import Sheet from '../sheet/sheet';
 import './game.css';
 
 function Game(props) {
 
-    const [state, setState] = useState({
-        diceToRoll: [0, 1, 2, 3, 4],
-        rolling: false
-    });
+    const [fillBox, setFillBox] = useState(null);
+    const [restart, setRestart] = useState(false);
+    const [diceToRoll, setDiceToRoll] = useState([0, 1, 2, 3, 4]);
+
+    useEffect(() => {
+        if (restart) {
+            props.onRestart();
+            setRestart(false);
+            setDiceToRoll([0, 1, 2, 3, 4]);
+        }
+    }, [restart]);
+
+    useEffect(() => {
+        if (fillBox) {
+            props.onFillBox(fillBox.columnType, fillBox.boxType);
+            setDiceToRoll([0, 1, 2, 3, 4]);
+            setFillBox(null);
+        }
+    }, [fillBox]);
 
     function handleDiceClick(index) {
-        let diceToRoll = [...state.diceToRoll];
-        if (diceToRoll.includes(index)) {   
-            diceToRoll.splice(diceToRoll.indexOf(index), 1);
+        let newDiceToRoll = [...diceToRoll];
+        if (newDiceToRoll.includes(index)) {   
+            newDiceToRoll.splice(newDiceToRoll.indexOf(index), 1);
         } else {
-            diceToRoll.push(index);
+            newDiceToRoll.push(index);
         }
-        setState({ ...state, diceToRoll, rolling: false });
+        setDiceToRoll(newDiceToRoll);
     };
 
     function handleRollDice() {
-        props.onRollDice(state.diceToRoll);
-        setState({ ...state, rolling: true });
-        setTimeout(() => {
-            if (state.rolling) {
-                setState({ ...state, rolling: false });
-            }
-        }, 3000);
-    };
+        props.onRollDice(diceToRoll);
+    }
 
     function handleBoxClick(columnType, boxType) {
         if (columnType === "ANNOUNCEMENT" && props.announcement == null) {
             props.onMakeAnnouncement(boxType);
         } else {
-            props.onFillBox(columnType, boxType);
-            setState({ diceToRoll: [0, 1, 2, 3, 4], rolling: false });
+            setFillBox({ columnType, boxType })
         }
     };
 
     function handleRestart() {
-        setState({ diceToRoll: [0, 1, 2, 3, 4], rolling: false });
-        props.onRestart();
+        setRestart(true);
     };
 
     function handleLogout() {
@@ -65,8 +72,8 @@ function Game(props) {
                         <Dice 
                             value={dice.value} 
                             index={dice.index} 
-                            saved={!state.diceToRoll.includes(dice.index)}
-                            rolling={state.rolling}
+                            saved={!diceToRoll.includes(dice.index)}
+                            rollCount={rollCount}
                             diceDisabled={diceDisabled}
                             onDiceClick={handleDiceClick}>
                         </Dice>

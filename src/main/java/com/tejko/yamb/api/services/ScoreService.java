@@ -11,12 +11,13 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.constants.MessageConstants;
+import com.tejko.yamb.interfaces.RestService;
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.models.payload.DateTimeInterval;
 import com.tejko.yamb.repositories.ScoreRepository;
 
 @Service
-public class ScoreService {
+public class ScoreService implements RestService<Score> {
 
 	@Autowired
 	ScoreRepository scoreRepo;
@@ -32,6 +33,12 @@ public class ScoreService {
 
 	public List<Score> getByInterval(DateTimeInterval interval) {
 		return scoreRepo.findByDateBetween(interval.getFrom(), interval.getTo());
+	}
+
+	@Override
+	public void deleteById(Long id) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
 	}
 
 }

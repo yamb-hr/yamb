@@ -1,6 +1,7 @@
 package com.tejko.yamb.models;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -9,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -42,13 +46,21 @@ public class Player implements UserDetails {
     @OneToMany(mappedBy = "player")
     @JsonIgnore
     private List<Score> scores;
+    
+    @OneToMany(mappedBy = "player")
+    @JsonIgnore
+    private List<Log> logs;
 
     @OneToMany(mappedBy = "player")
     @JsonIgnore
     private List<Game> games;
 
+    @ManyToMany
+    @JoinTable(name = "player_role", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
+
     @Transient
-    private Set<GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
 
     protected Player() {}
 
@@ -58,7 +70,7 @@ public class Player implements UserDetails {
 		this.tempUser = tempUser;
     }
 
-    private Player(Long id, String username, String password, Set<GrantedAuthority> authorities) {
+    private Player(Long id, String username, String password, List<GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
@@ -70,10 +82,18 @@ public class Player implements UserDetails {
     }
 
     public static Player build(Player player) {
-        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(SecurityConstants.AUTHORITY_PLAYER));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : player.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getLabel()));
+        }
 		return new Player(player.getId(), player.getUsername(), player.getPassword(), authorities);
 	}
+
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
 
     public Long getId() {
         return id;
@@ -107,22 +127,24 @@ public class Player implements UserDetails {
         return scores;
     }
 
-    public void setScores(List<Score> scores) {
-        this.scores = scores;
+    public List<Log> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<Log> logs) {
+        this.logs = logs;
     }
 
     public List<Game> getGames() {
         return games;
     }
 
-    public void setGames(List<Game> games) {
-        this.games = games;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    @Override
-    @JsonIgnore
-    public Set<GrantedAuthority> getAuthorities() {
-        return authorities;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -149,5 +171,13 @@ public class Player implements UserDetails {
         return true;
     }
 
+    @Override
+	public String toString() {
+        String string = username;
+        for (Role role : roles) {
+            string += role.getLabel() + ": " + role.getdescription() + "\n";
+        }
+		return string;
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.tejko.yamb.api.services;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,12 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.constants.SecurityConstants;
 import com.tejko.yamb.models.Player;
+import com.tejko.yamb.models.Role;
 import com.tejko.yamb.models.payload.AuthRequest;
 import com.tejko.yamb.models.payload.LoginResponse;
 import com.tejko.yamb.models.payload.TempPlayerRequest;
 import com.tejko.yamb.repositories.PlayerRepository;
+import com.tejko.yamb.repositories.RoleRepository;
 import com.tejko.yamb.security.JwtUtil;
 
 @Service
@@ -32,6 +36,9 @@ public class AuthService {
     PlayerRepository playerRepo;
 
     @Autowired
+    RoleRepository roleRepo;
+
+    @Autowired
     JwtUtil jwtUtil;
 
     @Autowired
@@ -41,12 +48,11 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Player player = playerRepo.findByUsername(authRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser());
+        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
     }
 
     public Player register(AuthRequest authRequest) {
         String usernameFromAuth = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(usernameFromAuth);
 		if (playerRepo.existsByUsername(authRequest.getUsername()) && !authRequest.getUsername().equals(usernameFromAuth)) {
 			throw new BadCredentialsException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
 		} else if (authRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || authRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
@@ -62,6 +68,14 @@ public class AuthService {
                 player.setTempUser(false);
             }
         }
+        Set<Role> roles = new HashSet<>();
+        Role userRole = roleRepo.findByLabel("USER").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
+        if (authRequest.getUsername().equals("matej")) {
+            Role adminRole = roleRepo.findByLabel("ADMIN").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
+            roles.add(adminRole);
+        }
+        roles.add(userRole);
+        player.setRoles(roles);
         return playerRepo.save(player);
     }
 
@@ -72,14 +86,18 @@ public class AuthService {
             throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
         }   
         Player player = Player.getInstance(tempPlayerRequest.getUsername(),  encoder.encode(UUID.randomUUID().toString()), true);
-        // Cookie cookie = new Cookie(SecurityConstants.COOKIE_TOKEN, jwtUtil.generateToken(player.getUsername()));
-        // cookie.setMaxAge(365 * 24 * 60 * 60); // expires in 1 year
-        // cookie.setSecure(true);
-        // cookie.setHttpOnly(true);
-        // cookie.setPath("/"); // global cookie accessible every where
-        // response.addCookie(cookie);
+        
+        Set<Role> roles = new HashSet<>();
+        Role userRole = roleRepo.findByLabel("USER").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
+        if (tempPlayerRequest.getUsername().equals("matej")) {
+            Role adminRole = roleRepo.findByLabel("ADMIN").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
+            roles.add(adminRole);
+        }
+        roles.add(userRole);
+        player.setRoles(roles);
+
         player = playerRepo.save(player);
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser());
+        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
     }
 
 }
