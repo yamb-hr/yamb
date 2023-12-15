@@ -7,6 +7,7 @@ function Dice(props) {
     const [rollCount, setRollCount] = useState(props.rollCount); 
     const [diceClass, setDiceClass] = useState("dice");
     const [diceStyle, setDiceStyle] = useState({});
+    const [diceDisabled, setDiceDisabled] = useState(true);
     const [value, setValue] = useState(props.value);
 
     function handleClick() {
@@ -15,6 +16,7 @@ function Dice(props) {
 
     useEffect(() => {
         if (!isRolling) {
+            setDiceDisabled(false)
             setValue(props.value);
         }
     }, [props.value, isRolling]);
@@ -50,11 +52,10 @@ function Dice(props) {
     useEffect(() => {
         if ((rollCount !== props.rollCount && !props.saved) && props.rollCount !== 0) {
             setRolling(true);
+            setDiceDisabled(true);
         }
         setRollCount(props.rollCount);
     }, [props.rollCount, props.saved]);
-
-    let diceDisabled = props.diceDisabled;
 
     return (
         <button className={diceClass} style={diceStyle} onClick={handleClick} disabled={diceDisabled}>

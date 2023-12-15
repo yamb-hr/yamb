@@ -21,7 +21,7 @@ function Game(props) {
 
     useEffect(() => {
         if (fillBox) {
-            props.onFillBox(fillBox.columnType, fillBox.boxType);
+            props.onFillBox(fillBox.columnType, fillBox.boxType);    
             setDiceToRoll([0, 1, 2, 3, 4]);
             setRollCount(0);
             setFillBox(null);
@@ -87,6 +87,7 @@ function Game(props) {
                 columns={sheet.columns} 
                 rollCount={rollCount}
                 announcement={announcement}
+                dices={dices}
                 player={player}
                 currentUser={currentUser}
                 onRollDice={handleRollDice}

@@ -8,7 +8,7 @@ function Box(props) {
     };
 
     const value = props.value;
-    const boxClass = `box ${props.columnType === "ANNOUNCEMENT" && props.type === props.announcement ? "announcement" : ""}`;
+    const boxClass = "box " + (props.columnType === "ANNOUNCEMENT" && props.type === props.announcement ? "announcement" : "");
     const disabled = props.disabled;
 
     return (

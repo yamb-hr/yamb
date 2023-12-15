@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import calculateScore from '../score-calculator';
+import { BoxType } from '../../constants/box-types';
+import AuthService from '../../api/auth-service';
 import GameService from '../../api/game-service';
 import Game from '../game/game';
-import AuthService from '../../api/auth-service';
 import './yamb.css';
 
 function Yamb(props) {
@@ -55,6 +57,13 @@ function Yamb(props) {
 
     function handleFillBox(columnType, boxType) {
         console.time("fillBox");
+        let diceValues = game.dices.map((dice) => dice.value);
+        let newGame = {...game};
+        const columnIndex = newGame.sheet.columns.findIndex(c => c.type === columnType);
+        const boxIndex = newGame.sheet.columns[columnIndex].boxes.findIndex(b => b.type === boxType);
+        let value = calculateScore(diceValues, BoxType[boxType])
+        newGame.sheet.columns[columnIndex].boxes[boxIndex].value = value;
+        setGame(newGame);
         GameService.fillBoxById(
             game.id, columnType, boxType
         )
@@ -67,7 +76,10 @@ function Yamb(props) {
             newGame.sheet.columns[columnIndex].boxes[boxIndex] = data;
             newGame.rollCount = 0;
             newGame.announcement = null;
-            setGame(newGame);
+            newGame.status = data.status;
+            setTimeout(() => {
+                setGame(newGame);
+            }, 1000);
             if (data.status === "FINISHED") {
                 handleFinish();
             }
