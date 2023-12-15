@@ -110,6 +110,7 @@ public class Game {
         return dices;
     }
 
+    @JsonIgnore
     public boolean isAnnouncementRequired() {
         return rollCount == 1 && announcement == null && sheet.areAllNonAnnouncementColumnsCompleted();
     }

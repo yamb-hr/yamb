@@ -10,6 +10,7 @@ import com.tejko.yamb.models.enums.GameStatus;
 public interface GameRepository extends JpaRepository<Game, Long> {
 
     Game existsByPlayerIdAndStatus(Long playerId, GameStatus status);
+    
     Optional<Game> findByPlayerIdAndStatus(Long playerId, GameStatus status);
 
 }

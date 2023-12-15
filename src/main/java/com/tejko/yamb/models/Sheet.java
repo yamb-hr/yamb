@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.ColumnType;
 
@@ -36,7 +34,7 @@ public class Sheet implements Serializable {
         return columns;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getTopSectionSum() {  
         int topSectionSum = 0;
         for (Column column : columns) {
@@ -45,8 +43,8 @@ public class Sheet implements Serializable {
         return topSectionSum;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
-    public int getMiddleSectionSum() { 
+    @JsonIgnore
+    public int getMiddleSectionSum() {
         int middleSectionSum = 0;
         for (Column column : columns) {
             middleSectionSum += column.getMiddleSectionSum();
@@ -54,7 +52,7 @@ public class Sheet implements Serializable {
         return middleSectionSum;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
         for (Column column : columns) {
@@ -63,7 +61,7 @@ public class Sheet implements Serializable {
         return bottomSectionSum;
     }
     
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getTotalSum() { 
         return getTopSectionSum() + getMiddleSectionSum() + getBottomSectionSum();
     }

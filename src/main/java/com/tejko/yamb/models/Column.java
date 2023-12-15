@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tejko.yamb.constants.GameConstants;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.ColumnType;
@@ -46,7 +45,7 @@ public class Column implements Serializable {
         return boxes;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getTopSectionSum() {
         int topSectionSum = 0;
         for (BoxType boxType : GameConstants.TOP_SECTION) {
@@ -61,7 +60,7 @@ public class Column implements Serializable {
         return topSectionSum;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getMiddleSectionSum() {
         int middleSectionSum = 0;
         Box ones = boxes.get(BoxType.ONES.ordinal());
@@ -73,7 +72,7 @@ public class Column implements Serializable {
         return middleSectionSum;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public int getBottomSectionSum() {
         int bottomSectionSum = 0;
         for (BoxType boxType : GameConstants.BOTTOM_SECTION) {
@@ -85,7 +84,7 @@ public class Column implements Serializable {
         return bottomSectionSum;
     }
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     public boolean isCompleted() {
         return getNumOfEmptyBoxes() == 0;
     }

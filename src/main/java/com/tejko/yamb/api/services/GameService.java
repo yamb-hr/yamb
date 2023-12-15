@@ -15,11 +15,15 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
+import com.tejko.yamb.models.Box;
+import com.tejko.yamb.models.Dice;
 import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.Player;
+import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.GameStatus;
 import com.tejko.yamb.models.payload.ActionRequest;
 import com.tejko.yamb.repositories.ScoreRepository;
+import com.tejko.yamb.util.Logger;
 import com.tejko.yamb.repositories.PlayerRepository;
 import com.tejko.yamb.repositories.GameRepository;
 
@@ -34,6 +38,9 @@ public class GameService implements RestService<Game> {
 
     @Autowired
     ScoreRepository scoreRepo;
+    
+    @Autowired
+    Logger logger;
 
     public Game getById(Long id) {
         return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
@@ -55,19 +62,23 @@ public class GameService implements RestService<Game> {
         }
     }
 
-    public Game rollDiceById(Long id, ActionRequest actionRequest) {
+    public List<Dice> rollDiceById(Long id, ActionRequest actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.rollDice(actionRequest.getDiceToRoll());
-        return gameRepo.save(game);
+        gameRepo.save(game);
+        logger.log("rollDice", actionRequest);
+        return game.getDices();
     }
 
-    public Game makeAnnouncementById(Long id, ActionRequest actionRequest) {
+    public BoxType makeAnnouncementById(Long id, ActionRequest actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.makeAnnouncement(actionRequest.getBoxType());
-        return gameRepo.save(game);
+        gameRepo.save(game);
+        logger.log("makeAnnouncement", actionRequest);
+        return game.getAnnouncement();
     }
 
-    public Game fillById(Long id, ActionRequest actionRequest) {
+    public Box fillBoxById(Long id, ActionRequest actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.fillBox(actionRequest.getColumnType(), actionRequest.getBoxType());
         if (game.getStatus() == GameStatus.FINISHED) {
@@ -77,7 +88,9 @@ public class GameService implements RestService<Game> {
             );
             scoreRepo.save(score);
         }
-        return gameRepo.save(game);
+        gameRepo.save(game);
+        logger.log("fillBox", actionRequest);
+        return game.getSheet().getColumns().get(actionRequest.getColumnType().ordinal()).getBoxes().get(actionRequest.getBoxType().ordinal());
     }
 
     public Game restartById(Long id) {

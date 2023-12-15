@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.GameService;
+import com.tejko.yamb.models.Box;
+import com.tejko.yamb.models.Dice;
 import com.tejko.yamb.models.Game;
+import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.payload.ActionRequest;
 
 @RestController
@@ -46,20 +49,20 @@ public class GameController {
 
 	@PutMapping("/{id}/roll")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
-	public ResponseEntity<Game> rollDiceById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
+	public ResponseEntity<List<Dice>> rollDiceById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
 		return new ResponseEntity<>(gameService.rollDiceById(id, actionRequest), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/announce")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
-	public ResponseEntity<Game> makeAnnouncementById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
+	public ResponseEntity<BoxType> makeAnnouncementById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
 		return new ResponseEntity<>(gameService.makeAnnouncementById(id, actionRequest), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/fill")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
-	public ResponseEntity<Game> fillById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
-		return new ResponseEntity<>(gameService.fillById(id, actionRequest), HttpStatus.OK);
+	public ResponseEntity<Box> fillBoxById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
+		return new ResponseEntity<>(gameService.fillBoxById(id, actionRequest), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}/restart")

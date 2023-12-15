@@ -27,28 +27,29 @@ public class Logger {
         return new Logger();
     }
 
-    public void log(String message) {
+    public void log(String message, Object data, LogLevel level) {
         try {
-            logService.create(Log.getInstance(null, message, LogLevel.DEBUG, null));
+            Optional<Player> player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (player.isPresent()) {
+                logService.create(Log.getInstance(player.get(), message, level, data));        
+            }
+            logService.create(Log.getInstance(null, message, level, data));                   
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }
 
+    public void log(String message) {
+        log(message, null, LogLevel.INFO);
+    }
+
+    public void log(String message, Object data) {
+        log(message, data, LogLevel.INFO);
+    }
+
     public void error(Exception exception) {
-        try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println(username);
-            Optional<Player> player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (player.isPresent()) {
-                logService.create(Log.getInstance(player.get(), exception.getMessage(), LogLevel.ERROR, null));        
-            }
-            logService.create(Log.getInstance(null, exception.getMessage(), LogLevel.ERROR, null));        
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
+        log(exception.getMessage(), exception.getClass(), LogLevel.ERROR);
     }
 
 }

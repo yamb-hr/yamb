@@ -8,11 +8,13 @@ function Game(props) {
     const [fillBox, setFillBox] = useState(null);
     const [restart, setRestart] = useState(false);
     const [diceToRoll, setDiceToRoll] = useState([0, 1, 2, 3, 4]);
+    const [rollCount, setRollCount] = useState(props.rollCount);
 
     useEffect(() => {
         if (restart) {
             props.onRestart();
             setRestart(false);
+            setRollCount(0);
             setDiceToRoll([0, 1, 2, 3, 4]);
         }
     }, [restart]);
@@ -21,6 +23,7 @@ function Game(props) {
         if (fillBox) {
             props.onFillBox(fillBox.columnType, fillBox.boxType);
             setDiceToRoll([0, 1, 2, 3, 4]);
+            setRollCount(0);
             setFillBox(null);
         }
     }, [fillBox]);
@@ -36,6 +39,7 @@ function Game(props) {
     };
 
     function handleRollDice() {
+        setRollCount(rollCount + 1);
         props.onRollDice(diceToRoll);
     }
 
@@ -55,13 +59,11 @@ function Game(props) {
         props.onLogout();
     };
 
-    let rollCount = props.rollCount;
     let sheet = props.sheet;
     let dices = props.dices;
     let announcement = props.announcement;
     let player = props.player;
-    let diceDisabled = props.rollCount === 0 || props.rollCount === 3;
-    let rollDiceButtonDisabled = props.rollCount === 3 || props.announcementRequired;
+    let diceDisabled = rollCount === 0 || rollCount === 3;
     let currentUser = props.currentUser;
 
     return (
@@ -84,14 +86,9 @@ function Game(props) {
             {sheet && <Sheet 
                 columns={sheet.columns} 
                 rollCount={rollCount}
-                topSectionSum={sheet.topSectionSum}
-                middleSectionSum={sheet.middleSectionSum}
-                bottomSectionSum={sheet.bottomSectionSum}
-                totalSum={sheet.totalSum}
                 announcement={announcement}
                 player={player}
                 currentUser={currentUser}
-                rollDiceButtonDisabled={rollDiceButtonDisabled}
                 onRollDice={handleRollDice}
                 onRestart={handleRestart}
                 onBoxClick={handleBoxClick}

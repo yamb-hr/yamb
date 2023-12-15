@@ -38,10 +38,15 @@ function Yamb(props) {
     }, [currentUser, id, props]);
 
     function handleRollDice(diceToRoll) {
+        console.time("rollDice");
         GameService.rollDiceById(game.id, diceToRoll)
         .then((data) => {
+            console.timeEnd("rollDice");
             console.log(data);
-            setGame(data);
+            let newGame = {...game};
+            newGame.dices = data;
+            newGame.rollCount = game.rollCount + 1;
+            setGame(newGame);
         })
         .catch((error) => {
             props.onError(error)
@@ -49,12 +54,21 @@ function Yamb(props) {
     };
 
     function handleFillBox(columnType, boxType) {
+        console.time("fillBox");
         GameService.fillBoxById(
             game.id, columnType, boxType
         )
         .then((data) => {
+            console.timeEnd("fillBox");
             console.log(data);
-            setGame(data);
+            let newGame = {...game};
+            console.log(game);
+            const columnIndex = newGame.sheet.columns.findIndex(c => c.type === columnType);
+            const boxIndex = newGame.sheet.columns[columnIndex].boxes.findIndex(b => b.type === boxType);
+            newGame.sheet.columns[columnIndex].boxes[boxIndex] = data;
+            newGame.rollCount = 0;
+            newGame.announcement = null;
+            setGame(newGame);
             if (data.status === "FINISHED") {
                 handleFinish();
             }
@@ -76,12 +90,16 @@ function Yamb(props) {
     }
 
     function handleMakeAnnouncement(type) {
+        console.time("makeAnnouncement");
         GameService.makeAnnouncementById(
             game.id, type
         )
         .then((data) => {
+            console.timeEnd("makeAnnouncement");
             console.log(data);
-            setGame(data);
+            let newGame = {...game};
+            newGame.announcement = data;
+            setGame(newGame);
         })
         .catch((error) => {
             props.onError(error)
@@ -89,11 +107,13 @@ function Yamb(props) {
 
     }
 
-    function handleRestart() {
+    function handleRestart() {       
+        console.time("restart");
         GameService.restartById(
             game.id
         )
         .then((data) => {
+            console.timeEnd("restart");
             console.log(data);
             setGame(data);
         })
@@ -133,11 +153,6 @@ function Yamb(props) {
                 dices={game.dices}
                 rollCount={game.rollCount}
                 announcement={game.announcement}
-                announcementRequired={game.announcementRequired}
-                topSectionSum={game.topSectionSum}
-                middleSectionSum={game.middleSectionSum}
-                bottomSectionSum={game.bottomSectionSum}
-                totalSum={game.totalSum}
                 player={game.player}
                 currentUser={currentUser}
                 onRollDice={handleRollDice}
