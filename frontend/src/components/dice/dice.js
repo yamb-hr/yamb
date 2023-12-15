@@ -16,7 +16,7 @@ function Dice(props) {
 
     useEffect(() => {
         if (!isRolling) {
-            setDiceDisabled(false)
+            setDiceDisabled(props.diceDisabled)
             setValue(props.value);
         }
     }, [props.value, isRolling]);
