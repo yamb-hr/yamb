@@ -73,13 +73,11 @@ function Yamb(props) {
             let newGame = {...game};
             const columnIndex = newGame.sheet.columns.findIndex(c => c.type === columnType);
             const boxIndex = newGame.sheet.columns[columnIndex].boxes.findIndex(b => b.type === boxType);
-            newGame.sheet.columns[columnIndex].boxes[boxIndex] = data;
+            newGame.sheet.columns[columnIndex].boxes[boxIndex].value = data;
             newGame.rollCount = 0;
             newGame.announcement = null;
             newGame.status = data.status;
-            setTimeout(() => {
-                setGame(newGame);
-            }, 1000);
+            setGame(newGame);
             if (data.status === "FINISHED") {
                 handleFinish();
             }

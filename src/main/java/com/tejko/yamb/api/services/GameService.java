@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
-import com.tejko.yamb.models.Box;
 import com.tejko.yamb.models.Dice;
 import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.Player;
@@ -78,7 +77,7 @@ public class GameService implements RestService<Game> {
         return game.getAnnouncement();
     }
 
-    public Box fillBoxById(Long id, ActionRequest actionRequest) {
+    public int fillBoxById(Long id, ActionRequest actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.fillBox(actionRequest.getColumnType(), actionRequest.getBoxType());
         if (game.getStatus() == GameStatus.FINISHED) {
@@ -90,7 +89,7 @@ public class GameService implements RestService<Game> {
         }
         gameRepo.save(game);
         logger.log("fillBox", actionRequest);
-        return game.getSheet().getColumns().get(actionRequest.getColumnType().ordinal()).getBoxes().get(actionRequest.getBoxType().ordinal());
+        return game.getSheet().getColumns().get(actionRequest.getColumnType().ordinal()).getBoxes().get(actionRequest.getBoxType().ordinal()).getValue();
     }
 
     public Game restartById(Long id) {

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.GameService;
-import com.tejko.yamb.models.Box;
 import com.tejko.yamb.models.Dice;
 import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.enums.BoxType;
@@ -61,7 +60,7 @@ public class GameController {
 
 	@PutMapping("/{id}/fill")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPermission(authentication, #id)")
-	public ResponseEntity<Box> fillBoxById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
+	public ResponseEntity<Integer> fillBoxById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
 		return new ResponseEntity<>(gameService.fillBoxById(id, actionRequest), HttpStatus.OK);
 	}
 
