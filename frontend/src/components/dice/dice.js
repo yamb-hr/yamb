@@ -7,10 +7,29 @@ function Dice(props) {
     const [rollCount, setRollCount] = useState(props.rollCount); 
     const [diceClass, setDiceClass] = useState("dice");
     const [diceStyle, setDiceStyle] = useState({});
+    const [value, setValue] = useState(props.value);
 
     function handleClick() {
         props.onDiceClick(props.index);
     };
+
+    useEffect(() => {
+        if (!isRolling) {
+            setValue(props.value);
+        }
+    }, [props.value, isRolling]);
+
+    useEffect(() => {
+        let intervalId;
+        if (isRolling) {
+            intervalId = setInterval(() => {
+                setValue(Math.floor(Math.random() * 6) + 1);
+            }, 150);
+        } else {
+            clearInterval(intervalId);
+        }
+        return () => clearInterval(intervalId);
+    }, [isRolling]);
 
     useEffect(() => {
         let newDiceClass = "dice " + (props.saved ? "saved " : " ");
@@ -35,7 +54,6 @@ function Dice(props) {
         setRollCount(props.rollCount);
     }, [props.rollCount, props.saved]);
 
-    let value = props.value;
     let diceDisabled = props.diceDisabled;
 
     return (

@@ -62,7 +62,6 @@ function Yamb(props) {
             console.timeEnd("fillBox");
             console.log(data);
             let newGame = {...game};
-            console.log(game);
             const columnIndex = newGame.sheet.columns.findIndex(c => c.type === columnType);
             const boxIndex = newGame.sheet.columns[columnIndex].boxes.findIndex(b => b.type === boxType);
             newGame.sheet.columns[columnIndex].boxes[boxIndex] = data;
