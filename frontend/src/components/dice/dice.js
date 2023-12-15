@@ -7,7 +7,7 @@ function Dice(props) {
     const [rollCount, setRollCount] = useState(props.rollCount); 
     const [diceClass, setDiceClass] = useState("dice");
     const [diceStyle, setDiceStyle] = useState({});
-    const [diceDisabled, setDiceDisabled] = useState(true);
+    const [diceDisabled, setDiceDisabled] = useState(props.diceDisabled);
     const [value, setValue] = useState(props.value);
 
     function handleClick() {
@@ -53,6 +53,8 @@ function Dice(props) {
         if ((rollCount !== props.rollCount && !props.saved) && props.rollCount !== 0) {
             setRolling(true);
             setDiceDisabled(true);
+        } else {
+            setDiceDisabled(props.diceDisabled);
         }
         setRollCount(props.rollCount);
     }, [props.rollCount, props.saved]);
