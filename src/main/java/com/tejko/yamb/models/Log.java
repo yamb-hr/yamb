@@ -79,4 +79,9 @@ public class Log {
         return time;
     }
 
+    @Override
+    public String toString() {
+        return "[" + time + "]: Message=" + message + "\nPlayer=" + player.getUsername();
+    }
+
 }

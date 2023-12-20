@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT), HttpStatus.BAD_REQUEST);
     }
     
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({ AccessDeniedException.class })
     public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
         logger.error(exception);
         return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_FORBIDDEN, exception.getLocalizedMessage()), HttpStatus.FORBIDDEN);

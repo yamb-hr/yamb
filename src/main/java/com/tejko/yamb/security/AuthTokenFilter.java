@@ -44,7 +44,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	private UserDetails extractUserFromRequest(HttpServletRequest request) {
 		String token = extractTokenFromAuthHeader(request);
 		try {
-			return playerService.loadUserByUsername(extractUsernameFromToken(token));
+			return playerService.loadUserByUsername(jwtUtil.extractUsernameFromToken(token));
 		} catch (Exception e) {
 			// ignore
 		}
@@ -59,7 +59,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 		return null;
 	}
 
-	private String extractUsernameFromToken(String token) {
-		return jwtUtil.parseToken(token).getBody().getSubject();
-	}
 }

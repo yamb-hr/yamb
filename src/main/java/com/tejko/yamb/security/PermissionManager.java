@@ -19,9 +19,15 @@ public class PermissionManager {
     @Autowired
     PlayerRepository playerRepo;
 
-    public boolean hasPermission(Authentication authentication, Long gameId) {
+    public boolean hasGamePermission(Authentication authentication, Long gameId) {
         Player player = playerRepo.findByUsername(authentication.getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
         return player.getId().equals(gameRepo.findById(gameId).get().getPlayer().getId());
     }
+
+    public boolean hasPlayerPermission(Authentication authentication, Long playerId) {
+        Player player = playerRepo.findByUsername(authentication.getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
+        return player.getId().equals(playerId);
+    }
+
 
 }

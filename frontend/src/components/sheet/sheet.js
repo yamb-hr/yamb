@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LanguageContext, ThemeContext } from '../../App';
+import { CurrentUserContext, LanguageContext, ThemeContext } from '../../App';
 import Column from '../column/column';
 import Label from '../label/label';
 import './sheet.css';
@@ -9,9 +9,10 @@ import './sheet.css';
 function Sheet(props) {
 
     const navigate = useNavigate();
-    const {theme, toggleTheme} = useContext(ThemeContext);
-    const {language, toggleLanguage} = useContext(LanguageContext);
     const { t } = useTranslation();
+    const { currentUser } = useContext(CurrentUserContext);
+    const { theme, toggleTheme } = useContext(ThemeContext);
+    const { language, toggleLanguage } = useContext(LanguageContext);
 
     function handleSettings() {
         toggleLanguage();
@@ -45,8 +46,7 @@ function Sheet(props) {
         columns,
         rollCount,
         announcement,
-        player,
-        currentUser
+        player
     } = props;
 
     function getTotalSum() {
@@ -158,7 +158,7 @@ function Sheet(props) {
                 <Label value={t('yamb')} info={t('yamb-info')}></Label>
                 <Label variant="sum" value="Σ (T, J)" info={t('bottom-section-sum')}></Label>
             </div>
-            {columns.map((column, index) => (
+            {columns && columns.map((column, index) => (
                 <div className="column" key={column.type}>
                     <Column 
                         type={column.type} 
@@ -197,7 +197,7 @@ function Sheet(props) {
             </div>
             <div className="last-row">
                 <button className="username-button">{player.username}</button>
-                {currentUser.tempUser ? <a className="register-sheet-button" href="/register">{t('register')}</a> : 
+                {currentUser?.tempUser ? <a className="register-sheet-button" href="/register">{t('register')}</a> : 
                 <button className="logout-button" onClick={handleLogout}>{t('logout')}</button>}
                 <Label variant="total-sum" value={getTotalSum()}></Label>
             </div>

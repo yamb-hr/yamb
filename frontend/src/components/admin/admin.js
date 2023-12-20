@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CurrentUserContext } from '../../App';
 import './admin.css';
-import AuthService from '../../api/auth-service';
 
 function Admin() {
 
     const navigate = useNavigate();   
 
-    const [currentUser] = useState(AuthService.getCurrentPlayer());
+    const { currentUser } = useContext(CurrentUserContext);
 
     useEffect(() => {
         if (!currentUser?.roles?.find(x => x.label === 'ADMIN')) {
@@ -22,6 +22,10 @@ function Admin() {
                 <br/>
                 <br/>
                 <a href="/">Home</a>
+                <br/>
+                <a href="/chat">Chat</a>
+                <br/>
+                <a href="/dashboard">Dashboard</a>
                 <br/>
                 <a href="/players">Players</a>
                 <br/>

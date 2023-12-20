@@ -3,17 +3,17 @@ import AuthService from '../../api/auth-service';
 import { Slide, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { CurrentUserContext, ThemeContext } from '../../App';
 import './auth.css';
-import { ThemeContext } from '../../App';
 
 function Register() {
-    const t = useTranslation();
-    const theme = useContext(ThemeContext);
-    const [username, setUsername] = useState(
-        AuthService.getCurrentPlayer() ? AuthService.getCurrentPlayer().username : "Player" + Math.round(Math.random() * 10000)
-    );
-    const [password, setPassword] = useState('');
-    const [repeatPassword, setRepeatPassword] = useState('');
+    
+    const { t} = useTranslation();
+    const { theme } = useContext(ThemeContext);
+    const { currentUser } = useContext(CurrentUserContext);
+    const [ username, setUsername ] = useState(currentUser ? currentUser.username : "Player" + Math.round(Math.random() * 10000));
+    const [ password, setPassword ] = useState('');
+    const [ repeatPassword, setRepeatPassword ] = useState('');
     const navigate = useNavigate();
 
     function handleSubmit() {

@@ -7,10 +7,11 @@ import './auth.css';
 
 function Login() {
 
+    const navigate = useNavigate();
+    const { theme } = useContext(ThemeContext);
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const theme = useContext(ThemeContext);
-    const navigate = useNavigate();
 
     function handleSubmit() {
         AuthService.login({

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.ScoreService;
 import com.tejko.yamb.models.Score;
+import com.tejko.yamb.models.payload.DashboardResponse;
 import com.tejko.yamb.models.payload.DateTimeInterval;
 
 @RestController
@@ -38,6 +39,11 @@ public class ScoreController {
 	@GetMapping("/interval")
 	public ResponseEntity<List<Score>> getByInterval(@RequestBody DateTimeInterval interval) {
 		return new ResponseEntity<>(scoreService.getByInterval(interval), HttpStatus.OK);
+	}
+
+	@GetMapping("/dashboard")
+	public ResponseEntity<DashboardResponse> getDashboardData() {
+		return new ResponseEntity<>(scoreService.getDashboardData(), HttpStatus.OK);
 	}
 
 }

@@ -30,13 +30,11 @@ public class Logger {
     public void log(String message, Object data, LogLevel level) {
         try {
             Optional<Player> player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (player.isPresent()) {
-                logService.create(Log.getInstance(player.get(), message, level, data));        
-            }
-            logService.create(Log.getInstance(null, message, level, data));                   
+            Log log = Log.getInstance(player.orElse(null), message, level, data);
+            System.out.println(log);
+            logService.create(log);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+            System.out.println(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 

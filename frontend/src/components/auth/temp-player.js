@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { CurrentUserContext } from '../../App';
 import AuthService from '../../api/auth-service';
 
 function TempPlayer(props) {
     
-    const [username, setUsername] = useState("Player" + Math.round(Math.random() * 10000));
+    const [ username, setUsername ] = useState("Player" + Math.round(Math.random() * 10000));
+    const { setCurrentUser } = useContext(CurrentUserContext);
 
     function handleSubmit() {
         AuthService.createTempPlayer({
@@ -12,7 +14,10 @@ function TempPlayer(props) {
         .then((player) => {
             console.log(player);
             localStorage.setItem("player", JSON.stringify(player));
-            props.onCurrentUserChange(player);
+            setCurrentUser(player);
+        })
+        .catch((error) => {
+            props.onError(error);
         });
     };
 
@@ -20,7 +25,7 @@ function TempPlayer(props) {
         setUsername(event.target.value);
     };
 
-    const loginDisabled = username.length < 5 || username.length > 15;
+    let loginDisabled = username.length < 5 || username.length > 15;
 
     return (
         <div className="login">

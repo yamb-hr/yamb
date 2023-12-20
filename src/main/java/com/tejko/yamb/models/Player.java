@@ -171,13 +171,4 @@ public class Player implements UserDetails {
         return true;
     }
 
-    @Override
-	public String toString() {
-        String string = username;
-        for (Role role : roles) {
-            string += role.getLabel() + ": " + role.getdescription() + "\n";
-        }
-		return string;
-    }
-
 }

@@ -53,8 +53,11 @@ public class AuthService {
 
     public Player register(AuthRequest authRequest) {
         String usernameFromAuth = SecurityContextHolder.getContext().getAuthentication().getName();
-		if (playerRepo.existsByUsername(authRequest.getUsername()) && !authRequest.getUsername().equals(usernameFromAuth)) {
-			throw new BadCredentialsException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
+		if (playerRepo.existsByUsername(authRequest.getUsername())) {
+            Player player = playerRepo.findByUsername(authRequest.getUsername()).get();
+            if (!player.isTempUser() || !authRequest.getUsername().equals(usernameFromAuth)) {
+                throw new BadCredentialsException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
+            }
 		} else if (authRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || authRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
             throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
         }

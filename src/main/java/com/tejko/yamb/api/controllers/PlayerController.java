@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.PlayerService;
 import com.tejko.yamb.models.Score;
-
+import com.tejko.yamb.models.payload.PrincipalResponse;
 import com.tejko.yamb.models.Player;
 
 @RestController
@@ -46,6 +46,12 @@ public class PlayerController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public void deleteById(@PathVariable Long id) {
 		playerService.deleteById(id);
+	}
+
+    @GetMapping("/{id}/principal")
+    @PreAuthorize("isAuthenticated() && @permissionManager.hasPlayerPermission(authentication, #id)")
+	public ResponseEntity<PrincipalResponse> getPrincipalById(@PathVariable Long id) {
+		return new ResponseEntity<>(playerService.getPrincipalById(id), HttpStatus.OK);
 	}
 
 }

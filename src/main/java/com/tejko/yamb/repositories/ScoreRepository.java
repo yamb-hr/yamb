@@ -13,4 +13,8 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
 
     List<Score> findByDateBetween(LocalDateTime from, LocalDateTime to); 
 
+    List<Score> findTop15ByDateBetweenOrderByValueDesc(LocalDateTime from, LocalDateTime to);
+
+    List<Score> findTop15ByOrderByValueDesc();
+
 }

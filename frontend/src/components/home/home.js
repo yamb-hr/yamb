@@ -1,20 +1,16 @@
-import React, { useEffect, useState} from 'react';
+import React, { useContext, useEffect } from 'react';
+import { CurrentUserContext } from '../../App';
 import TempPlayer from '../auth/temp-player';
 import Yamb from '../yamb/yamb';
-import AuthService from '../../api/auth-service';
 import './home.css';
 
 function Home(props) {
 
-    const [currentUser, setCurrentUser] = useState(AuthService.getCurrentPlayer());
+    const { currentUser } = useContext(CurrentUserContext);
 
     useEffect(() => {
         console.log(process.env.REACT_APP_API_URL);
     });    
-
-    function handleCurrentUserChange(player) {
-        setCurrentUser(player);
-    }
 
     function handleError(error) {
         props.onError(error);
@@ -22,7 +18,7 @@ function Home(props) {
 
     return (
         <div className="home">
-            {!currentUser ? <TempPlayer onCurrentUserChange={handleCurrentUserChange}></TempPlayer> : <Yamb onError={handleError}></Yamb>}
+            {currentUser ? <Yamb onError={handleError}></Yamb> : <TempPlayer onError={handleError}></TempPlayer> }
         </div>
     );
 };

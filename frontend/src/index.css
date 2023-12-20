@@ -289,7 +289,7 @@ a {
 }
 
 a:hover {
-  font-weight: bold;
+  text-decoration: underline;
 }
 
 @media only screen and (max-width: 480px) {

@@ -64,7 +64,6 @@ function Game(props) {
     let announcement = props.announcement;
     let player = props.player;
     let diceDisabled = rollCount === 0 || rollCount === 3;
-    let currentUser = props.currentUser;
 
     return (
         <div className="game">
@@ -89,7 +88,6 @@ function Game(props) {
                 announcement={announcement}
                 dices={dices}
                 player={player}
-                currentUser={currentUser}
                 onRollDice={handleRollDice}
                 onRestart={handleRestart}
                 onBoxClick={handleBoxClick}

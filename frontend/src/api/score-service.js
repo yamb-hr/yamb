@@ -9,7 +9,7 @@ const ScoreService = {
             body: JSON.stringify({ interval: interval }),
             credentials: 'same-origin',
             headers: {
-                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer().token
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token
             },
             method: 'POST',
             mode: 'cors'
@@ -21,6 +21,24 @@ const ScoreService = {
             return response.json().then(error => { throw new Error(error.message) })
         });
     },
+
+    getDashboardData: function() {
+        return fetch(API_URL + '/dashboard', {
+            body: null,
+            credentials: 'same-origin',
+            headers: {
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token
+            },
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().then(data => data);
+            }
+            return response.json().then(error => { throw new Error(error.message) })
+        });
+    }
 
 }
 

@@ -40,7 +40,6 @@ public class Score {
 
 	public static Score getInstance(Player player, int value) {
 		return new Score(player, value, LocalDateTime.now());
-
 	}
 
 	public Long getId() {
@@ -53,6 +52,10 @@ public class Score {
 
 	public int getValue() {
 		return value;
+	}
+	
+	public LocalDateTime getDate() {
+		return date;
 	}
 
 }

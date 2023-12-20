@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import calculateScore from '../score-calculator';
 import { BoxType } from '../../constants/box-types';
+import { CurrentUserContext } from '../../App';
+import calculateScore from '../score-calculator';
 import AuthService from '../../api/auth-service';
 import GameService from '../../api/game-service';
 import Game from '../game/game';
@@ -11,10 +12,11 @@ import './yamb.css';
 
 function Yamb(props) {
 
-    const { t } = useTranslation();
     const { id } = useParams();
+    const { t } = useTranslation();
+    const { currentUser } = useContext(CurrentUserContext);
+    
     const [game, setGame] = useState(null);
-    const [currentUser] = useState(AuthService.getCurrentPlayer());
 
     useEffect(() => {   
         if (id) {
@@ -163,7 +165,6 @@ function Yamb(props) {
                 rollCount={game.rollCount}
                 announcement={game.announcement}
                 player={game.player}
-                currentUser={currentUser}
                 onRollDice={handleRollDice}
                 onFillBox={handleFillBox}
                 onMakeAnnouncement={handleMakeAnnouncement}

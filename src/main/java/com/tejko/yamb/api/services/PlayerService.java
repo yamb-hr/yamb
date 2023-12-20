@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.models.Score;
+import com.tejko.yamb.models.payload.PrincipalResponse;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
@@ -32,6 +33,9 @@ public class PlayerService implements UserDetailsService, RestService<Player> {
 
     @Autowired
     ScoreRepository scoreRepo;
+    
+    @Autowired
+    WebSocketService webSocketService;
 
     public Player getById(Long id) {
         return playerRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
@@ -57,6 +61,10 @@ public class PlayerService implements UserDetailsService, RestService<Player> {
     @Override
     public void deleteById(Long id) {
         playerRepo.deleteById(id);
+    }
+
+    public PrincipalResponse getPrincipalById(Long id) {
+        return webSocketService.getPrincipalByPlayerId(id);
     }
 
 }
