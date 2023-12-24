@@ -80,7 +80,7 @@ function Register() {
                     type="text"
                     value={username}
                     onChange={handleUsernameChange}
-                    placeholder="Ime...">
+                    placeholder={t('username') + "..."} >
                 </input>
                 <br />
                 <input
@@ -88,7 +88,7 @@ function Register() {
                     type="password"
                     value={password}
                     onChange={handlePasswordChange}
-                    placeholder="Lozinka...">
+                    placeholder={t('password') + "..."} >
                 </input>
                 <br />
                 <input
@@ -96,13 +96,13 @@ function Register() {
                     type="password"
                     value={repeatPassword}
                     onChange={handleRepeatPasswordChange}
-                    placeholder="Ponovi Lozinku...">
+                    placeholder={t('password') + "..."} >
                 </input>
                 <br />
-                <button className="register-button" disabled={registerDisabled} onClick={handleSubmit} >Registracija</button>
+                <button className="register-button" disabled={registerDisabled} onClick={handleSubmit}>{t('register')}</button>
                 <br />
-                <span style={{ float: "left" }}><a href="/">Igra</a></span>
-                <span style={{ float: "right" }}><a href="/login">Prijava</a></span>
+                <span style={{ float: "left" }}><a href="/">{t('play')}</a></span>
+                <span style={{ float: "right" }}><a href="/login">{t('login')}</a></span>
                 <br />
             </div>
         </div>

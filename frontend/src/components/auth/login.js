@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import AuthService from '../../api/auth-service';
 import { Slide, toast } from 'react-toastify';
 import { ThemeContext } from '../../App';
+import { useTranslation } from 'react-i18next';
 import './auth.css';
 
 function Login() {
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
 
@@ -62,31 +64,24 @@ function Login() {
                     type="text"
                     value={username}
                     onChange={handleUsernameChange}
-                    placeholder="Ime..."
-                />
+                    placeholder={t('username') + "..."} />
                 <br />
                 <input
                     className="password-input"
                     type="password"
                     value={password}
                     onChange={handlePasswordChange}
-                    placeholder="Lozinka..."
-                />
+                    placeholder={t('password') + "..."} />
                 <br />
                 <button
                     className="login-button"
                     disabled={loginDisabled}
-                    onClick={handleSubmit}
-                >
-                    Prijava
+                    onClick={handleSubmit}>
+                    {t('login')}
                 </button>
                 <br />
-                <span style={{ float: "left" }}>
-                    <a href="/">Igra</a>
-                </span>
-                <span style={{ float: "right" }}>
-                    <a href="/register">Registracija</a>
-                </span>
+                <span style={{ float: "left" }}><a href="/">{t('play')}</a></span>
+                <span style={{ float: "right" }}><a href="/register">{t('register')}</a></span>
                 <br />
             </div>
         </div>

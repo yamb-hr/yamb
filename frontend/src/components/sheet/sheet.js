@@ -1,29 +1,17 @@
 import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CurrentUserContext, LanguageContext, ThemeContext } from '../../App';
+import { MenuContext } from '../../App';
 import Column from '../column/column';
 import Label from '../label/label';
 import './sheet.css';
 
 function Sheet(props) {
 
-    const navigate = useNavigate();
     const { t } = useTranslation();
-    const { currentUser } = useContext(CurrentUserContext);
-    const { theme, toggleTheme } = useContext(ThemeContext);
-    const { language, toggleLanguage } = useContext(LanguageContext);
+    const { isMenuOpen, setMenuOpen } = useContext(MenuContext);
 
     function handleSettings() {
-        toggleLanguage();
-    }
-
-    function handleInfo() {
-        toggleTheme();
-    }
-
-    function handleLogout() {
-        props.onLogout();
+        setMenuOpen(!isMenuOpen);
     }
 
     function handleRollDice() {
@@ -36,10 +24,6 @@ function Sheet(props) {
 
     function handleBoxClick(columnType, boxType) {
         props.onBoxClick(columnType, boxType);
-    }
-
-    function handleAdminClick() {
-        navigate('/admin');
     }
 
     const {
@@ -136,8 +120,8 @@ function Sheet(props) {
     return (
         <div className="sheet">
             <div className="column">
-                <button className="settings-button" onClick={handleSettings}>
-                    <img src="../svg/buttons/language.svg" alt={language} ></img>
+                <button className="settings-button-sheet" onClick={handleSettings}>
+                    <img src="../svg/buttons/cog.svg" alt="Settings" ></img>
                 </button>
                 <Label icon="ones" info={t('ones')}></Label>
                 <Label icon="twos" info={t('twos')}></Label>
@@ -173,12 +157,6 @@ function Sheet(props) {
                 </div>
             ))}
             <div className="column">
-                <button className="info-button" onClick={handleInfo}>
-                    <img src={"../svg/buttons/" + (theme === "dark" ? "sun" : "moon") + ".svg"} alt="Language"></img>
-                </button>
-                {currentUser?.roles?.find(x => x.label=== "ADMIN") && <button className="admin-button" onClick={handleAdminClick}> 
-                    <img src={"../svg/buttons/cog.svg"} alt="Admin"></img>
-                </button>}
                 <button className="roll-button" onClick={handleRollDice} disabled={rollDiceButtonDisabled}>
                     <img src={"../svg/buttons/roll-" + (3-rollCount) + ".svg"} alt="Roll"></img>
                 </button>                    
@@ -197,8 +175,6 @@ function Sheet(props) {
             </div>
             <div className="last-row">
                 <button className="username-button">{player.username}</button>
-                {currentUser?.tempUser ? <a className="register-sheet-button" href="/register">{t('register')}</a> : 
-                <button className="logout-button" onClick={handleLogout}>{t('logout')}</button>}
                 <Label variant="total-sum" value={getTotalSum()}></Label>
             </div>
         </div>

@@ -25,6 +25,7 @@
 	color: var(--color-total-sum);
 	background: var(--background-total-sum);
 	border: var(--border-total-sum);
+    grid-column-start: 3;
 }
 
 .column-symbol {

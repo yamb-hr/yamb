@@ -1,26 +1,27 @@
-import React, { Component } from 'react';
+import React, { useContext } from 'react';
+import { MenuContext } from '../../App';
+import { useTranslation } from 'react-i18next';
 
-class Games extends Component {
+function Games() {
 
-    constructor(props) {
-        super(props)
-        this.state = {}
+    const { t } = useTranslation();
+    const {isMenuOpen, setMenuOpen} = useContext(MenuContext);
+
+    function handleSettings() {
+        setMenuOpen(!isMenuOpen);
     }
 
-    render() {
-        return (
-            <div className="form">
-                Games
-                <br/>
-                <br/>
-                <a href="/">Home</a>
-                <br/>
-                <a href="/players">Players</a>
-                <br/>
-                <a href="/scores">Scores</a>
-            </div>   
-        );
-    }    
+    return (
+        <div className="form">
+            {t('games')}
+            <br/>
+            <br/>
+            <button className="settings-button" onClick={handleSettings}>
+                <img src="../svg/buttons/cog.svg" alt="Settings" ></img>
+            </button>
+        </div>   
+    );
+      
 }
 
 export default Games;

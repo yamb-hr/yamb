@@ -4,7 +4,6 @@
     border: var(--border-form);
     border-radius: var(--border-radius-box);
     padding: var(--padding-form);
-    filter: brightness(110%);
 }
 
 .play-button {

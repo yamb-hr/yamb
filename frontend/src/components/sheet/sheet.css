@@ -12,36 +12,16 @@
 	grid-template-rows: repeat(17, var(--height-box));
 }
 
-.settings-button {
+.settings-button-sheet {
 	background: var(--background-settings-button);
     color: var(--color-settings-button);
     border: var(--border-settings-button);
     border-radius: var(--border-radius-box);
 }
 
-.settings-button img {
+.settings-button-sheet img {
 	width: calc(var(--width-box) / 2);
 	filter: var(--filter-settings-button)
-}
-
-.info-button {
-    background: var(--background-info-button);
-    color: var(--color-info-button);
-    border: var(--border-info-button);
-    border-radius: var(--border-radius-box);
-}
-
-.info-button img {
-	width: calc(var(--width-box) / 2);
-	filter: var(--filter-info-button);
-}
-
-.admin-button {
-	background: var(--background-admin-button);
-	color: var(--color-admin-button);
-	border: var(--border-admin-button);
-	grid-row-start: 9;
-	grid-row-end: 11;
 }
 
 .roll-button {
@@ -95,23 +75,3 @@
 	border: var(--border-username-button);
 	background: var(--background-username-button);
 }
-
-.logout-button {
-	font-weight: bold;
-    background: var(--background-logout-button);
-    color: var(--color-logout-button);
-    border: var(--border-logout-button);
-    border-radius: var(--border-radius-box);
-}
-
-.register-sheet-button {
-	margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--background-register-button);
-    color: var(--color-register-button);
-    border: var(--border-register-button);
-    border-radius: var(--border-radius-box);
-}
-

@@ -151,11 +151,6 @@ function Yamb(props) {
 			}
 		);
     }
-
-    function handleLogout() {
-        AuthService.logout();
-        window.location.reload();
-    }
    
     return (
         <div className="yamb">
@@ -168,8 +163,7 @@ function Yamb(props) {
                 onRollDice={handleRollDice}
                 onFillBox={handleFillBox}
                 onMakeAnnouncement={handleMakeAnnouncement}
-                onRestart={handleRestart}
-                onLogout={handleLogout}>
+                onRestart={handleRestart}>
             </Game>}
         </div>
     );

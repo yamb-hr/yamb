@@ -1,9 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { CurrentUserContext } from '../../App';
 import AuthService from '../../api/auth-service';
+import { useTranslation } from 'react-i18next';
 
 function TempPlayer(props) {
     
+    const { t } = useTranslation();
     const [ username, setUsername ] = useState("Player" + Math.round(Math.random() * 10000));
     const { setCurrentUser } = useContext(CurrentUserContext);
 
@@ -35,22 +37,21 @@ function TempPlayer(props) {
                     type="text"
                     value={username}
                     onChange={handleUsernameChange}
-                    placeholder="Ime..."
+                    placeholder={t('username') + "..."}
                 />
                 <br />
                 <button
                     className="login-button"
                     disabled={loginDisabled}
-                    onClick={handleSubmit}
-                >
-                    Igraj
+                    onClick={handleSubmit}>
+                    {t('play')}
                 </button>
                 <br />
                 <span style={{ float: "left" }}>
-                    <a href="/login">Prijava</a>
+                    <a href="/login">{t('login')}</a>
                 </span>
                 <span style={{ float: "right" }}>
-                    <a href="/register">Registracija</a>
+                    <a href="/register">{t('register')}</a>
                 </span>
                 <br />
             </div>

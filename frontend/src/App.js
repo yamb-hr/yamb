@@ -16,12 +16,14 @@ import Chat from './components/chat/chat';
 import Dashboard from './components/dashboard/dashboard';
 import AuthService from './api/auth-service';
 import PlayerService from "./api/player-service";
+import { slide as Menu } from 'react-burger-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 export const ThemeContext = createContext(null);
 export const LanguageContext = createContext(null);
 export const CurrentUserContext = createContext(null);
+export const MenuContext = createContext(null);
 
 var socket = null
 
@@ -31,9 +33,11 @@ function App() {
 	const [ theme, setTheme ] = useState(getCurrentTheme());
 	const [ language, setLanguage ] = useState(getCurrentLanguage());
 	const [ currentUser, setCurrentUser ] = useState(AuthService.getCurrentPlayer());
+	const [ isMenuOpen, setMenuOpen ] = useState(false);
 
     const [ principal, setPrincipal ] = useState(null);
     const [ connected, setConnected ] = useState(false);
+	
     const [ topics, setTopics ] = useState(["/chat/public"]);
 
 	useEffect(() => {
@@ -158,29 +162,58 @@ function App() {
 		}
 	}
 
+	function handleOnMenuClose() {
+		setMenuOpen(false);
+	}
+
 	return (
 		<div className="App">
+			<Menu isOpen={ isMenuOpen } onClose={handleOnMenuClose} className={ "menu" } customBurgerIcon={ false }>
+				<br/>
+				<a href="/">{t('play')}</a>
+				<br/>
+				<a href="/players">{t('players')}</a>
+				<br/>
+				<a href="/scores">{t('scores')}</a>
+				<br/>
+				<a href="/games">{t('games')}</a>
+				<br/>
+				{currentUser?.tempUser ? <a href="/register">{t('register')}</a> : <a href="/logout">{t('logout')}</a>}
+				<br/>
+				<div className="menu-buttons"> 
+					<button className="language-button" onClick={toggleLanguage}>
+						<img src="../svg/buttons/language.svg" alt={language} ></img>
+					</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button className="theme-button" onClick={toggleTheme}>
+						<img src={"../svg/buttons/" + (theme === "dark" ? "sun" : "moon") + ".svg"} alt={theme}></img>
+					</button>
+				</div>
+                {currentUser?.roles?.find(x => x.label=== "ADMIN") && <a href="/admin">Admin</a>}	
+			</Menu>
 			<header className="App-header">
-				<CurrentUserContext.Provider value={{ currentUser, setCurrentUser}}>
-					<ThemeContext.Provider value={{ theme, toggleTheme}}>
-						<LanguageContext.Provider value={{ language, toggleLanguage}}>
-								<Router>
-									<Routes>
-										<Route path="/" element={<Home onError={handleError}/>} />
-										<Route path="/login" element={<Login onError={handleError}/>} />
-										<Route path="/register" element={<Register onError={handleError}/>} />
-										<Route path="/players" element={<Players onError={handleError}/>} />
-										<Route path="/scores" element={<Scores onError={handleError}/>} />
-										<Route path="/games" element={<Games onError={handleError}/>} />
-										<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
-										<Route path="/admin" element={<Admin onError={handleError}/>} />
-										<Route path="/chat" element={<Chat onError={handleError}/>} />
-										<Route path="/dashboard" element={<Dashboard onError={handleError}/>} />
-									</Routes>
-								</Router>
-						</LanguageContext.Provider>
-					</ThemeContext.Provider>
-				</CurrentUserContext.Provider>
+				<MenuContext.Provider value={{ isMenuOpen, setMenuOpen}}>
+					<CurrentUserContext.Provider value={{ currentUser, setCurrentUser}}>
+						<ThemeContext.Provider value={{ theme, toggleTheme}}>
+							<LanguageContext.Provider value={{ language, toggleLanguage}}>
+									<Router>
+										<Routes>
+											<Route path="/" element={<Home onError={handleError}/>} />
+											<Route path="/login" element={<Login onError={handleError}/>} />
+											<Route path="/register" element={<Register onError={handleError}/>} />
+											<Route path="/players" element={<Players onError={handleError}/>} />
+											<Route path="/scores" element={<Scores onError={handleError}/>} />
+											<Route path="/games" element={<Games onError={handleError}/>} />
+											<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
+											<Route path="/admin" element={<Admin onError={handleError}/>} />
+											<Route path="/chat" element={<Chat onError={handleError}/>} />
+											<Route path="/dashboard" element={<Dashboard onError={handleError}/>} />
+										</Routes>
+									</Router>
+							</LanguageContext.Provider>
+						</ThemeContext.Provider>
+					</CurrentUserContext.Provider>
+				</MenuContext.Provider>
 				<ToastContainer limit={5} style={{fontSize:"medium"}}/>
 				{currentUser && <SockJsClient url={process.env.REACT_APP_API_URL + "/ws?token=" + currentUser.token}
 					topics={topics}

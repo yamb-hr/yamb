@@ -16,6 +16,8 @@
   --border-sheet: none;
   --margin-sheet: 40px 0 0 0;
 
+  --background-menu: var(--color-blue);
+
   --color-label: var(--color-gray);
   --background-label: var(--color-blue);
   --border-label: none;
@@ -131,9 +133,10 @@
 }
 
 [theme="light"] {
-  --color-gray: #EEEEEE;
 
-  --color-background: #FFFFFB;
+  --background-menu: var(--color-gray);
+
+  --color-background: #cecece;
   --background-sheet: var(--color-gray);
 
   --color-label: var(--color-blue);
@@ -286,6 +289,10 @@ a {
   text-decoration: none;
   color: var(--color-yellow);
   font-size: medium;
+}
+
+[theme="light"] a {
+  color: var(--color-blue);
 }
 
 a:hover {

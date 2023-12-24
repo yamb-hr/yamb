@@ -1,6 +1,8 @@
 {
     "login": "Prijava",
     "register": "Registracija",
+    "username": "Ime",
+    "password": "Lozinka",
     "player": "Igrač",
     "play": "Igraj",
     "players": "Igrači",
