@@ -4,7 +4,7 @@ import TempPlayer from '../auth/temp-player';
 import Yamb from '../yamb/yamb';
 import './home.css';
 
-function Home(props) {
+function Home() {
 
     const { currentUser } = useContext(CurrentUserContext);
 
@@ -12,13 +12,9 @@ function Home(props) {
         console.log(process.env.REACT_APP_API_URL);
     });    
 
-    function handleError(error) {
-        props.onError(error);
-    }
-
     return (
         <div className="home">
-            {currentUser ? <Yamb onError={handleError}></Yamb> : <TempPlayer onError={handleError}></TempPlayer> }
+            {currentUser ? <Yamb></Yamb> : <TempPlayer></TempPlayer> }
         </div>
     );
 };

@@ -7,9 +7,9 @@ import i18n from './i18n';
 import Home from './components/home/home';
 import Login from './components/auth/login';
 import Register from './components/auth/register';
-import Players from './components/lists/players';
-import Scores from './components/lists/scores';
-import Games from './components/lists/games';
+import Players from './components/table/players';
+import Scores from './components/table/scores';
+import Games from './components/table/games';
 import Admin from './components/admin/admin';
 import Yamb from './components/yamb/yamb';
 import Chat from './components/chat/chat';
@@ -24,6 +24,7 @@ export const ThemeContext = createContext(null);
 export const LanguageContext = createContext(null);
 export const CurrentUserContext = createContext(null);
 export const MenuContext = createContext(null);
+export const ErrorContext = createContext(null);
 
 var socket = null
 
@@ -189,31 +190,34 @@ function App() {
 						<img src={"../svg/buttons/" + (theme === "dark" ? "sun" : "moon") + ".svg"} alt={theme}></img>
 					</button>
 				</div>
+				<br/>
                 {currentUser?.roles?.find(x => x.label=== "ADMIN") && <a href="/admin">Admin</a>}	
 			</Menu>
 			<header className="App-header">
-				<MenuContext.Provider value={{ isMenuOpen, setMenuOpen}}>
-					<CurrentUserContext.Provider value={{ currentUser, setCurrentUser}}>
-						<ThemeContext.Provider value={{ theme, toggleTheme}}>
-							<LanguageContext.Provider value={{ language, toggleLanguage}}>
-									<Router>
-										<Routes>
-											<Route path="/" element={<Home onError={handleError}/>} />
-											<Route path="/login" element={<Login onError={handleError}/>} />
-											<Route path="/register" element={<Register onError={handleError}/>} />
-											<Route path="/players" element={<Players onError={handleError}/>} />
-											<Route path="/scores" element={<Scores onError={handleError}/>} />
-											<Route path="/games" element={<Games onError={handleError}/>} />
-											<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
-											<Route path="/admin" element={<Admin onError={handleError}/>} />
-											<Route path="/chat" element={<Chat onError={handleError}/>} />
-											<Route path="/dashboard" element={<Dashboard onError={handleError}/>} />
-										</Routes>
-									</Router>
-							</LanguageContext.Provider>
-						</ThemeContext.Provider>
-					</CurrentUserContext.Provider>
-				</MenuContext.Provider>
+				<ErrorContext.Provider value={{ handleError}}>
+					<MenuContext.Provider value={{ isMenuOpen, setMenuOpen}}>
+						<CurrentUserContext.Provider value={{ currentUser, setCurrentUser}}>
+							<ThemeContext.Provider value={{ theme, toggleTheme}}>
+								<LanguageContext.Provider value={{ language, toggleLanguage}}>
+										<Router>
+											<Routes>
+												<Route path="/" element={<Home onError={handleError}/>} />
+												<Route path="/login" element={<Login onError={handleError}/>} />
+												<Route path="/register" element={<Register onError={handleError}/>} />
+												<Route path="/players" element={<Players onError={handleError}/>} />
+												<Route path="/scores" element={<Scores onError={handleError}/>} />
+												<Route path="/games" element={<Games onError={handleError}/>} />
+												<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
+												<Route path="/admin" element={<Admin onError={handleError}/>} />
+												<Route path="/chat" element={<Chat onError={handleError}/>} />
+												<Route path="/dashboard" element={<Dashboard onError={handleError}/>} />
+											</Routes>
+										</Router>
+								</LanguageContext.Provider>
+							</ThemeContext.Provider>
+						</CurrentUserContext.Provider>
+					</MenuContext.Provider>
+				</ErrorContext.Provider>
 				<ToastContainer limit={5} style={{fontSize:"medium"}}/>
 				{currentUser && <SockJsClient url={process.env.REACT_APP_API_URL + "/ws?token=" + currentUser.token}
 					topics={topics}

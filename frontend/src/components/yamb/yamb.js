@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { BoxType } from '../../constants/box-types';
-import { CurrentUserContext } from '../../App';
+import { CurrentUserContext, ErrorContext } from '../../App';
 import calculateScore from '../score-calculator';
 import AuthService from '../../api/auth-service';
 import GameService from '../../api/game-service';
@@ -15,6 +15,7 @@ function Yamb(props) {
     const { id } = useParams();
     const { t } = useTranslation();
     const { currentUser } = useContext(CurrentUserContext);
+    const { handleError } = useContext(ErrorContext);
     
     const [game, setGame] = useState(null);
 
@@ -26,7 +27,7 @@ function Yamb(props) {
                 setGame(data);
             })
             .catch((error) => {
-                props.onError(error)
+                handleError(error)
             });
         } else if (currentUser) {
             GameService.play()
@@ -35,7 +36,7 @@ function Yamb(props) {
                 setGame(data);
             })
             .catch((error) => {
-                props.onError(error);
+                handleError(error);
                 AuthService.logout();
             });
         }
@@ -53,7 +54,7 @@ function Yamb(props) {
             setGame(newGame);
         })
         .catch((error) => {
-            props.onError(error)
+            handleError(error)
         });
     };
 
@@ -85,7 +86,7 @@ function Yamb(props) {
             }
         })
         .catch((error) => {
-            props.onError(error)
+            handleError(error)
         });
     }
 
@@ -96,7 +97,7 @@ function Yamb(props) {
             setGame(data);
         })
         .catch((error) => {
-            props.onError(error)
+            handleError(error)
         });
     }
 
@@ -113,7 +114,7 @@ function Yamb(props) {
             setGame(newGame);
         })
         .catch((error) => {
-            props.onError(error)
+            handleError(error)
         });
 
     }
@@ -129,7 +130,7 @@ function Yamb(props) {
             setGame(data);
         })
         .catch((error) => {
-            props.onError(error)
+            handleError(error)
         });
     }
 

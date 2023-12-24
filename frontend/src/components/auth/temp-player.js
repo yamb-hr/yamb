@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { CurrentUserContext } from '../../App';
+import { CurrentUserContext, ErrorContext } from '../../App';
 import AuthService from '../../api/auth-service';
 import { useTranslation } from 'react-i18next';
 
-function TempPlayer(props) {
+function TempPlayer() {
     
     const { t } = useTranslation();
     const [ username, setUsername ] = useState("Player" + Math.round(Math.random() * 10000));
     const { setCurrentUser } = useContext(CurrentUserContext);
+    const { handleError } = useContext(ErrorContext);
 
     function handleSubmit() {
         AuthService.createTempPlayer({
@@ -19,7 +20,7 @@ function TempPlayer(props) {
             setCurrentUser(player);
         })
         .catch((error) => {
-            props.onError(error);
+            handleError(error);
         });
     };
 

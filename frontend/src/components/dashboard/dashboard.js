@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ErrorContext } from "../../App";
 import ScoreService from "../../api/score-service";
 import "./dashboard.css";
 
+function Dashboard() {
 
-function Dashboard(props) {
-
-    const [activeTab, setActiveTab] = useState('topAllTime');
-    const [tabs] = useState(['topAllTime', 'topThisYear', 'topThisMonth', 'topThisWeek', 'topToday']);
-    const [dashboardData, setDashboardData] = useState(null);
-    const [tableData, setTableData] = useState(null);
+    const [ activeTab, setActiveTab ] = useState('topAllTime');
+    const [ tabs ] = useState(['topAllTime', 'topThisYear', 'topThisMonth', 'topThisWeek', 'topToday']);
+    const [ dashboardData, setDashboardData ] = useState(null);
+    const [ tableData, setTableData ] = useState(null);
+    const { handleError } = useContext(ErrorContext); 
 
     useEffect(() => {
         ScoreService.getDashboardData()
@@ -17,7 +18,7 @@ function Dashboard(props) {
             setDashboardData(data);  
         }
         ).catch(error => {
-            props.onError(error);
+            handleError(error);
         });
     }, []);
 

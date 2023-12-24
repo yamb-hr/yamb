@@ -66,6 +66,8 @@
   --border-form: none;
   --padding-form: 20px;
   --margin-form: none;
+  --width-table-form: 400px;
+  --height-table-form: 500px;
     
   --color-username-input: var(--color-gray);
   --background-username-input: var(--color-blue);
@@ -311,5 +313,7 @@ a:hover {
     --margin-play-button: 20px 0 20px 0;
     --margin-register-button: 20px 0 20px 0;
     --margin-login-button: 20px 0 20px 0;
+
+    --width-table-form: 80vw;
   }
 }

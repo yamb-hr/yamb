@@ -25,6 +25,27 @@ const GameService = {
         });
     },
 
+    getGames: function(size = 10, page = 0, order = 'id', direction = 'asc') {
+        return fetch(API_URL + '?size=' + size +'&page=' + page + '&sort=' + order + '&direction=' + direction, {
+            body: null,
+            credentials: 'same-origin',
+            headers: {
+                'Authorization': 'Bearer ' + AuthService.getCurrentPlayer()?.token
+            },
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().then(data => data);
+            }
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
+        });
+    },
+
     play: function() {
         return fetch(API_URL + '/play', {
             body: null,

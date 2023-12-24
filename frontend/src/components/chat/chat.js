@@ -1,14 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { CurrentUserContext } from "../../App";
+import { CurrentUserContext, ErrorContext } from "../../App";
 import SockJsClient from "react-stomp";
 import PlayerService from "../../api/player-service";
 import "./chat.css";
 
 var socket = null;
 
-function Chat(props) {
+function Chat() {
 
     const { currentUser } = useContext(CurrentUserContext);
+    const { handleError } = useContext(ErrorContext);
     
     const [topics, setTopics] = useState(["/chat/public"]);
     const [publicChats, setPublicChats] = useState([]);
@@ -76,7 +77,7 @@ function Chat(props) {
             setPrincipal(data.principal);
         }
         ).catch(error => {
-            props.onError(error);
+            handleError(error);
         });
     }
 
