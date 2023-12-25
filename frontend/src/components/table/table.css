@@ -6,6 +6,19 @@
     font-weight: normal;
 }
 
+.element {
+    background: var(--background-form);
+    color: var(--color-form);
+    border: var(--border-form);
+    border-radius: var(--border-radius-box);
+    padding: var(--padding-form);
+    width: var(--width-table-form);
+    height: var(--height-table-form);
+    text-align: left;
+    font-size: medium;
+    font-weight: normal;
+}
+
 .table tr {
     display: table;
     width: 100%;

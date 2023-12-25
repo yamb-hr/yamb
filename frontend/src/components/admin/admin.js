@@ -6,7 +6,6 @@ import './admin.css';
 function Admin() {
 
     const navigate = useNavigate();   
-
     const { currentUser } = useContext(CurrentUserContext);
 
     useEffect(() => {

@@ -19,6 +19,7 @@ import PlayerService from "./api/player-service";
 import { slide as Menu } from 'react-burger-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import Element from './components/table/element';
 
 export const ThemeContext = createContext(null);
 export const LanguageContext = createContext(null);
@@ -169,6 +170,9 @@ function App() {
 
 	return (
 		<div className="App">
+			<button className="settings-button" onClick={() => {setMenuOpen(!isMenuOpen)}}>
+                <img src="../svg/buttons/cog.svg" alt="Settings" ></img>
+            </button>
 			<Menu isOpen={ isMenuOpen } onClose={handleOnMenuClose} className={ "menu" } customBurgerIcon={ false }>
 				<br/>
 				<a href="/">{t('play')}</a>
@@ -201,16 +205,18 @@ function App() {
 								<LanguageContext.Provider value={{ language, toggleLanguage}}>
 										<Router>
 											<Routes>
-												<Route path="/" element={<Home onError={handleError}/>} />
-												<Route path="/login" element={<Login onError={handleError}/>} />
-												<Route path="/register" element={<Register onError={handleError}/>} />
-												<Route path="/players" element={<Players onError={handleError}/>} />
-												<Route path="/scores" element={<Scores onError={handleError}/>} />
-												<Route path="/games" element={<Games onError={handleError}/>} />
-												<Route path="/games/:id" element={<Yamb onError={handleError}/>} />
-												<Route path="/admin" element={<Admin onError={handleError}/>} />
-												<Route path="/chat" element={<Chat onError={handleError}/>} />
-												<Route path="/dashboard" element={<Dashboard onError={handleError}/>} />
+												<Route path="/" element={<Home  />} />
+												<Route path="/login" element={<Login  />} />
+												<Route path="/register" element={<Register  />} />
+												<Route path="/players" element={<Players  />} />
+												<Route path="/players/:id" element={<Element />} />
+												<Route path="/scores" element={<Scores  />} />
+												<Route path="/scores/:id" element={<Element />} />
+												<Route path="/games" element={<Games  />} />
+												<Route path="/games/:id" element={<Yamb  />} />
+												<Route path="/admin" element={<Admin  />} />
+												<Route path="/chat" element={<Chat  />} />
+												<Route path="/dashboard" element={<Dashboard  />} />
 											</Routes>
 										</Router>
 								</LanguageContext.Provider>

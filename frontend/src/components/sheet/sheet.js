@@ -10,10 +10,6 @@ function Sheet(props) {
     const { t } = useTranslation();
     const { isMenuOpen, setMenuOpen } = useContext(MenuContext);
 
-    function handleSettings() {
-        setMenuOpen(!isMenuOpen);
-    }
-
     function handleRollDice() {
         props.onRollDice();
     }
@@ -120,7 +116,7 @@ function Sheet(props) {
     return (
         <div className="sheet">
             <div className="column">
-                <button className="settings-button-sheet" onClick={handleSettings}>
+                <button className="settings-button-sheet" onClick={() => {setMenuOpen(!isMenuOpen)}}>
                     <img src="../svg/buttons/cog.svg" alt="Settings" ></img>
                 </button>
                 <Label icon="ones" info={t('ones')}></Label>

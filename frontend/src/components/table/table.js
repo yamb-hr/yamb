@@ -1,51 +1,57 @@
 import { useContext, useEffect, useState } from "react";
 import { ErrorContext, LanguageContext } from "../../App";
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PlayerService from "../../api/player-service";
 import GameService from "../../api/game-service";
 import ScoreService from "../../api/score-service";
 import "./table.css";
 
-function Table(props) {
+function Table() {
 
+    const location = useLocation();
+    const navigate = useNavigate();   
     const { handleError } = useContext(ErrorContext);
     const { language } = useContext(LanguageContext);
-    const [ data, setData ] = useState(null);
-    const [ size, setSize ] = useState(10);
-    const [ page, setPage ] = useState(0);
-    const [ order, setOrder ] = useState('id');
-    const [ direction, setDirection ] = useState('asc');
+    const [ tableState, setTableState ] = useState({
+        data: null,
+        size: 10,
+        page: 0,
+        order: 'id',
+        direction: 'asc'
+    });
 
     const localeStringFormat = {
         year: 'numeric', month: 'long', day: 'numeric'
     }
     
     useEffect(() => {
-        switch (props.resource) {
-            case 'player':
-                PlayerService.getPlayers(size, page, order, direction)
+        switch (location.pathname) {
+            case '/players':
+                PlayerService.getPlayers(tableState.size, tableState.page, tableState.order, tableState.direction)
                 .then(data => {
                     console.log(data);
-                    setData(data);  
+                    setTableState(prevState => ({...prevState, data: data}));
                 })
                 .catch(error => {
                     handleError(error);
                 });
                 break;
-            case 'game':
-                GameService.getGames(size, page, order, direction)
+            case '/games':
+                GameService.getGames(tableState.size, tableState.page, tableState.order, tableState.direction)
                 .then(data => {
                     console.log(data);
-                    setData(data);  
+                    setTableState(prevState => ({...prevState, data: data}));
                 })
                 .catch(error => {
                     handleError(error);
                 });
                 break;
-            case 'score': 
-                ScoreService.getScores(size, page, order, direction)
+            case '/scores': 
+                ScoreService.getScores(tableState.size, tableState.page, tableState.order, tableState.direction)
                 .then(data => {
                     console.log(data);
-                    setData(data);  
+                    setTableState(prevState => ({...prevState, data: data}));
                 })
                 .catch(error => {
                     handleError(error);
@@ -54,37 +60,28 @@ function Table(props) {
             default:
                 break;
         }
-    }, [size, page, order, direction, setData, props.resource]);
-
-    function toggleDirection() {
-        if (direction === 'asc') {
-            setDirection('desc');
-        } else {
-            setDirection('asc');
-        }
-    }
+    }, [tableState.direction, tableState.order, tableState.page, tableState.size]);
 
     function handleSizeChange(event) {
-        setSize(event.target.value);
-        setPage(0);
+        setTableState(prevState => ({...prevState, size: event.target.value, page: 0}));
     }
 
     return(
         <div>
-            {data && <table className="table">
+            {tableState.data && <table className="table">
                 <thead>
                     <tr> 
-                        {data[0] && [...Object.keys(data[0])]?.map((field, index) => {
-                            if (!Array.isArray(data[0][field]) && typeof(data[0][field]) !== 'object') {
-                                return <th key={index} onClick={() => {setOrder(field); toggleDirection();}}>{field}</th>
+                        {tableState.data[0] && [...Object.keys(tableState.data[0])]?.map((field, index) => {
+                            if (!Array.isArray(tableState.data[0][field]) && typeof(tableState.data[0][field]) !== 'object') {
+                                return <th key={index} onClick={() => {setTableState(prevState => ({...prevState, order: field, direction: 'desc'}))}}>{field}</th>
                             }
                             return null;
                         })} 
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((element, index) => (
-                        <tr key={index}>
+                    {tableState.data.map((element, index) => (
+                        <tr key={index} onClick={() => {navigate(location.pathname + "/" + element['id'])}}>
                             {[...Object.keys(element)]?.map((field, index) => {
                                 if (!Array.isArray(element[field]) && typeof(element[field]) !== 'object') {
                                     if (field === 'date') {
@@ -101,13 +98,13 @@ function Table(props) {
             </table>}
             <br/>
             <div>
-                <button onClick={() => {setPage(page - 1)}} disabled={page === 0} className="page-control">{"<"}</button>
-                &nbsp;&nbsp;{page}&nbsp;&nbsp;
-                <button onClick={() => {setPage(page + 1)}} disabled={data && data.length < size} className="page-control">{">"}</button>
+                <button onClick={() => {setTableState(prevState => ({...prevState, page: tableState.page - 1 }))}} disabled={tableState.page === 0} className="page-control">{"<"}</button>
+                &nbsp;&nbsp;{tableState.page}&nbsp;&nbsp;
+                <button onClick={() => {setTableState(prevState => ({...prevState, page: tableState.page + 1 }))}} disabled={tableState.data && tableState.data.length < tableState.size} className="page-control">{">"}</button>
             </div>  
             <br/>
             <label>Rows per page: </label>
-            <select value={size} onChange={handleSizeChange}>
+            <select value={tableState.size} onChange={handleSizeChange}>
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>

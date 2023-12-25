@@ -10,7 +10,7 @@ import GameService from '../../api/game-service';
 import Game from '../game/game';
 import './yamb.css';
 
-function Yamb(props) {
+function Yamb() {
 
     const { id } = useParams();
     const { t } = useTranslation();
@@ -40,7 +40,7 @@ function Yamb(props) {
                 AuthService.logout();
             });
         }
-    }, [currentUser, id, props]);
+    }, [currentUser, handleError, id]);
 
     function handleRollDice(diceToRoll) {
         console.time("rollDice");

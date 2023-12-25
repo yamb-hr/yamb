@@ -1,3 +1,6 @@
 .dices {
     display: inline-flex;
+    z-index: 1;
+    background: var(--color-background);
 }
+
