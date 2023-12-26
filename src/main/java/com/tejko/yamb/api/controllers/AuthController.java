@@ -3,8 +3,6 @@ package com.tejko.yamb.api.controllers;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.AuthService;
 import com.tejko.yamb.models.Player;
-import com.tejko.yamb.models.payload.AuthRequest;
-import com.tejko.yamb.models.payload.LoginResponse;
-import com.tejko.yamb.models.payload.TempPlayerRequest;
+import com.tejko.yamb.models.payload.AuthResult;
+import com.tejko.yamb.models.payload.PlayerCredentials;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,18 +21,18 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody AuthRequest authRequest) {
-        return new ResponseEntity<>(authService.login(authRequest), HttpStatus.OK);
+    public AuthResult login(@Valid @RequestBody PlayerCredentials playerCredentials) {
+        return authService.login(playerCredentials);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Player> register(@Valid @RequestBody AuthRequest authRequest) {
-        return new ResponseEntity<>(authService.register(authRequest), HttpStatus.OK);
+    public Player register(@Valid @RequestBody PlayerCredentials playerCredentials) {
+        return authService.register(playerCredentials);
     }
 
 	@PostMapping("/temp-player")
-	public ResponseEntity<LoginResponse> createTempPlayer(@Valid @RequestBody TempPlayerRequest tempPlayerRequest) {
-		return new ResponseEntity<>(authService.createTempPlayer(tempPlayerRequest), HttpStatus.OK);
+	public AuthResult createTempPlayer(@RequestBody PlayerCredentials playerCredentials) {
+		return authService.createTempPlayer(playerCredentials);
 	}
 
 }

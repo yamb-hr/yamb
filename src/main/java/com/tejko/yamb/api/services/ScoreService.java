@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
 import com.tejko.yamb.models.Score;
-import com.tejko.yamb.models.payload.DashboardResponse;
+import com.tejko.yamb.models.payload.DashboardData;
 import com.tejko.yamb.models.payload.DateTimeInterval;
 import com.tejko.yamb.repositories.ScoreRepository;
 
@@ -46,7 +46,7 @@ public class ScoreService implements RestService<Score> {
 		throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
 	}
 
-	public DashboardResponse getDashboardData() {
+	public DashboardData getDashboardData() {
 		LocalDate today = LocalDate.now();
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime startOfToday = today.atStartOfDay();
@@ -58,7 +58,7 @@ public class ScoreService implements RestService<Score> {
 		List<Score> topThisMonth = scoreRepo.findTop15ByDateBetweenOrderByValueDesc(startOfMonth, now);
 		List<Score> topThisYear = scoreRepo.findTop15ByDateBetweenOrderByValueDesc(startOfYear, now);
 		List<Score> topAllTime = scoreRepo.findTop15ByOrderByValueDesc();
-		return new DashboardResponse(topToday, topThisWeek, topThisMonth, topThisYear, topAllTime);
+		return new DashboardData(topToday, topThisWeek, topThisMonth, topThisYear, topAllTime);
 	}
 
 }

@@ -3,7 +3,7 @@ import AuthService from '../../api/auth-service';
 import { Slide, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CurrentUserContext, ThemeContext } from '../../App';
+import { CurrentUserContext, ErrorContext, ThemeContext } from '../../App';
 import './auth.css';
 
 function Register() {
@@ -11,6 +11,7 @@ function Register() {
     const { t} = useTranslation();
     const { theme } = useContext(ThemeContext);
     const { currentUser } = useContext(CurrentUserContext);
+    const { handleError } = useContext(ErrorContext);
     const [ username, setUsername ] = useState(currentUser ? currentUser.username : "Player" + Math.round(Math.random() * 10000));
     const [ password, setPassword ] = useState('');
     const [ repeatPassword, setRepeatPassword ] = useState('');
@@ -52,22 +53,6 @@ function Register() {
 
     function handleRepeatPasswordChange(event) {
         setRepeatPassword(event.target.value);
-    };
-
-    function handleError(error) {
-        console.error(error?.message);
-        toast.error(error?.message, {
-            position: "top-center",
-            autoClose: 2000,
-            transition: Slide,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            pauseOnFocusLoss: true,
-            draggable: true,
-            progress: undefined,
-            theme: theme
-        });
     };
 
     const registerDisabled = username.length < 5 || username.length > 15 || !password || (password !== repeatPassword);

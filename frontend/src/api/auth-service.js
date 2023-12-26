@@ -27,7 +27,7 @@ const AuthService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
             return response.json().then(error => { 
                 console.error(error);
@@ -49,7 +49,7 @@ const AuthService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
             return response.json().then(error => { 
                 console.error(error);
@@ -70,7 +70,7 @@ const AuthService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
             return response.json().then(error => { 
                 console.error(error);

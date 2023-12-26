@@ -16,9 +16,12 @@ const PlayerService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
-            return response.json().then(error => { throw new Error(error.message) })
+            return response.json().then(error => { 
+                console.error(error);
+                throw new Error(error.message);
+            });
         });
     },
 
@@ -34,7 +37,7 @@ const PlayerService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
             return response.json().then(error => { 
                 console.error(error);
@@ -55,7 +58,7 @@ const PlayerService = {
         })
         .then(response => {
             if (response.ok) {
-                return response.json().then(data => data);
+                return response.json().then(body => body.data);
             }
             return response.json().then(error => { 
                 console.error(error);

@@ -7,9 +7,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -25,11 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tejko.yamb.constants.SecurityConstants;
 
 @Entity
-public class Player implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Player extends DatabaseEntity implements UserDetails {
 
     @Column(nullable = false, unique = true)
     @Size(min = SecurityConstants.MIN_USERNAME_SIZE, max = SecurityConstants.MAX_USERNAME_SIZE)
@@ -70,8 +63,7 @@ public class Player implements UserDetails {
 		this.tempUser = tempUser;
     }
 
-    private Player(Long id, String username, String password, List<GrantedAuthority> authorities) {
-		this.id = id;
+    private Player(String username, String password, List<GrantedAuthority> authorities) {
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
@@ -86,17 +78,13 @@ public class Player implements UserDetails {
         for (Role role : player.getRoles()) {
             authorities.add(new SimpleGrantedAuthority(role.getLabel()));
         }
-		return new Player(player.getId(), player.getUsername(), player.getPassword(), authorities);
+		return new Player(player.getUsername(), player.getPassword(), authorities);
 	}
 
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getUsername() {

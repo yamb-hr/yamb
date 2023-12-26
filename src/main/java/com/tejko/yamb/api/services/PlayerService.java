@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.models.Score;
-import com.tejko.yamb.models.payload.PrincipalResponse;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
@@ -63,7 +62,7 @@ public class PlayerService implements UserDetailsService, RestService<Player> {
         playerRepo.deleteById(id);
     }
 
-    public PrincipalResponse getPrincipalById(Long id) {
+    public String getPrincipalById(Long id) {
         return webSocketService.getPrincipalByPlayerId(id);
     }
 

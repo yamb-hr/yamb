@@ -19,9 +19,8 @@ import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.constants.SecurityConstants;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.models.Role;
-import com.tejko.yamb.models.payload.AuthRequest;
-import com.tejko.yamb.models.payload.LoginResponse;
-import com.tejko.yamb.models.payload.TempPlayerRequest;
+import com.tejko.yamb.models.payload.PlayerCredentials;
+import com.tejko.yamb.models.payload.AuthResult;
 import com.tejko.yamb.repositories.PlayerRepository;
 import com.tejko.yamb.repositories.RoleRepository;
 import com.tejko.yamb.security.JwtUtil;
@@ -44,36 +43,36 @@ public class AuthService {
     @Autowired
     PasswordEncoder encoder;
 
-    public LoginResponse login(AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+    public AuthResult login(PlayerCredentials playerCredentials) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(playerCredentials.getUsername(), playerCredentials.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Player player = playerRepo.findByUsername(authRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
+        Player player = playerRepo.findByUsername(playerCredentials.getUsername()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
+        return new AuthResult(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
     }
 
-    public Player register(AuthRequest authRequest) {
+    public Player register(PlayerCredentials playerCredentials) {
         String usernameFromAuth = SecurityContextHolder.getContext().getAuthentication().getName();
-		if (playerRepo.existsByUsername(authRequest.getUsername())) {
-            Player player = playerRepo.findByUsername(authRequest.getUsername()).get();
-            if (!player.isTempUser() || !authRequest.getUsername().equals(usernameFromAuth)) {
+		if (playerRepo.existsByUsername(playerCredentials.getUsername())) {
+            Player player = playerRepo.findByUsername(playerCredentials.getUsername()).get();
+            if (!player.isTempUser() || !playerCredentials.getUsername().equals(usernameFromAuth)) {
                 throw new BadCredentialsException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
             }
-		} else if (authRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || authRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
+		} else if (playerCredentials.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || playerCredentials.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
             throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
         }
-        Player player = Player.getInstance(authRequest.getUsername(), encoder.encode(authRequest.getPassword()), false);
+        Player player = Player.getInstance(playerCredentials.getUsername(), encoder.encode(playerCredentials.getPassword()), false);
         if (usernameFromAuth != SecurityConstants.ANONYMOUS_USER) {
             Optional<Player> optionalPlayer = playerRepo.findByUsername(usernameFromAuth);
             if (optionalPlayer.isPresent()) {
                 player = optionalPlayer.get();
-                player.setUsername(authRequest.getUsername());
-                player.setPassword(encoder.encode(authRequest.getPassword()));
+                player.setUsername(playerCredentials.getUsername());
+                player.setPassword(encoder.encode(playerCredentials.getPassword()));
                 player.setTempUser(false);
             }
         }
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepo.findByLabel("USER").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
-        if (authRequest.getUsername().equals("matej")) {
+        if (playerCredentials.getUsername().equals("matej")) {
             Role adminRole = roleRepo.findByLabel("ADMIN").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
             roles.add(adminRole);
         }
@@ -82,17 +81,17 @@ public class AuthService {
         return playerRepo.save(player);
     }
 
-    public LoginResponse createTempPlayer(TempPlayerRequest tempPlayerRequest) {
-        if (playerRepo.existsByUsername(tempPlayerRequest.getUsername())) {
+    public AuthResult createTempPlayer(PlayerCredentials tempPlayerCredentials) {
+        if (playerRepo.existsByUsername(tempPlayerCredentials.getUsername())) {
             throw new IllegalArgumentException(MessageConstants.ERROR_USERNAME_ALREADY_TAKEN);
-        } else if (tempPlayerRequest.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || tempPlayerRequest.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
+        } else if (tempPlayerCredentials.getUsername().length() < SecurityConstants.MIN_USERNAME_SIZE || tempPlayerCredentials.getUsername().length() > SecurityConstants.MAX_USERNAME_SIZE) {
             throw new IllegalArgumentException(MessageConstants.ERROR_INVALID_USERNAME_SIZE);
         }   
-        Player player = Player.getInstance(tempPlayerRequest.getUsername(),  encoder.encode(UUID.randomUUID().toString()), true);
+        Player player = Player.getInstance(tempPlayerCredentials.getUsername(),  encoder.encode(UUID.randomUUID().toString()), true);
         
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepo.findByLabel("USER").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
-        if (tempPlayerRequest.getUsername().equals("matej")) {
+        if (tempPlayerCredentials.getUsername().equals("matej")) {
             Role adminRole = roleRepo.findByLabel("ADMIN").orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_ROLE_NOT_FOUND));
             roles.add(adminRole);
         }
@@ -100,7 +99,7 @@ public class AuthService {
         player.setRoles(roles);
 
         player = playerRepo.save(player);
-        return new LoginResponse(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
+        return new AuthResult(player.getId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()), player.isTempUser(), player.getRoles());
     }
 
 }

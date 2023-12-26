@@ -2,7 +2,9 @@ package com.tejko.yamb.interfaces;
 
 import java.util.List;
 
-public interface RestService<T> {
+import com.tejko.yamb.models.DatabaseEntity;
+
+public interface RestService<T extends DatabaseEntity> {
 
         T getById(Long id);
     

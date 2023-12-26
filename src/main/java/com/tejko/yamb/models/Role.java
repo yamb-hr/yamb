@@ -2,16 +2,9 @@ package com.tejko.yamb.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import org.springframework.data.rest.core.annotation.RestResource;
 
 @Entity
-@RestResource(rel = "roles", path = "roles")
-public class Role {
-    
-    @Id
-	private Long id;
+public class Role extends DatabaseEntity {
 
 	@Column
 	private String label;
@@ -21,24 +14,19 @@ public class Role {
 
     private Role() {}
 
-    private Role(Long id, String label) {
-        this.id = id;
+    private Role(String label) {
         this.label = label;
     }
 
-    public static Role getInstance(Long id, String label) {
-        return new Role(id, label);
-    }
-
-    public Long getId() {
-        return id;
+    public static Role getInstance(String label) {
+        return new Role(label);
     }
 
     public String getLabel() {
         return label;
     }
 
-    public String getdescription() {
+    public String getDescription() {
         return description;
     }
     

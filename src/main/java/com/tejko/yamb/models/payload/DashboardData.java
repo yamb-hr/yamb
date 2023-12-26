@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.tejko.yamb.models.Score;
 
-public class DashboardResponse {
+public class DashboardData {
 
     private List<Score> topToday;
     private List<Score> topThisWeek;
@@ -12,7 +12,7 @@ public class DashboardResponse {
     private List<Score> topThisYear;
     private List<Score> topAllTime;
 
-    public DashboardResponse(List<Score> topToday, List<Score> topThisWeek, List<Score> topThisMonth, List<Score> topThisYear, List<Score> topAllTime) {
+    public DashboardData(List<Score> topToday, List<Score> topThisWeek, List<Score> topThisMonth, List<Score> topThisYear, List<Score> topAllTime) {
         this.topToday = topToday;
         this.topThisWeek = topThisWeek;
         this.topThisMonth = topThisMonth;

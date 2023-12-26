@@ -1,16 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../../api/auth-service';
-import { Slide, toast } from 'react-toastify';
-import { ThemeContext } from '../../App';
+import { ErrorContext } from '../../App';
 import { useTranslation } from 'react-i18next';
 import './auth.css';
 
 function Login() {
 
-    const { t } = useTranslation();
     const navigate = useNavigate();
-    const { theme } = useContext(ThemeContext);
+    const { t } = useTranslation();
+    const { handleError } = useContext(ErrorContext);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -36,22 +35,6 @@ function Login() {
 
     function handlePasswordChange(event) {
         setPassword(event.target.value);
-    };
-
-    function handleError(message) {
-        console.error(message);
-        toast.error(message, {
-            position: "top-center",
-            autoClose: 2000,
-            transition: Slide,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            pauseOnFocusLoss: true,
-            draggable: true,
-            progress: undefined,
-            theme: theme
-        });
     };
 
     const loginDisabled = username.length < 5 || username.length > 15 || !password;

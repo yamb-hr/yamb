@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.models.Score;
 import com.tejko.yamb.constants.MessageConstants;
 import com.tejko.yamb.interfaces.RestService;
-import com.tejko.yamb.models.Dice;
 import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.Player;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.GameStatus;
-import com.tejko.yamb.models.payload.ActionRequest;
+import com.tejko.yamb.models.game.Dice;
+import com.tejko.yamb.models.payload.GameAction;
 import com.tejko.yamb.repositories.ScoreRepository;
 import com.tejko.yamb.util.Logger;
 import com.tejko.yamb.repositories.PlayerRepository;
@@ -61,7 +61,7 @@ public class GameService implements RestService<Game> {
         }
     }
 
-    public List<Dice> rollDiceById(Long id, ActionRequest actionRequest) {
+    public List<Dice> rollDiceById(Long id, GameAction actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.rollDice(actionRequest.getDiceToRoll());
         gameRepo.save(game);
@@ -69,7 +69,7 @@ public class GameService implements RestService<Game> {
         return game.getDices();
     }
 
-    public BoxType makeAnnouncementById(Long id, ActionRequest actionRequest) {
+    public BoxType makeAnnouncementById(Long id, GameAction actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.makeAnnouncement(actionRequest.getBoxType());
         gameRepo.save(game);
@@ -77,7 +77,7 @@ public class GameService implements RestService<Game> {
         return game.getAnnouncement();
     }
 
-    public int fillBoxById(Long id, ActionRequest actionRequest) {
+    public int fillBoxById(Long id, GameAction actionRequest) {
         Game game = gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.fillBox(actionRequest.getColumnType(), actionRequest.getBoxType());
         if (game.getStatus() == GameStatus.FINISHED) {

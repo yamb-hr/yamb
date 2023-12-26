@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.tejko.yamb.models.enums.MessageType;
 
-public class Message {
+public class WebSocketMessage {
 
     private String sender;
     private String receiver;
@@ -12,7 +12,7 @@ public class Message {
     private Object content;
     private LocalDateTime time;
 
-    public Message(String sender, String receiver, MessageType type, Object content) {
+    public WebSocketMessage(String sender, String receiver, MessageType type, Object content) {
         this.sender = sender;
         this.receiver = receiver;
         this.type = type;

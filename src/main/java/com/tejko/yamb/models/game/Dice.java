@@ -1,4 +1,4 @@
-package com.tejko.yamb.models;
+package com.tejko.yamb.models.game;
 
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;

@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.tejko.yamb.constants.MessageConstants;
-import com.tejko.yamb.models.payload.ErrorResponse;
+import com.tejko.yamb.models.enums.ResponseStatus;
+import com.tejko.yamb.models.payload.RestResponse;
 import com.tejko.yamb.util.Logger;
 
 @ControllerAdvice
@@ -24,29 +25,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     Logger logger;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+    public ResponseEntity<RestResponse> handleException(Exception exception) {
         exception.printStackTrace(System.out);
         logger.error(exception);
-        return new ResponseEntity<>(new ErrorResponse(exception.getClass().getSimpleName(), exception.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ BadCredentialsException.class })
-    public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
+    public ResponseEntity<RestResponse> handleException(BadCredentialsException exception) {
         exception.printStackTrace(System.out);        
-        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new RestResponse(MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT, null, ResponseStatus.ERROR), HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
+    public ResponseEntity<RestResponse> handleException(AccessDeniedException exception) {
         logger.error(exception);
-        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_FORBIDDEN, exception.getLocalizedMessage()), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class, ResourceNotFoundException.class })
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {
+    @ExceptionHandler({ ResourceNotFoundException.class })
+    public ResponseEntity<RestResponse> handleException(ResourceNotFoundException exception) {
         exception.printStackTrace(System.out);     
         logger.error(exception);
-        return new ResponseEntity<>(new ErrorResponse(MessageConstants.ERROR_BAD_REQUEST, exception.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.NOT_FOUND);
     }
     
+    @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
+    public ResponseEntity<RestResponse> handleException(RuntimeException exception) {
+        exception.printStackTrace(System.out);     
+        logger.error(exception);
+        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -1,10 +1,9 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.LogService;
-import com.tejko.yamb.models.Log;
+import com.tejko.yamb.models.payload.dto.LogDTO;
+import com.tejko.yamb.util.Mapper;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -23,16 +23,22 @@ public class LogController {
 	@Autowired
 	LogService logService;
 
+	@Autowired
+	Mapper mapper;
+
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Log> getById(@PathVariable Long id) {
-		return new ResponseEntity<>(logService.getById(id), HttpStatus.OK);
+	public LogDTO getById(@PathVariable Long id) {
+		return mapper.toDTO(logService.getById(id));
 	}
 
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<List<Log>> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
-		return new ResponseEntity<>(logService.getAll(page, size, sort, direction), HttpStatus.OK);
+	public List<LogDTO> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
+		return logService.getAll(page, size, sort, direction)
+			.stream()
+			.map(mapper::toDTO)
+			.collect(Collectors.toList());
 	}
 
 	@DeleteMapping("/{id}")

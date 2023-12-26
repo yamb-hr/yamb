@@ -13,7 +13,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.tejko.yamb.api.services.WebSocketService;
-import com.tejko.yamb.models.payload.Message;
+import com.tejko.yamb.models.payload.WebSocketMessage;
 
 @RestController
 public class WebSocketController {
@@ -24,13 +24,13 @@ public class WebSocketController {
 
     @MessageMapping("/message")
     @SendTo("/chat/public")
-    public Message publicMessage(Message message, Principal principal) throws Exception {
+    public WebSocketMessage publicMessage(WebSocketMessage message, Principal principal) throws Exception {
         return webSocketService.publicMessage(message, principal);
     }
 
     @MessageMapping("/private-message")
     @SendToUser("/private")
-    public Message privateMessage(Message message, Principal principal) throws Exception {
+    public WebSocketMessage privateMessage(WebSocketMessage message, Principal principal) throws Exception {
         return webSocketService.privateMessage(message, principal);
     }
 

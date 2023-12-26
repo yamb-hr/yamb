@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.tejko.yamb.models.Role;
 
-public class LoginResponse {
+public class AuthResult {
 
     public Long id;
     public String username;
@@ -12,7 +12,7 @@ public class LoginResponse {
     public String token;
     public Set<Role> roles;
 
-    public LoginResponse(Long id, String username, String token, boolean tempUser, Set<Role> roles) {
+    public AuthResult(Long id, String username, String token, boolean tempUser, Set<Role> roles) {
         this.id = id;
         this.username = username;
         this.token = token;

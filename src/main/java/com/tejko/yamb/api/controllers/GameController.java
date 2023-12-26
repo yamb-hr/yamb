@@ -1,10 +1,9 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.services.GameService;
-import com.tejko.yamb.models.Dice;
-import com.tejko.yamb.models.Game;
 import com.tejko.yamb.models.enums.BoxType;
-import com.tejko.yamb.models.payload.ActionRequest;
+import com.tejko.yamb.models.payload.GameAction;
+import com.tejko.yamb.models.payload.dto.DiceDTO;
+import com.tejko.yamb.models.payload.dto.GameDTO;
+import com.tejko.yamb.util.Mapper;
 
 @RestController
 @RequestMapping("/api/games")
@@ -28,46 +28,53 @@ public class GameController {
 	@Autowired
 	GameService gameService;
 
+	@Autowired
+	Mapper mapper;
+
 	@GetMapping("")
-	public ResponseEntity<List<Game>> getAll(@RequestParam(defaultValue = "0") Integer page,
-	@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort,
-	@RequestParam(defaultValue = "desc") String direction) {
-		return new ResponseEntity<>(gameService.getAll(page, size, sort, direction), HttpStatus.OK);
+	public List<GameDTO> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
+		return gameService.getAll(page, size, sort, direction)
+			.stream()
+			.map(mapper::toDTO)
+			.collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}") 
-	public ResponseEntity<Game> getById(@PathVariable Long id) {
-		return new ResponseEntity<>(gameService.getById(id), HttpStatus.OK);
+	public GameDTO getById(@PathVariable Long id) {
+		return mapper.toDTO(gameService.getById(id));
 	}
 
 	@PostMapping("/play")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<Game> play() { 
-		return new ResponseEntity<>(gameService.play(), HttpStatus.CREATED);
+	public GameDTO play() { 
+		return mapper.toDTO(gameService.play());
 	}
 
 	@PutMapping("/{id}/roll")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public ResponseEntity<List<Dice>> rollDiceById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
-		return new ResponseEntity<>(gameService.rollDiceById(id, actionRequest), HttpStatus.OK);
+	public List<DiceDTO> rollDiceById(@PathVariable Long id, @RequestBody GameAction action) {
+		return gameService.rollDiceById(id, action)
+				.stream()
+				.map(mapper::toDTO)
+				.collect(Collectors.toList());
 	}
 
 	@PutMapping("/{id}/announce")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public ResponseEntity<BoxType> makeAnnouncementById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
-		return new ResponseEntity<>(gameService.makeAnnouncementById(id, actionRequest), HttpStatus.OK);
+	public BoxType makeAnnouncementById(@PathVariable Long id, @RequestBody GameAction action) {
+		return gameService.makeAnnouncementById(id, action);
 	}
 
 	@PutMapping("/{id}/fill")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public ResponseEntity<Integer> fillBoxById(@PathVariable Long id, @RequestBody ActionRequest actionRequest) {
-		return new ResponseEntity<>(gameService.fillBoxById(id, actionRequest), HttpStatus.OK);
+	public int fillBoxById(@PathVariable Long id, @RequestBody GameAction action) {
+		return gameService.fillBoxById(id, action);
 	}
 
 	@PutMapping("/{id}/restart")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public ResponseEntity<Game> restartById(@PathVariable Long id) {
-		return new ResponseEntity<>(gameService.restartById(id), HttpStatus.OK);
+	public GameDTO restartById(@PathVariable Long id) {
+		return mapper.toDTO(gameService.restartById(id));
 	}
 
 }

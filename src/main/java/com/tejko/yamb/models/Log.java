@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -18,11 +15,7 @@ import org.hibernate.annotations.TypeDef;
 
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Log {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Log extends DatabaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "player_id")
@@ -53,10 +46,6 @@ public class Log {
 
     public static Log getInstance(Player player, String message, LogLevel level, Object data) {
         return new Log(player, message, level, data, LocalDateTime.now());
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public Player getPlayer() {

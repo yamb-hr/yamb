@@ -5,9 +5,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
@@ -28,15 +25,13 @@ import com.tejko.yamb.exceptions.RollLimitExceededException;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.ColumnType;
 import com.tejko.yamb.models.enums.GameStatus;
+import com.tejko.yamb.models.game.Dice;
+import com.tejko.yamb.models.game.Sheet;
 import com.tejko.yamb.util.ScoreCalculator;
 
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Game {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Game extends DatabaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = false)
@@ -72,10 +67,6 @@ public class Game {
 
     public static Game getInstance(Player player) {
         return new Game(player, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS);
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public Player getPlayer() {

@@ -121,8 +121,7 @@ function App() {
     }
 
 	function handleError(error) {
-		console.error(error?.message);
-		toast.error(error?.message, {
+		toast.error(error, {
 			position: "top-center",
 			autoClose: 2000,
 			transition: Slide,

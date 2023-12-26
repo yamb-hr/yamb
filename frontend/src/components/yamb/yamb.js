@@ -40,7 +40,7 @@ function Yamb() {
                 AuthService.logout();
             });
         }
-    }, [currentUser, handleError, id]);
+    }, [currentUser, id]);
 
     function handleRollDice(diceToRoll) {
         console.time("rollDice");

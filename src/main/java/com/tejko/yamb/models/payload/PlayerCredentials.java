@@ -1,11 +1,11 @@
 package com.tejko.yamb.models.payload;
 
-public class AuthRequest {
+public class PlayerCredentials {
 
     private String username;
     private String password;
 
-    private AuthRequest(String username, String password) {
+    private PlayerCredentials(String username, String password) {
         this.username = username;
         this.password = password;
     }
