@@ -84,7 +84,7 @@
 			<artifactId>frontend-maven-plugin</artifactId>
 			<version>${frontend-maven-plugin.version}</version>
 			<configuration>
-				<workingDirectory>frontend</workingDirectory>
+				<workingDirectory>yamb-frontend</workingDirectory>
 				<installDirectory>target</installDirectory>
 			</configuration>
 			<executions>
@@ -126,7 +126,7 @@
 					<configuration>
 						<target>
 						<copy todir="${project.build.directory}/classes/public">
-							<fileset dir="${project.basedir}/frontend/build"/>
+							<fileset dir="${project.basedir}/yamb-frontend/build"/>
 						</copy>
 						</target>
 					</configuration>

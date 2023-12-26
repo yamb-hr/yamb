@@ -1,0 +1,3 @@
+[submodule "yamb-frontend"]
+	path = yamb-frontend
+	url = https://github.com/MatejDanic/yamb-frontend
