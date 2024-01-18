@@ -20,7 +20,7 @@ import com.tejko.yamb.exceptions.AnnouncementUnavailableException;
 import com.tejko.yamb.exceptions.BoxUnavailableException;
 import com.tejko.yamb.exceptions.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.DiceRollRequiredException;
-import com.tejko.yamb.exceptions.RestartFinishedGameException;
+import com.tejko.yamb.exceptions.LockedGameException;
 import com.tejko.yamb.exceptions.RollLimitExceededException;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.ColumnType;
@@ -155,6 +155,8 @@ public class Game extends DatabaseEntity {
             throw new RollLimitExceededException();
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
+        } else if (status == GameStatus.FINISHED) {
+            throw new LockedGameException();
         }
     }
 
@@ -178,7 +180,7 @@ public class Game extends DatabaseEntity {
 
     private void validateRestartAction() {
         if (status == GameStatus.FINISHED) {
-            throw new RestartFinishedGameException();
+            throw new LockedGameException();
         }
     }
 

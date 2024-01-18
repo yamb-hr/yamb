@@ -10,7 +10,7 @@ import com.tejko.yamb.exceptions.AnnouncementUnavailableException;
 import com.tejko.yamb.exceptions.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.BoxUnavailableException;
 import com.tejko.yamb.exceptions.DiceRollRequiredException;
-import com.tejko.yamb.exceptions.RestartFinishedGameException;
+import com.tejko.yamb.exceptions.LockedGameException;
 import com.tejko.yamb.exceptions.RollLimitExceededException;
 import com.tejko.yamb.models.enums.BoxType;
 import com.tejko.yamb.models.enums.ColumnType;
@@ -43,6 +43,16 @@ public class GameTest {
         game.rollDice(DICE_TO_ROLL);
 
         assertThrows(RollLimitExceededException.class, () -> {    
+            game.rollDice(DICE_TO_ROLL);
+        });
+    }
+
+    @Test
+    public void testRollDiceFinishedGame() {
+        Game game = Game.getInstance(player);
+        finishGame(game);
+
+        assertThrows(LockedGameException.class, () -> {    
             game.rollDice(DICE_TO_ROLL);
         });
     }
@@ -87,8 +97,9 @@ public class GameTest {
         });
     }
 
+
     @Test
-    public void testBoxNotAvailable() {
+    public void testBoxUnavailable() {
         Game game = Game.getInstance(player);
         game.rollDice(DICE_TO_ROLL);                        
         game.fillBox(ColumnType.DOWNWARDS, BoxType.ONES);
@@ -133,7 +144,7 @@ public class GameTest {
     }
 
     @Test
-    public void testAnnouncementNotAvailable() {
+    public void testAnnouncementUnavailable() {
         Game game = Game.getInstance(player);
         game.rollDice(DICE_TO_ROLL);
         game.rollDice(DICE_TO_ROLL);
@@ -162,8 +173,16 @@ public class GameTest {
     }   
     
     @Test
-    public void testRestartCompletedGame() {
+    public void testRestartFinishedGame() {
         Game game = Game.getInstance(player);
+        finishGame(game);
+
+        assertThrows(LockedGameException.class, () -> {    
+            game.restart();;
+        });
+    }
+
+    private void finishGame(Game game) {
         for (Integer i = 0; i < BoxType.values().length; i++) {    
             game.rollDice(DICE_TO_ROLL);
             game.fillBox(ColumnType.DOWNWARDS, BoxType.values()[i]);
@@ -181,11 +200,6 @@ public class GameTest {
             game.makeAnnouncement(BoxType.values()[i]);
             game.fillBox(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);
         }
-
-        assertThrows(RestartFinishedGameException.class, () -> {    
-            game.restart();;
-        });
-    
     }
     
 }
