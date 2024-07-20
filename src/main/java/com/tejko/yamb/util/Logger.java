@@ -27,12 +27,14 @@ public class Logger {
         return new Logger();
     }
 
-    public void log(String message, Object data, LogLevel level) {
+    public void log(String message, Object data, LogLevel logLevel) {
         try {
             Player player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-            Log log = Log.getInstance(player, message, level, data);
+            Log log = Log.getInstance(player, message, logLevel, data);
             System.out.println(log);
-            logService.create(log);
+            if (logLevel == LogLevel.ERROR) {
+                logService.create(log);
+            }
         } catch (Exception e) {
             System.out.println(e.getClass().getName() + ": " + e.getMessage());
         }
