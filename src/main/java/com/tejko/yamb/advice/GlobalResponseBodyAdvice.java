@@ -12,8 +12,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.tejko.yamb.models.enums.ResponseStatus;
-import com.tejko.yamb.models.payload.RestResponse;
+import com.tejko.yamb.api.payload.responses.ResponseWrapper;
+import com.tejko.yamb.domain.enums.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object> {
@@ -28,7 +28,7 @@ public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (body instanceof Collection<?>) {
             response.getHeaders().add("X-Total-Count", String.valueOf(((Collection<?>) body).size()));
         }
-        return new RestResponse("Success", body, ResponseStatus.SUCCESS);
+        return new ResponseWrapper("Success", body, ResponseStatus.SUCCESS);
     }
 
 }

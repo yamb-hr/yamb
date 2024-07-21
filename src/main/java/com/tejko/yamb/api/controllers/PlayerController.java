@@ -1,6 +1,7 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.services.PlayerService;
-import com.tejko.yamb.models.payload.dto.PlayerDTO;
-import com.tejko.yamb.models.payload.dto.ScoreDTO;
+import com.tejko.yamb.services.PlayerService;
+import com.tejko.yamb.api.payload.responses.PlayerResponse;
+import com.tejko.yamb.api.payload.responses.ScoreResponse;
+import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.util.Mapper;
 
 @RestController
 @RequestMapping("/api/players")
-public class PlayerController {
+public class PlayerController implements BaseController<PlayerResponse> {
 
 	@Autowired
 	PlayerService playerService;
@@ -29,37 +31,39 @@ public class PlayerController {
 	@Autowired
 	Mapper mapper;
 
-	@GetMapping("/{id}")
-	public PlayerDTO getById(@PathVariable Long id) {
-		return mapper.toDTO(playerService.getById(id));
+	@GetMapping("/{externalId}")
+	public PlayerResponse getByExternalId(@PathVariable UUID externalId) {
+		return mapper.toDTO(playerService.getByExternalId(externalId));
 	}
 
 	@GetMapping("")
-	public List<PlayerDTO> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
+	public List<PlayerResponse> getAll(@RequestParam(defaultValue = "0") Integer page,
+			@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "createdAt") String sort,
+			@RequestParam(defaultValue = "desc") String direction) {
 		return playerService.getAll(page, size, sort, direction)
-			.stream()
-			.map(mapper::toDTO)
-			.collect(Collectors.toList());
+				.stream()
+				.map(mapper::toDTO)
+				.collect(Collectors.toList());
 	}
 
-	@GetMapping("/{id}/scores")
-	public List<ScoreDTO> getScoresByPlayerId(@PathVariable Long id) {
-		return playerService.getScoresByPlayerId(id)
-			.stream()
-			.map(mapper::toDTO)
-			.collect(Collectors.toList());
+	@GetMapping("/{externalId}/scores")
+	public List<ScoreResponse> getScoresByPlayerId(@PathVariable UUID externalId) {
+		return playerService.getScoresByPlayerId(externalId)
+				.stream()
+				.map(mapper::toDTO)
+				.collect(Collectors.toList());
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public void deleteById(@PathVariable Long id) {
-		playerService.deleteById(id);
+	public void deleteByExternalId(@PathVariable UUID externalId) {
+		playerService.deleteByExternalId(externalId);
 	}
 
-    @GetMapping("/{id}/principal")
-    @PreAuthorize("isAuthenticated() && @permissionManager.hasPlayerPermission(authentication, #id)")
-	public ResponseEntity<String> getPrincipalById(@PathVariable Long id) {
-		return new ResponseEntity<>(playerService.getPrincipalById(id), HttpStatus.OK);
+	@GetMapping("/{externalId}/principal")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasPlayerPermission(authentication, #externalId)")
+	public ResponseEntity<String> getPrincipalById(@PathVariable UUID externalId) {
+		return new ResponseEntity<>(playerService.getPrincipalByExternalId(externalId), HttpStatus.OK);
 	}
 
 }

@@ -12,15 +12,14 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import com.tejko.yamb.api.services.WebSocketService;
-import com.tejko.yamb.models.payload.WebSocketMessage;
+import com.tejko.yamb.api.payload.WebSocketMessage;
+import com.tejko.yamb.services.WebSocketService;
 
 @RestController
 public class WebSocketController {
 
     @Autowired
     WebSocketService webSocketService;
-    
 
     @MessageMapping("/message")
     @SendTo("/chat/public")
@@ -48,6 +47,5 @@ public class WebSocketController {
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
         webSocketService.handleSessionSubscribeEvent(event);
     }
-
 
 }

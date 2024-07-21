@@ -3,7 +3,7 @@ package com.tejko.yamb.util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.tejko.yamb.models.enums.BoxType;
+import com.tejko.yamb.domain.enums.BoxType;
 
 public class ScoreCalculatorTest {
 

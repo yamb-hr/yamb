@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.tejko.yamb.api.services.PlayerService;
+import com.tejko.yamb.services.PlayerService;
 
 @Configuration
 @EnableWebSecurity

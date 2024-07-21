@@ -1,6 +1,7 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.services.RoleService;
-import com.tejko.yamb.models.payload.dto.RoleDTO;
+import com.tejko.yamb.services.RoleService;
+import com.tejko.yamb.api.payload.responses.RoleResponse;
+import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.util.Mapper;
 
 @RestController
 @RequestMapping("/api/roles")
-public class RoleController {
+public class RoleController implements BaseController<RoleResponse> {
 
 	@Autowired
 	RoleService roleService;
@@ -26,23 +28,25 @@ public class RoleController {
 	@Autowired
 	Mapper mapper;
 
-	@GetMapping("/{id}")
-	public RoleDTO getById(@PathVariable Long id) {
-		return mapper.toDTO(roleService.getById(id));
+	@GetMapping("/{externalId}")
+	public RoleResponse getByExternalId(@PathVariable UUID externalId) {
+		return mapper.toDTO(roleService.getByExternalId(externalId));
 	}
 
 	@GetMapping("")
-	public List<RoleDTO> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
+	public List<RoleResponse> getAll(@RequestParam(defaultValue = "0") Integer page,
+			@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "createdAt") String sort,
+			@RequestParam(defaultValue = "desc") String direction) {
 		return roleService.getAll(page, size, sort, direction)
-			.stream()
-			.map(mapper::toDTO)
-			.collect(Collectors.toList());
+				.stream()
+				.map(mapper::toDTO)
+				.collect(Collectors.toList());
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public void deleteById(@PathVariable Long id) {
-		roleService.deleteById(id);
+	public void deleteByExternalId(@PathVariable UUID externalId) {
+		roleService.deleteByExternalId(externalId);
 	}
 
 }

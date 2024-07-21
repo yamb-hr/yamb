@@ -14,8 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.tejko.yamb.api.services.PlayerService;
-import com.tejko.yamb.constants.SecurityConstants;
+import com.tejko.yamb.services.PlayerService;
+import com.tejko.yamb.domain.constants.SecurityConstants;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 

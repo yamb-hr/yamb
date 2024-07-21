@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.tejko.yamb.constants.MessageConstants;
-import com.tejko.yamb.models.enums.ResponseStatus;
-import com.tejko.yamb.models.payload.RestResponse;
+import com.tejko.yamb.api.payload.responses.ResponseWrapper;
+import com.tejko.yamb.domain.constants.MessageConstants;
+import com.tejko.yamb.domain.enums.ResponseStatus;
 import com.tejko.yamb.util.Logger;
 
 @ControllerAdvice
@@ -25,36 +25,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     Logger logger;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<RestResponse> handleException(Exception exception) {
+    public ResponseEntity<ResponseWrapper> handleException(Exception exception) {
         exception.printStackTrace(System.out);
         logger.error(exception);
-        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ BadCredentialsException.class })
-    public ResponseEntity<RestResponse> handleException(BadCredentialsException exception) {
+    public ResponseEntity<ResponseWrapper> handleException(BadCredentialsException exception) {
         exception.printStackTrace(System.out);        
-        return new ResponseEntity<>(new RestResponse(MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT, null, ResponseStatus.ERROR), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new ResponseWrapper(MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT, null, ResponseStatus.ERROR), HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<RestResponse> handleException(AccessDeniedException exception) {
+    public ResponseEntity<ResponseWrapper> handleException(AccessDeniedException exception) {
         logger.error(exception);
-        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler({ ResourceNotFoundException.class })
-    public ResponseEntity<RestResponse> handleException(ResourceNotFoundException exception) {
+    public ResponseEntity<ResponseWrapper> handleException(ResourceNotFoundException exception) {
         exception.printStackTrace(System.out);     
         logger.error(exception);
-        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.NOT_FOUND);
     }
     
     @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
-    public ResponseEntity<RestResponse> handleException(RuntimeException exception) {
+    public ResponseEntity<ResponseWrapper> handleException(RuntimeException exception) {
         exception.printStackTrace(System.out);     
         logger.error(exception);
-        return new ResponseEntity<>(new RestResponse(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.BAD_REQUEST);
     }
 
 }
