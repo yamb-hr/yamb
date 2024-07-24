@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tejko.yamb.services.GameService;
 import com.tejko.yamb.api.payload.requests.ActionRequest;
 import com.tejko.yamb.api.payload.responses.GameResponse;
-import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.util.Mapper;
 

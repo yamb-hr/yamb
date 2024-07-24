@@ -28,7 +28,7 @@ public class PermissionManager {
 
     public boolean hasPlayerPermission(Authentication authentication, UUID playerExternalId) {
         Player player = playerRepo.findByUsername(authentication.getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return player.getId().equals(playerExternalId);
+        return player.getExternalId().equals(playerExternalId);
     }
 
 

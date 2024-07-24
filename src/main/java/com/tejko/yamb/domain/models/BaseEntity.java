@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
@@ -22,7 +23,7 @@ public abstract class BaseEntity {
     @Column
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = true)
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID externalId;
@@ -49,6 +50,13 @@ public abstract class BaseEntity {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @PrePersist
+    protected void initializeExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
     }
     
 }

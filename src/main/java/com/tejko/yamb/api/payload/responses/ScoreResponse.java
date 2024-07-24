@@ -1,8 +1,8 @@
 package com.tejko.yamb.api.payload.responses;
 
-public class ScoreResponse extends BaseDTO {
+public class ScoreResponse extends BaseResponse {
 
-    public String player;
+    public PlayerResponse player;
     public int value;
     
 }

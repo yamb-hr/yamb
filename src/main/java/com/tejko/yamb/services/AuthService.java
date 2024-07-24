@@ -24,6 +24,7 @@ import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RoleRepository;
 import com.tejko.yamb.security.JwtUtil;
+import com.tejko.yamb.util.Mapper;
 
 @Service
 public class AuthService {
@@ -43,14 +44,19 @@ public class AuthService {
     @Autowired
     PasswordEncoder encoder;
 
+    @Autowired
+    Mapper mapper;
+
     public AuthResponse login(AuthRequest playerCredentials) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 playerCredentials.getUsername(), playerCredentials.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Player player = playerRepo.findByUsername(playerCredentials.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return new AuthResponse(player.getExternalId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()),
-                player.isTempUser(), player.getRoles());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.player = mapper.toDTO(player);
+        authResponse.token = jwtUtil.generateToken(player.getUsername());
+        return authResponse;
     }
 
     public Player register(AuthRequest playerCredentials) {
@@ -110,8 +116,10 @@ public class AuthService {
         player.setRoles(roles);
 
         player = playerRepo.save(player);
-        return new AuthResponse(player.getExternalId(), player.getUsername(), jwtUtil.generateToken(player.getUsername()),
-                player.isTempUser(), player.getRoles());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.player = mapper.toDTO(player);
+        authResponse.token = jwtUtil.generateToken(player.getUsername());
+        return authResponse;
     }
 
 }

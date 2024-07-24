@@ -6,36 +6,36 @@ import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
 
-public class GameResponse extends BaseDTO {
+public class GameResponse extends BaseResponse {
 
-    public String player;
-    public SheetDTO sheet;
-    public List<DiceDTO> dices;
+    public PlayerResponse player;
+    public SheetResponse sheet;
+    public List<DiceResponse> dices;
     public int rollCount;
     public BoxType announcement;
     public GameStatus status;
 
-    public static class DiceDTO {
+    public static class DiceResponse {
 
         public int index;
         public int value;
     
     }
 
-    public static class SheetDTO {
+    public static class SheetResponse {
 
-        public List<ColumnDTO> columns;
+        public List<ColumnResponse> columns;
 
     }
 
-    public static class ColumnDTO {
+    public static class ColumnResponse {
 
         public ColumnType type;
-        public List<BoxDTO> boxes;
+        public List<BoxResponse> boxes;
 
     }
 
-    public static class BoxDTO {
+    public static class BoxResponse {
 
         public BoxType type;
         public Integer value;

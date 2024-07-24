@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tejko.yamb.api.payload.responses.BaseDTO;
+import com.tejko.yamb.api.payload.responses.BaseResponse;
 
-public interface BaseController<T extends BaseDTO> {
+public interface BaseController<T extends BaseResponse> {
 
     @GetMapping("")
 	public List<T> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "createdAt") String sort, @RequestParam(defaultValue = "desc") String direction);
