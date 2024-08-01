@@ -62,8 +62,8 @@ public class PlayerController implements BaseController<PlayerResponse> {
 
 	@GetMapping("/{externalId}/principal")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPlayerPermission(authentication, #externalId)")
-	public ResponseEntity<String> getPrincipalById(@PathVariable UUID externalId) {
-		return new ResponseEntity<>(playerService.getPrincipalByExternalId(externalId), HttpStatus.OK);
+	public String getPrincipalById(@PathVariable UUID externalId) {
+		return playerService.getPrincipalByExternalId(externalId);
 	}
 
 }
