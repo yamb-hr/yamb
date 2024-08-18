@@ -25,7 +25,7 @@ import com.tejko.yamb.domain.exceptions.AnnouncementUnavailableException;
 import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
 import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
 import com.tejko.yamb.domain.exceptions.DiceRollRequiredException;
-import com.tejko.yamb.domain.exceptions.RestartFinishedGameException;
+import com.tejko.yamb.domain.exceptions.LockedGameException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 import com.tejko.yamb.util.ScoreCalculator;
 
@@ -182,7 +182,7 @@ public class Game extends BaseEntity {
 
     private void validateRestartAction() {
         if (status == GameStatus.FINISHED) {
-            throw new RestartFinishedGameException();
+            throw new LockedGameException();
         }
     }
 

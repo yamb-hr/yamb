@@ -12,7 +12,7 @@ import com.tejko.yamb.domain.exceptions.AnnouncementUnavailableException;
 import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
 import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
 import com.tejko.yamb.domain.exceptions.DiceRollRequiredException;
-import com.tejko.yamb.domain.exceptions.RestartFinishedGameException;
+import com.tejko.yamb.domain.exceptions.LockedGameException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 
 public class GameTest {

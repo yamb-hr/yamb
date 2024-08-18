@@ -1,6 +1,6 @@
-package com.tejko.yamb.exceptions;
+package com.tejko.yamb.domain.exceptions;
 
-import com.tejko.yamb.constants.MessageConstants;
+import com.tejko.yamb.domain.constants.MessageConstants;
 
 public class LockedGameException extends IllegalStateException {
 
