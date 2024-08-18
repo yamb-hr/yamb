@@ -71,7 +71,7 @@ public class GameService implements BaseService<Game> {
         return game;
     }
 
-    public Game makeAnnouncementByExternalId(UUID externalId, ActionRequest actionRequest) {
+    public Game announceByExternalId(UUID externalId, ActionRequest actionRequest) {
         Game game = gameRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.makeAnnouncement(actionRequest.getBoxType());

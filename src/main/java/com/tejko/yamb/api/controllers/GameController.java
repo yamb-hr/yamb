@@ -61,8 +61,8 @@ public class GameController implements BaseController<GameResponse> {
 
 	@PutMapping("/{externalId}/announce")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
-	public GameResponse makeAnnouncementByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
-		return  mapper.toDTO(gameService.makeAnnouncementByExternalId(externalId, action));
+	public GameResponse announceByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return  mapper.toDTO(gameService.announceByExternalId(externalId, action));
 	}
 
 	@PutMapping("/{externalId}/fill")
