@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.tejko.yamb.api.payload.responses.ResponseWrapper;
+import com.tejko.yamb.api.payload.responses.ErrorResponse;
 import com.tejko.yamb.domain.constants.MessageConstants;
-import com.tejko.yamb.domain.enums.ResponseStatus;
 import com.tejko.yamb.util.Logger;
 
 @ControllerAdvice
@@ -25,36 +24,46 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     Logger logger;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseWrapper> handleException(Exception exception) {
+    public ResponseEntity<ErrorResponse> handleException(Exception exception) {
         exception.printStackTrace(System.out);
         logger.error(exception);
-        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.message = exception.getLocalizedMessage();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ BadCredentialsException.class })
-    public ResponseEntity<ResponseWrapper> handleException(BadCredentialsException exception) {
-        exception.printStackTrace(System.out);        
-        return new ResponseEntity<>(new ResponseWrapper(MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT, null, ResponseStatus.ERROR), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
+        exception.printStackTrace(System.out);    
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.message = MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT;
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<ResponseWrapper> handleException(AccessDeniedException exception) {
+    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
         logger.error(exception);
-        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.FORBIDDEN);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.message = exception.getLocalizedMessage();
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler({ ResourceNotFoundException.class })
-    public ResponseEntity<ResponseWrapper> handleException(ResourceNotFoundException exception) {
+    public ResponseEntity<ErrorResponse> handleException(ResourceNotFoundException exception) {
         exception.printStackTrace(System.out);     
         logger.error(exception);
-        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.NOT_FOUND);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.message = exception.getLocalizedMessage();
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
     
     @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
-    public ResponseEntity<ResponseWrapper> handleException(RuntimeException exception) {
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {
         exception.printStackTrace(System.out);     
         logger.error(exception);
-        return new ResponseEntity<>(new ResponseWrapper(exception.getLocalizedMessage(), null, ResponseStatus.ERROR), HttpStatus.BAD_REQUEST);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.message = exception.getLocalizedMessage();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
 }

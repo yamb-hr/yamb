@@ -60,7 +60,7 @@ public class Log extends BaseEntity {
 
     @Override
     public String toString() {
-        return "[" + createdAt + "]: Message=" + message + "\nPlayer=" + player.getUsername();
+        return player.getUsername() + " [" + createdAt + "]: " + message;
     }
 
 }

@@ -1,7 +1,5 @@
 package com.tejko.yamb.domain.models;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -19,13 +17,13 @@ public class Score extends BaseEntity {
 
 	protected Score() {}
 
-	private Score(Player player, int value, LocalDateTime date) {
+	private Score(Player player, int value) {
 		this.player = player;
 		this.value = value;
 	}
 
 	public static Score getInstance(Player player, int value) {
-		return new Score(player, value, LocalDateTime.now());
+		return new Score(player, value);
 	}
 
 	public Player getPlayer() {

@@ -5,8 +5,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,7 +60,7 @@ public class PlayerController implements BaseController<PlayerResponse> {
 
 	@GetMapping("/{externalId}/principal")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasPlayerPermission(authentication, #externalId)")
-	public String getPrincipalById(@PathVariable UUID externalId) {
+	public String getPrincipal(@PathVariable UUID externalId) {
 		return playerService.getPrincipalByExternalId(externalId);
 	}
 

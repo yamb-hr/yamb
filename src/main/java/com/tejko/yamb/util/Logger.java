@@ -31,9 +31,9 @@ public class Logger {
         try {
             Player player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
             Log log = Log.getInstance(player, message, logLevel, data);
-            System.out.println(log);
             if (logLevel == LogLevel.ERROR) {
                 logService.create(log);
+                System.out.println(log);
             }
         } catch (Exception e) {
             System.out.println(e.getClass().getName() + ": " + e.getMessage());
