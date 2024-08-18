@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.services.AuthService;
-import com.tejko.yamb.models.Player;
-import com.tejko.yamb.models.payload.AuthResult;
-import com.tejko.yamb.models.payload.PlayerCredentials;
+import com.tejko.yamb.services.AuthService;
+import com.tejko.yamb.api.payload.requests.AuthRequest;
+import com.tejko.yamb.api.payload.responses.AuthResponse;
+import com.tejko.yamb.domain.models.Player;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,17 +21,17 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping("/login")
-    public AuthResult login(@Valid @RequestBody PlayerCredentials playerCredentials) {
+    public AuthResponse login(@Valid @RequestBody AuthRequest playerCredentials) {
         return authService.login(playerCredentials);
     }
 
     @PostMapping("/register")
-    public Player register(@Valid @RequestBody PlayerCredentials playerCredentials) {
+    public Player register(@Valid @RequestBody AuthRequest playerCredentials) {
         return authService.register(playerCredentials);
     }
 
 	@PostMapping("/temp-player")
-	public AuthResult createTempPlayer(@RequestBody PlayerCredentials playerCredentials) {
+	public AuthResponse createTempPlayer(@RequestBody AuthRequest playerCredentials) {
 		return authService.createTempPlayer(playerCredentials);
 	}
 

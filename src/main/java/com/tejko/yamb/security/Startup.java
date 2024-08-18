@@ -7,8 +7,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.models.Role;
-import com.tejko.yamb.repositories.RoleRepository;
+import com.tejko.yamb.domain.models.Role;
+import com.tejko.yamb.domain.repositories.RoleRepository;
 
 @Component
 public class Startup implements ApplicationRunner {

@@ -1,11 +1,13 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.services.GameService;
-import com.tejko.yamb.models.enums.BoxType;
-import com.tejko.yamb.models.payload.GameAction;
-import com.tejko.yamb.models.payload.dto.DiceDTO;
-import com.tejko.yamb.models.payload.dto.GameDTO;
+import com.tejko.yamb.services.GameService;
+import com.tejko.yamb.api.payload.requests.ActionRequest;
+import com.tejko.yamb.api.payload.responses.GameResponse;
+import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.util.Mapper;
 
 @RestController
 @RequestMapping("/api/games")
-public class GameController {
+public class GameController implements BaseController<GameResponse> {
 
 	@Autowired
 	GameService gameService;
@@ -32,49 +33,54 @@ public class GameController {
 	Mapper mapper;
 
 	@GetMapping("")
-	public List<GameDTO> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue = "desc") String direction) {
+	public List<GameResponse> getAll(@RequestParam(defaultValue = "0") Integer page,
+			@RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "createdAt") String sort,
+			@RequestParam(defaultValue = "desc") String direction) {
 		return gameService.getAll(page, size, sort, direction)
-			.stream()
-			.map(mapper::toDTO)
-			.collect(Collectors.toList());
-	}
-
-	@GetMapping("/{id}") 
-	public GameDTO getById(@PathVariable Long id) {
-		return mapper.toDTO(gameService.getById(id));
-	}
-
-	@PostMapping("/play")
-	@PreAuthorize("isAuthenticated()")
-	public GameDTO play() { 
-		return mapper.toDTO(gameService.play());
-	}
-
-	@PutMapping("/{id}/roll")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public List<DiceDTO> rollDiceById(@PathVariable Long id, @RequestBody GameAction action) {
-		return gameService.rollDiceById(id, action)
 				.stream()
 				.map(mapper::toDTO)
 				.collect(Collectors.toList());
 	}
 
-	@PutMapping("/{id}/announce")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public BoxType makeAnnouncementById(@PathVariable Long id, @RequestBody GameAction action) {
-		return gameService.makeAnnouncementById(id, action);
+	@GetMapping("/{externalId}")
+	public GameResponse getByExternalId(@PathVariable UUID externalId) {
+		return mapper.toDTO(gameService.getByExternalId(externalId));
 	}
 
-	@PutMapping("/{id}/fill")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public int fillBoxById(@PathVariable Long id, @RequestBody GameAction action) {
-		return gameService.fillBoxById(id, action);
+	@PostMapping("")
+	@PreAuthorize("isAuthenticated()")
+	public GameResponse play() {
+		return mapper.toDTO(gameService.play());
 	}
 
-	@PutMapping("/{id}/restart")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
-	public GameDTO restartById(@PathVariable Long id) {
-		return mapper.toDTO(gameService.restartById(id));
+	@PutMapping("/{externalId}/roll")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
+	public GameResponse rollDiceByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return  mapper.toDTO(gameService.rollDiceByExternalId(externalId, action));
+	}
+
+	@PutMapping("/{externalId}/announce")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
+	public GameResponse makeAnnouncementByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return  mapper.toDTO(gameService.makeAnnouncementByExternalId(externalId, action));
+	}
+
+	@PutMapping("/{externalId}/fill")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
+	public GameResponse fillBoxByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return mapper.toDTO(gameService.fillBoxByExternalId(externalId, action));
+	}
+
+	@PutMapping("/{externalId}/restart")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
+	public GameResponse restartByExternalId(@PathVariable UUID externalId) {
+		return mapper.toDTO(gameService.restartByExternalId(externalId));
+	}
+
+	@DeleteMapping("/{externalId}")
+	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
+	public void deleteByExternalId(@PathVariable UUID externalId) {
+		gameService.deleteByExternalId(externalId);
 	}
 
 }

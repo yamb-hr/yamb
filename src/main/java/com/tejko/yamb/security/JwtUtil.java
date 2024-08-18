@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.constants.SecurityConstants;
+import com.tejko.yamb.domain.constants.SecurityConstants;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

@@ -4,64 +4,100 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.models.Game;
-import com.tejko.yamb.models.Log;
-import com.tejko.yamb.models.Player;
-import com.tejko.yamb.models.Role;
-import com.tejko.yamb.models.Score;
-import com.tejko.yamb.models.game.Box;
-import com.tejko.yamb.models.game.Column;
-import com.tejko.yamb.models.game.Dice;
-import com.tejko.yamb.models.game.Sheet;
-import com.tejko.yamb.models.payload.dto.BoxDTO;
-import com.tejko.yamb.models.payload.dto.ColumnDTO;
-import com.tejko.yamb.models.payload.dto.DiceDTO;
-import com.tejko.yamb.models.payload.dto.GameDTO;
-import com.tejko.yamb.models.payload.dto.LogDTO;
-import com.tejko.yamb.models.payload.dto.PlayerDTO;
-import com.tejko.yamb.models.payload.dto.RoleDTO;
-import com.tejko.yamb.models.payload.dto.ScoreDTO;
-import com.tejko.yamb.models.payload.dto.SheetDTO;
+import com.tejko.yamb.api.payload.responses.GameResponse;
+import com.tejko.yamb.api.payload.responses.LogResponse;
+import com.tejko.yamb.api.payload.responses.PlayerResponse;
+import com.tejko.yamb.api.payload.responses.RoleResponse;
+import com.tejko.yamb.api.payload.responses.ScoreResponse;
+import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.Role;
+import com.tejko.yamb.domain.models.Score;
 
 import io.swagger.v3.core.util.Json;
 
 @Component
 public class Mapper {
 
-    public PlayerDTO toDTO(Player player) {
-        return new PlayerDTO(player.getId(), player.getUsername(), player.getRoles().stream().map(role -> role.getLabel()).collect(Collectors.toList()));
+    public PlayerResponse toDTO(Player player) {
+        PlayerResponse playerResponse = new PlayerResponse();
+        playerResponse.id = player.getExternalId();
+        playerResponse.createdAt = player.getCreatedAt();
+        playerResponse.updatedAt = player.getUpdatedAt();
+        playerResponse.name = player.getUsername();
+        playerResponse.roles = player.getRoles().stream().map(role -> toDTO(role)).collect(Collectors.toList());
+        return playerResponse;
     }
 
-    public ScoreDTO toDTO(Score score) {
-        return new ScoreDTO(score.getId(), score.getPlayer().getUsername(), score.getValue(), score.getDate());
+    public ScoreResponse toDTO(Score score) {
+        ScoreResponse scoreResponse = new ScoreResponse();
+        scoreResponse.id = score.getExternalId();
+        scoreResponse.createdAt = score.getCreatedAt();
+        scoreResponse.updatedAt = score.getUpdatedAt();
+        scoreResponse.player = toDTO(score.getPlayer());
+        scoreResponse.value = score.getValue();
+        return scoreResponse;
     }
 
-    public RoleDTO toDTO(Role role) {
-        return new RoleDTO(role.getId(), role.getLabel(), role.getDescription());
+    public RoleResponse toDTO(Role role) {
+        RoleResponse roleResponse = new RoleResponse();
+        roleResponse.id = role.getExternalId();
+        roleResponse.name = role.getLabel();
+        roleResponse.description = role.getDescription();
+        return roleResponse;
     }
 
-    public GameDTO toDTO(Game game) {
-        return new GameDTO(game.getId(), game.getPlayer().getUsername(), toDTO(game.getSheet()), game.getDices().stream().map(dice -> toDTO(dice)).collect(Collectors.toList()), game.getRollCount(), game.getAnnouncement(), game.getStatus());
+    public GameResponse toDTO(Game game) {
+        GameResponse gameResponse = new GameResponse();
+        gameResponse.id = game.getExternalId();
+        gameResponse.createdAt = game.getCreatedAt();
+        gameResponse.updatedAt = game.getUpdatedAt();
+        gameResponse.player = toDTO(game.getPlayer());
+        gameResponse.sheet = toDTO(game.getSheet());
+        gameResponse.dices = game.getDices().stream().map(dice -> toDTO(dice)).collect(Collectors.toList());
+        gameResponse.rollCount = game.getRollCount();
+        gameResponse.announcement = game.getAnnouncement();
+        gameResponse.status = game.getStatus();
+        return gameResponse;
     }
 
-    public SheetDTO toDTO(Sheet sheet) {
-        return new SheetDTO(sheet.getColumns().stream().map(this::toDTO).collect(Collectors.toList()));
+    public GameResponse.SheetResponse toDTO(Game.Sheet sheet) {
+        GameResponse.SheetResponse sheetResponse = new GameResponse.SheetResponse();
+        sheetResponse.columns = sheet.getColumns().stream().map(this::toDTO).collect(Collectors.toList());
+        return sheetResponse;
     }
 
-    public ColumnDTO toDTO(Column column) {
-        return new ColumnDTO(column.getType(), column.getBoxes().stream().map(this::toDTO).collect(Collectors.toList()));
+    public GameResponse.ColumnResponse toDTO(Game.GameColumn column) {
+        GameResponse.ColumnResponse columnResponse = new GameResponse.ColumnResponse();
+        columnResponse.type = column.getType();
+        columnResponse.boxes = column.getBoxes().stream().map(this::toDTO).collect(Collectors.toList());
+        return columnResponse;
     }
 
-    public BoxDTO toDTO(Box box) {
-        return new BoxDTO(box.getType(), box.getValue());
+    public GameResponse.BoxResponse toDTO(Game.Box box) {
+        GameResponse.BoxResponse boxResponse = new GameResponse.BoxResponse();
+        boxResponse.type = box.getType();
+        boxResponse.value = box.getValue();
+        return boxResponse;
     }
 
-    public DiceDTO toDTO(Dice dice) {
-        return new DiceDTO(dice.getIndex(), dice.getValue());
+    public GameResponse.DiceResponse toDTO(Game.Dice dice) {
+        GameResponse.DiceResponse diceResponse = new GameResponse.DiceResponse();
+        diceResponse.index = dice.getIndex();
+        diceResponse.value = dice.getValue();
+        return diceResponse;
     }
 
-    public LogDTO toDTO(Log log) {
-        return new LogDTO(log.getId(), log.getPlayer().getUsername(), Json.pretty(log.getData()), log.getMessage(), log.getLevel(), log.getTime());
+    public LogResponse toDTO(Log log) {
+        LogResponse logResponse = new LogResponse();
+        logResponse.id = log.getExternalId();
+        logResponse.player = toDTO(log.getPlayer());
+        logResponse.data = Json.pretty(log.getData());
+        logResponse.message = log.getMessage();
+        logResponse.level = log.getLevel();
+        logResponse.createdAt = log.getCreatedAt();
+        return logResponse;
     }
 
 }

@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.constants.MessageConstants;
+import com.tejko.yamb.domain.constants.MessageConstants;
 
 @Component
 public class AuthEntryPoint implements AuthenticationEntryPoint {

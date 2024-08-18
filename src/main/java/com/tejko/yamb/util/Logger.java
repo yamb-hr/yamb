@@ -5,12 +5,12 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.api.services.LogService;
-import com.tejko.yamb.constants.MessageConstants;
-import com.tejko.yamb.models.Log;
-import com.tejko.yamb.models.Player;
-import com.tejko.yamb.models.enums.LogLevel;
-import com.tejko.yamb.repositories.PlayerRepository;
+import com.tejko.yamb.services.LogService;
+import com.tejko.yamb.domain.constants.MessageConstants;
+import com.tejko.yamb.domain.enums.LogLevel;
+import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.repositories.PlayerRepository;
 
 @Component
 public class Logger {
@@ -31,9 +31,9 @@ public class Logger {
         try {
             Player player = playerRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
             Log log = Log.getInstance(player, message, logLevel, data);
-            System.out.println(log);
             if (logLevel == LogLevel.ERROR) {
                 logService.create(log);
+                System.out.println(log);
             }
         } catch (Exception e) {
             System.out.println(e.getClass().getName() + ": " + e.getMessage());

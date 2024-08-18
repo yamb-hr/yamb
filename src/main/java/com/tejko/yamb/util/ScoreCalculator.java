@@ -1,7 +1,7 @@
 package com.tejko.yamb.util;
 
-import com.tejko.yamb.constants.GameConstants;
-import com.tejko.yamb.models.enums.BoxType;
+import com.tejko.yamb.domain.constants.GameConstants;
+import com.tejko.yamb.domain.enums.BoxType;
 
 public class ScoreCalculator {
 

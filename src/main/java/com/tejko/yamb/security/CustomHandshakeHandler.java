@@ -13,7 +13,7 @@ import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.tejko.yamb.api.services.WebSocketService;
+import com.tejko.yamb.services.WebSocketService;
 
 @Component
 @Scope("prototype")
