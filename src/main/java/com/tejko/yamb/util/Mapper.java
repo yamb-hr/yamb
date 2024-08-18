@@ -26,6 +26,7 @@ public class Mapper {
         playerResponse.createdAt = player.getCreatedAt();
         playerResponse.updatedAt = player.getUpdatedAt();
         playerResponse.name = player.getUsername();
+        playerResponse.tempUser = player.isTempUser();
         playerResponse.roles = player.getRoles().stream().map(role -> toDTO(role)).collect(Collectors.toList());
         return playerResponse;
     }
