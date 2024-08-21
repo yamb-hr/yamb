@@ -27,14 +27,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		UserDetails userDetails = extractUserFromRequest(request);
-		if (userDetails != null) {
-			try {
-				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
+        String requestURI = request.getRequestURI();
+		if (!"/api/auth/login".equals(requestURI) && !"/api/auth/temp-player".equals(requestURI)) {
+			UserDetails userDetails = extractUserFromRequest(request);
+			if (userDetails != null) {
+				try {
+					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 			}
 		}
 		filterChain.doFilter(request, response);
@@ -44,8 +47,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	private UserDetails extractUserFromRequest(HttpServletRequest request) {
 		String token = extractTokenFromAuthHeader(request);
 		try {
-			return playerService.loadUserByUsername(jwtUtil.extractUsernameFromToken(token));
+			String username = jwtUtil.extractUsernameFromToken(token);
+			return playerService.loadUserByUsername(username);
 		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
 			// ignore
 		}
 		return null;

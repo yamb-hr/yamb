@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.services.PlayerService;
 import com.tejko.yamb.api.payload.responses.PlayerResponse;
+import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.util.Mapper;
@@ -63,5 +64,10 @@ public class PlayerController implements BaseController<PlayerResponse> {
 	public String getPrincipal(@PathVariable UUID externalId) {
 		return playerService.getPrincipalByExternalId(externalId);
 	}
+
+	@GetMapping("/{externalId}/stats")
+    public PlayerStatsResponse getPlayerStats(@PathVariable UUID externalId) {
+        return playerService.getPlayerStats(externalId);
+    }
 
 }

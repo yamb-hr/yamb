@@ -3,22 +3,14 @@ package com.tejko.yamb.interfaces;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.tejko.yamb.api.payload.responses.BaseResponse;
 
 public interface BaseController<T extends BaseResponse> {
 
-    @GetMapping("")
-	public List<T> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "createdAt") String sort, @RequestParam(defaultValue = "desc") String direction);
+	public List<T> getAll(Integer page, Integer size, String sort, String direction);
 
-	@GetMapping("/{externalId}")
-	public T getByExternalId(@PathVariable UUID externalId);
+	public T getByExternalId(UUID externalId);
 
-	@DeleteMapping("/{externalId}")
-	public void deleteByExternalId(@PathVariable UUID externalId);
+	public void deleteByExternalId(UUID externalId);
     
 }

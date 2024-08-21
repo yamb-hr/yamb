@@ -1,4 +1,4 @@
-package com.tejko.yamb.security;
+package com.tejko.yamb.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.tejko.yamb.security.AuthEntryPoint;
+import com.tejko.yamb.security.AuthTokenFilter;
+import com.tejko.yamb.security.RecaptchaFilter;
 import com.tejko.yamb.services.PlayerService;
 
 @Configuration
@@ -32,6 +35,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public AuthTokenFilter authTokenFilter() {
 		return new AuthTokenFilter();
+	}
+
+	@Bean
+	public RecaptchaFilter recaptchaFilter() {
+		return new RecaptchaFilter();
 	}
 
 	@Override
@@ -57,8 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/**").permitAll()
 			.antMatchers("/**").permitAll();
-		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-	}
+			http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
+		}
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {

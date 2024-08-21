@@ -63,11 +63,18 @@ public class WebSocketService {
         StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
         Principal principal = headers.getUser();
         if (principal != null) {
-            String username = getUsernameFromPrincipal(principal.getName());
-            playerStatusMap.put(username, PlayerStatus.OFFLINE);
-            System.out.println(username + " has disconnected... ");
-            WebSocketMessage message = new WebSocketMessage("Server", "all", MessageType.PLAYERS, playerStatusMap);
-            simpMessagingTemplate.convertAndSend("/chat/public", message);
+            try {
+                String username = getUsernameFromPrincipal(principal.getName());
+                if (playerStatusMap.containsKey(username)) {
+                    playerStatusMap.remove(username);
+                    System.out.println(username + " has disconnected... ");
+                }
+                WebSocketMessage message = new WebSocketMessage("Server", "all", MessageType.PLAYERS, playerStatusMap);
+                simpMessagingTemplate.convertAndSend("/chat/public", message);
+            } catch (Exception e) {
+                playerStatusMap.clear();
+                System.out.println(e.getMessage());
+            }            
         }
     }
 
@@ -79,9 +86,12 @@ public class WebSocketService {
             String username = getUsernameFromPrincipal(principal.getName());
             System.out.println(username + " has subscribed to " + destination);
             if ("/chat/public".equals(destination)) {
-                WebSocketMessage message = new WebSocketMessage("Server", username, MessageType.PLAYERS,
-                        playerStatusMap);
-                simpMessagingTemplate.convertAndSend("/chat/public", message);
+                try {
+                    WebSocketMessage message = new WebSocketMessage("Server", username, MessageType.PLAYERS, playerStatusMap);
+                    simpMessagingTemplate.convertAndSend("/chat/public", message);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }

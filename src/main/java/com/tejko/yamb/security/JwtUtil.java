@@ -44,7 +44,11 @@ public class JwtUtil {
 	}
 	
 	public String extractUsernameFromToken(String token) {
-		return parseToken(token).getBody().getSubject();
+		try {
+			return parseToken(token).getBody().getSubject();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public String extractTokenFromAuthHeader(HttpServletRequest request) {

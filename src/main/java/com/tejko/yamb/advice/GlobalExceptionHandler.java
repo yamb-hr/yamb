@@ -24,24 +24,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     Logger logger;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception exception) {
-        exception.printStackTrace(System.out);
-        logger.error(exception);
+    public ResponseEntity<ErrorResponse> handleException(Exception exception) {       
+        System.out.println(exception.getLocalizedMessage());
+        try {
+            logger.error(exception);
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.message = exception.getLocalizedMessage();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ BadCredentialsException.class })
-    public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {
-        exception.printStackTrace(System.out);    
+    public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {       
+        System.out.println(exception.getLocalizedMessage());
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.message = MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT;
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {
+    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException exception) {       
+        System.out.println(exception.getLocalizedMessage());
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.message = exception.getLocalizedMessage();
@@ -49,8 +54,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ ResourceNotFoundException.class })
-    public ResponseEntity<ErrorResponse> handleException(ResourceNotFoundException exception) {
-        exception.printStackTrace(System.out);     
+    public ResponseEntity<ErrorResponse> handleException(ResourceNotFoundException exception) {       
+        System.out.println(exception.getLocalizedMessage());
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.message = exception.getLocalizedMessage();
@@ -58,8 +63,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
     
     @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {
-        exception.printStackTrace(System.out);     
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException exception) {       
+        System.out.println(exception.getLocalizedMessage());  
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.message = exception.getLocalizedMessage();

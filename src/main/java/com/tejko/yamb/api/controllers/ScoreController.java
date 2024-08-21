@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.services.ScoreService;
 import com.tejko.yamb.api.payload.requests.DateRangeRequest;
 import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.api.payload.responses.ScoreboardResponse;
 import com.tejko.yamb.interfaces.BaseController;
+import com.tejko.yamb.interfaces.services.ScoreService;
 import com.tejko.yamb.util.Mapper;
 
 @RestController
@@ -53,9 +53,9 @@ public class ScoreController implements BaseController<ScoreResponse> {
 				.collect(Collectors.toList());
 	}
 
-	@GetMapping("/dashboard")
-	public ScoreboardResponse getDashboardData() {
-		return scoreService.getDashboardData();
+	@GetMapping("/scoreboard")
+	public ScoreboardResponse getScoreboard() {
+		return scoreService.getScoreboard();
 	}
 
 	@DeleteMapping("/{externalId}")
