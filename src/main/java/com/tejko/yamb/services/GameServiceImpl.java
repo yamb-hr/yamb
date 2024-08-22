@@ -17,28 +17,28 @@ import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.api.payload.requests.ActionRequest;
 import com.tejko.yamb.domain.constants.MessageConstants;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.interfaces.BaseService;
+import com.tejko.yamb.interfaces.services.GameService;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
-import com.tejko.yamb.util.Logger;
+import com.tejko.yamb.util.YambLogger;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
 
 @Service
-public class GameService implements BaseService<Game> {
+public class GameServiceImpl implements GameService {
 
     @Autowired
-    GameRepository gameRepo;
+    private GameRepository gameRepo;
 
     @Autowired
-    PlayerRepository playerRepo;
+    private PlayerRepository playerRepo;
 
     @Autowired
-    ScoreRepository scoreRepo;
+    private ScoreRepository scoreRepo;
 
     @Autowired
-    Logger logger;
+    private YambLogger logger;
 
     public Game getByExternalId(UUID externalId) {
         return gameRepo.findByExternalId(externalId)
@@ -62,28 +62,28 @@ public class GameService implements BaseService<Game> {
         }
     }
 
-    public Game rollDiceByExternalId(UUID externalId, ActionRequest actionRequest) {
+    public Game rollByExternalId(UUID externalId, ActionRequest actionRequest) {
         Game game = gameRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
-        game.rollDice(actionRequest.getDiceToRoll());
+        game.roll(actionRequest.getDiceToRoll());
         gameRepo.save(game);
-        logger.log("rollDice", actionRequest);
+        logger.log("roll", actionRequest);
         return game;
     }
 
     public Game announceByExternalId(UUID externalId, ActionRequest actionRequest) {
         Game game = gameRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
-        game.makeAnnouncement(actionRequest.getBoxType());
+        game.announce(actionRequest.getBoxType());
         gameRepo.save(game);
-        logger.log("makeAnnouncement", actionRequest);
+        logger.log("announce", actionRequest);
         return game;
     }
 
-    public Game fillBoxByExternalId(UUID externalId, ActionRequest actionRequest) {
+    public Game fillByExternalId(UUID externalId, ActionRequest actionRequest) {
         Game game = gameRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
-        game.fillBox(actionRequest.getColumnType(), actionRequest.getBoxType());
+        game.fill(actionRequest.getColumnType(), actionRequest.getBoxType());
         if (game.getStatus() == GameStatus.FINISHED) {
             Score score = Score.getInstance(
                     game.getPlayer(),
@@ -91,7 +91,7 @@ public class GameService implements BaseService<Game> {
             scoreRepo.save(score);
         }
         gameRepo.save(game);
-        logger.log("fillBox", actionRequest);
+        logger.log("fill", actionRequest);
         return game;
     }
 
@@ -99,12 +99,12 @@ public class GameService implements BaseService<Game> {
         Game game = gameRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
         game.restart();
-        return gameRepo.save(game);
+        gameRepo.save(game);
+        return game;
     }
 
     public void deleteByExternalId(UUID externalId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByExternalId'");
+        gameRepo.deleteByExternalId(externalId);
     }
 
 }

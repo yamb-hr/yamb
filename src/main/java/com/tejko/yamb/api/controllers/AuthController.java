@@ -18,7 +18,7 @@ import com.tejko.yamb.domain.models.Player;
 public class AuthController {
 
     @Autowired
-    AuthService authService;
+    private AuthService authService;
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest playerCredentials) {

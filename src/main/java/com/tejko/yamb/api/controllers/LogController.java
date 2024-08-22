@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.services.LogService;
 import com.tejko.yamb.api.payload.responses.LogResponse;
 import com.tejko.yamb.interfaces.BaseController;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.interfaces.services.LogService;
+import com.tejko.yamb.util.PayloadMapper;
 
 @RestController
 @RequestMapping("/api/logs")
 public class LogController implements BaseController<LogResponse> {
 
 	@Autowired
-	LogService logService;
+	private LogService logService;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	@GetMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")

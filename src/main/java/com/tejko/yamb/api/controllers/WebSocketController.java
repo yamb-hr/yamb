@@ -13,13 +13,13 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import com.tejko.yamb.api.payload.WebSocketMessage;
-import com.tejko.yamb.services.WebSocketService;
+import com.tejko.yamb.interfaces.services.WebSocketService;
 
 @RestController
 public class WebSocketController {
 
     @Autowired
-    WebSocketService webSocketService;
+    private WebSocketService webSocketService;
 
     @MessageMapping("/message")
     @SendTo("/chat/public")

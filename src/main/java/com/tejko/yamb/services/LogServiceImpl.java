@@ -13,22 +13,20 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.constants.MessageConstants;
-import com.tejko.yamb.interfaces.BaseService;
+import com.tejko.yamb.interfaces.services.LogService;
 import com.tejko.yamb.domain.repositories.LogRepository;
 
 @Service
-public class LogService implements BaseService<Log> {
+public class LogServiceImpl implements LogService {
 
     @Autowired
-    LogRepository logRepo;
+    private LogRepository logRepo;
 
-    @Override
     public Log getByExternalId(UUID externalId) {
         return logRepo.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_LOG_NOT_FOUND));
     }
 
-    @Override
     public List<Log> getAll(Integer page, Integer size, String sort, String direction) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.fromString(direction), sort));
         return logRepo.findAll(pageable).getContent();

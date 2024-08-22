@@ -18,7 +18,7 @@ import com.tejko.yamb.domain.models.Score;
 import io.swagger.v3.core.util.Json;
 
 @Component
-public class Mapper {
+public class PayloadMapper {
 
     public PlayerResponse toDTO(Player player) {
         PlayerResponse playerResponse = new PlayerResponse();

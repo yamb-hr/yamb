@@ -2,8 +2,6 @@ package com.tejko.yamb.api.payload.responses;
 
 import java.util.List;
 
-import com.tejko.yamb.domain.models.Score;
-
 public class ScoreboardResponse {
 
     public long gamesPlayed;

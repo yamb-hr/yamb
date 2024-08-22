@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -18,25 +16,22 @@ import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
 import com.tejko.yamb.domain.constants.MessageConstants;
-import com.tejko.yamb.interfaces.BaseService;
+import com.tejko.yamb.interfaces.services.PlayerService;
+import com.tejko.yamb.interfaces.services.WebSocketService;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
-import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 
 @Service
-public class PlayerService implements UserDetailsService, BaseService<Player> {
+public class PlayerServiceImpl implements PlayerService {
 
     @Autowired
-    PlayerRepository playerRepo;
+    private PlayerRepository playerRepo;
 
     @Autowired
-    ScoreRepository scoreRepo;
+    private ScoreRepository scoreRepo;
 
     @Autowired
-    GameRepository gameRepo;
-
-    @Autowired
-    WebSocketService webSocketService;
+    private WebSocketService webSocketService;
 
     public Player getByExternalId(UUID externalId) {
         return playerRepo.findByExternalId(externalId)
@@ -54,10 +49,10 @@ public class PlayerService implements UserDetailsService, BaseService<Player> {
         return scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
     }
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public Player loadUserByUsername(String username) throws UsernameNotFoundException {
         Player player = playerRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return Player.build(player);
+        return player;
     }
 
     public void deleteByExternalId(UUID externalId) {
@@ -65,7 +60,7 @@ public class PlayerService implements UserDetailsService, BaseService<Player> {
     }
 
     public String getPrincipalByExternalId(UUID externalId) {
-        return webSocketService.getPrincipalByPlayerId(externalId);
+        return webSocketService.getPrincipalByExternalId(externalId);
     }
 
     public PlayerStatsResponse getPlayerStats(UUID externalId) {

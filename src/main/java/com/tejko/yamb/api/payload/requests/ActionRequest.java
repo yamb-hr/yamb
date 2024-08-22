@@ -9,9 +9,9 @@ public class ActionRequest {
     private ColumnType columnType;
     private BoxType boxType;
 
-    private ActionRequest() {}
-    
-    private ActionRequest(int[] diceToRoll, ColumnType columnType, BoxType boxType) {
+    public ActionRequest() {}
+
+    public ActionRequest(int[] diceToRoll, ColumnType columnType, BoxType boxType) {
         this.diceToRoll = diceToRoll;
         this.columnType = columnType;
         this.boxType = boxType;
@@ -21,12 +21,24 @@ public class ActionRequest {
         return diceToRoll;
     }
 
+    public void setDiceToRoll(int[] diceToRoll) {
+        this.diceToRoll = diceToRoll;
+    }
+
     public ColumnType getColumnType() {
         return columnType;
     }
 
+    public void setColumnType(ColumnType columnType) {
+        this.columnType = columnType;
+    }
+
     public BoxType getBoxType() {
         return boxType;
+    }
+
+    public void setBoxType(BoxType boxType) {
+        this.boxType = boxType;
     }
     
 }

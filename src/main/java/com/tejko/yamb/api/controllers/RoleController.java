@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.services.RoleService;
 import com.tejko.yamb.api.payload.responses.RoleResponse;
 import com.tejko.yamb.interfaces.BaseController;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.interfaces.services.RoleService;
+import com.tejko.yamb.util.PayloadMapper;
 
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController implements BaseController<RoleResponse> {
 
 	@Autowired
-	RoleService roleService;
+	private RoleService roleService;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	@GetMapping("/{externalId}")
 	public RoleResponse getByExternalId(@PathVariable UUID externalId) {

@@ -87,7 +87,7 @@
 				<workingDirectory>yamb-frontend</workingDirectory>
 				<installDirectory>target</installDirectory>
 			</configuration>
-			<executions>
+			<!-- <executions>
 				<execution>
 					<id>install node and npm</id>
 					<goals>
@@ -134,7 +134,7 @@
 						<goal>run</goal>
 					</goals>
 				</execution>
-			</executions>
+			</executions> -->
 			</plugin>
 		</plugins>
 	</build>

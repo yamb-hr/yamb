@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class YambApplication {
+public class Yamb {
 
 	public static void main(String[] args) {
-		SpringApplication.run(YambApplication.class, args);
+		SpringApplication.run(Yamb.class, args);
 	}
 
 }

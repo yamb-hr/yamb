@@ -65,27 +65,17 @@ public class Player extends BaseEntity implements UserDetails {
         this.tempUser = tempUser;
     }
 
-    private Player(String username, String password, List<GrantedAuthority> authorities) {
-		this.username = username;
-		this.password = password;
-		this.authorities = authorities;
-	}
-
     public static Player getInstance(String username, String password, boolean tempUser) {
         return new Player(username, password, tempUser);
     }
 
-    public static Player build(Player player) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : player.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role.getLabel()));
-        }
-		return new Player(player.getUsername(), player.getPassword(), authorities);
-	}
-
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getLabel()));
+        }
         return authorities;
     }
 

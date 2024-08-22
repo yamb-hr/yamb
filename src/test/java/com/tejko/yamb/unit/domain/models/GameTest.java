@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.models;
+package com.tejko.yamb.unit.domain.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +14,8 @@ import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
 import com.tejko.yamb.domain.exceptions.DiceRollRequiredException;
 import com.tejko.yamb.domain.exceptions.LockedGameException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
+import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.Player;
 
 public class GameTest {
 
@@ -23,149 +25,148 @@ public class GameTest {
 
     @BeforeEach
     public void setup() {
-        player = Player.getInstance("TEST", "TEST", true);
+        player = Player.getInstance("username", "password", true);
     }
 
     @Test
-    public void testRollDice() {
+    public void testRoll_Success() {
         Game game = Game.getInstance(player);
 
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
 
         assertEquals(1, game.getRollCount());
     }
 
     @Test
-    public void testRollLimitExceeded() {
+    public void testRoll_LimitExceeded() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);
-        game.rollDice(DICE_TO_ROLL);
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
 
         assertThrows(RollLimitExceededException.class, () -> {    
-            game.rollDice(DICE_TO_ROLL);
+            game.roll(DICE_TO_ROLL);
         });
     }
 
     @Test
-    public void testRollDiceFinishedGame() {
+    public void testRoll_FinishedGame() {
         Game game = Game.getInstance(player);
         finishGame(game);
 
         assertThrows(LockedGameException.class, () -> {    
-            game.rollDice(DICE_TO_ROLL);
+            game.roll(DICE_TO_ROLL);
         });
     }
 
     @Test
-    public void testAnnouncementRequired() {
+    public void testRoll_AnnouncementRequired() {
         Game game = Game.getInstance(player);
         for (Integer i = 0; i < BoxType.values().length; i++) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.DOWNWARDS, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.DOWNWARDS, BoxType.values()[i]);
         }
         for (Integer i = BoxType.values().length - 1; i >= 0; i--) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.UPWARDS, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.UPWARDS, BoxType.values()[i]);
         }
         for (Integer i = 0; i < BoxType.values().length; i++) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.FREE, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.FREE, BoxType.values()[i]);
         } 
-        game.rollDice(DICE_TO_ROLL);   
+        game.roll(DICE_TO_ROLL);   
 
         assertThrows(AnnouncementRequiredException.class, () -> {    
-            game.rollDice(DICE_TO_ROLL);
+            game.roll(DICE_TO_ROLL);
         });
     }
     
     @Test
-    public void testFillBox() {
+    public void testFill_Success() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
         
-        game.fillBox(ColumnType.DOWNWARDS, BoxType.ONES);
+        game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
         
         assertNotNull(game.getSheet().getColumns().get(ColumnType.DOWNWARDS.ordinal()).getBoxes().get(BoxType.ONES.ordinal()).getValue());
     }
 
     @Test
-    public void testFillDiceRollRequired() {
+    public void testFill_DiceRollRequired() {
         Game game = Game.getInstance(player);
         assertThrows(DiceRollRequiredException.class, () -> {    
-            game.fillBox(ColumnType.DOWNWARDS, BoxType.ONES);
-        });
-    }
-
-
-    @Test
-    public void testBoxUnavailable() {
-        Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);                        
-        game.fillBox(ColumnType.DOWNWARDS, BoxType.ONES);
-        game.rollDice(DICE_TO_ROLL);       
-        
-        assertThrows(BoxUnavailableException.class, () -> {    
-            game.fillBox(ColumnType.DOWNWARDS, BoxType.ONES);
+            game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
         });
     }
 
     @Test
-    public void testBoxNotAnnounced() {
+    public void testFill_BoxUnavailable() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);    
-        game.makeAnnouncement(BoxType.ONES);    
+        game.roll(DICE_TO_ROLL);                        
+        game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
+        game.roll(DICE_TO_ROLL);       
         
         assertThrows(BoxUnavailableException.class, () -> {    
-            game.fillBox(ColumnType.ANNOUNCEMENT, BoxType.TWOS);
+            game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
+        });
+    }
+
+    @Test
+    public void testFill_BoxNotAnnounced() {
+        Game game = Game.getInstance(player);
+        game.roll(DICE_TO_ROLL);    
+        game.announce(BoxType.ONES);    
+        
+        assertThrows(BoxUnavailableException.class, () -> {    
+            game.fill(ColumnType.ANNOUNCEMENT, BoxType.TWOS);
         });
     }
     
     @Test
-    public void testMakeAnnouncement() {
+    public void testAnnounce_Success() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
         
-        game.makeAnnouncement(BoxType.ONES);
+        game.announce(BoxType.ONES);
         
         assertEquals(BoxType.ONES, game.getAnnouncement());
     }
 
     @Test
-    public void testAnnouncementAlreadyDeclared() {
+    public void testAnnounce_AnnouncementAlreadyDeclared() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
         
-        game.makeAnnouncement(BoxType.ONES);
+        game.announce(BoxType.ONES);
 
         assertThrows(AnnouncementAlreadyDeclaredException.class, () -> {    
-            game.makeAnnouncement(BoxType.TWOS);
+            game.announce(BoxType.TWOS);
         });
     }
 
     @Test
-    public void testAnnouncementUnavailable() {
+    public void testAnnounce_AnnouncementUnavailable() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);
-        game.rollDice(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
+        game.roll(DICE_TO_ROLL);
 
         assertThrows(AnnouncementUnavailableException.class, () -> {    
-            game.makeAnnouncement(BoxType.ONES);
+            game.announce(BoxType.ONES);
         });
     }
 
     @Test
-    public void testAnnounceDiceRollRequired() {
+    public void testAnnounce_DiceRollRequired() {
         Game game = Game.getInstance(player);
         assertThrows(DiceRollRequiredException.class, () -> {    
-            game.makeAnnouncement(BoxType.ONES);
+            game.announce(BoxType.ONES);
         });
     }
     
     @Test
-    public void testRestartGame() {
+    public void testRestart_Success() {
         Game game = Game.getInstance(player);
-        game.rollDice(DICE_TO_ROLL);        
+        game.roll(DICE_TO_ROLL);        
         
         game.restart();
         
@@ -173,7 +174,7 @@ public class GameTest {
     }   
     
     @Test
-    public void testRestartFinishedGame() {
+    public void testRestart_FinishedGame() {
         Game game = Game.getInstance(player);
         finishGame(game);
 
@@ -184,21 +185,21 @@ public class GameTest {
 
     private void finishGame(Game game) {
         for (Integer i = 0; i < BoxType.values().length; i++) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.DOWNWARDS, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.DOWNWARDS, BoxType.values()[i]);
         }
         for (Integer i = BoxType.values().length - 1; i >= 0; i--) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.UPWARDS, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.UPWARDS, BoxType.values()[i]);
         }
         for (Integer i = 0; i < BoxType.values().length; i++) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.fillBox(ColumnType.FREE, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.fill(ColumnType.FREE, BoxType.values()[i]);
         }
         for (Integer i = 0; i < BoxType.values().length; i++) {    
-            game.rollDice(DICE_TO_ROLL);
-            game.makeAnnouncement(BoxType.values()[i]);
-            game.fillBox(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);
+            game.roll(DICE_TO_ROLL);
+            game.announce(BoxType.values()[i]);
+            game.fill(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);
         }
     }
     

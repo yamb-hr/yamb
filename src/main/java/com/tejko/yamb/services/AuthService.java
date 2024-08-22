@@ -24,28 +24,28 @@ import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RoleRepository;
 import com.tejko.yamb.security.JwtUtil;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.util.PayloadMapper;
 
 @Service
 public class AuthService {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    PlayerRepository playerRepo;
+    private PlayerRepository playerRepo;
 
     @Autowired
-    RoleRepository roleRepo;
+    private RoleRepository roleRepo;
 
     @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
-    Mapper mapper;
+    private PayloadMapper mapper;
 
     public AuthResponse login(AuthRequest playerCredentials) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

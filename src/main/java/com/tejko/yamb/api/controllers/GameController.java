@@ -16,21 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.services.GameService;
 import com.tejko.yamb.api.payload.requests.ActionRequest;
 import com.tejko.yamb.api.payload.responses.GameResponse;
 import com.tejko.yamb.interfaces.BaseController;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.interfaces.services.GameService;
+import com.tejko.yamb.util.PayloadMapper;
 
 @RestController
 @RequestMapping("/api/games")
 public class GameController implements BaseController<GameResponse> {
 
 	@Autowired
-	GameService gameService;
+	private GameService gameService;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	@GetMapping("")
 	public List<GameResponse> getAll(@RequestParam(defaultValue = "0") Integer page,
@@ -55,8 +55,8 @@ public class GameController implements BaseController<GameResponse> {
 
 	@PutMapping("/{externalId}/roll")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
-	public GameResponse rollDiceByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
-		return  mapper.toDTO(gameService.rollDiceByExternalId(externalId, action));
+	public GameResponse rollByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return  mapper.toDTO(gameService.rollByExternalId(externalId, action));
 	}
 
 	@PutMapping("/{externalId}/announce")
@@ -67,8 +67,8 @@ public class GameController implements BaseController<GameResponse> {
 
 	@PutMapping("/{externalId}/fill")
 	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #externalId)")
-	public GameResponse fillBoxByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
-		return mapper.toDTO(gameService.fillBoxByExternalId(externalId, action));
+	public GameResponse fillByExternalId(@PathVariable UUID externalId, @RequestBody ActionRequest action) {
+		return mapper.toDTO(gameService.fillByExternalId(externalId, action));
 	}
 
 	@PutMapping("/{externalId}/restart")

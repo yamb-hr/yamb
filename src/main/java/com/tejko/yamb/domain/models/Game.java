@@ -110,7 +110,7 @@ public class Game extends BaseEntity {
         return rollCount == 1 && announcement == null && sheet.areAllNonAnnouncementColumnsCompleted();
     }
     
-    public void rollDice(int[] diceToRoll) {
+    public void roll(int[] diceToRoll) {
         validateRollAction();
         // always roll all dice for the first roll
         if (rollCount == 0) {
@@ -131,9 +131,9 @@ public class Game extends BaseEntity {
         return dices.stream().map(Dice::getValue).mapToInt(Number::intValue).toArray();
     }
     
-    public void fillBox(ColumnType columnType, BoxType boxType) {
-        validateFillBoxAction(columnType, boxType);
-        sheet.fillBox(columnType, boxType, ScoreCalculator.calculateScore(getDiceValues(), boxType));
+    public void fill(ColumnType columnType, BoxType boxType) {
+        validatefillAction(columnType, boxType);
+        sheet.fill(columnType, boxType, ScoreCalculator.calculateScore(getDiceValues(), boxType));
         if (sheet.isCompleted() ) {
             status = GameStatus.FINISHED;
         }
@@ -141,7 +141,7 @@ public class Game extends BaseEntity {
         announcement = null;
     }
     
-    public void makeAnnouncement(BoxType boxType) {
+    public void announce(BoxType boxType) {
         validateAnnouncementAction(boxType);
         announcement = boxType;
     }
@@ -159,10 +159,12 @@ public class Game extends BaseEntity {
             throw new RollLimitExceededException();
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
+        } else if (status == GameStatus.FINISHED) {
+            throw new LockedGameException();
         }
     }
 
-    private void validateFillBoxAction(ColumnType columnType, BoxType boxType) {
+    private void validatefillAction(ColumnType columnType, BoxType boxType) {
         if (rollCount == 0) {
 			throw new DiceRollRequiredException();
         } else if (!isBoxAvailable(columnType, boxType)) {
@@ -302,8 +304,8 @@ public class Game extends BaseEntity {
             return true;
         }
     
-        public void fillBox(ColumnType columnType, BoxType boxType, int value) {
-            columns.get(columnType.ordinal()).fillBox(boxType, value);
+        public void fill(ColumnType columnType, BoxType boxType, int value) {
+            columns.get(columnType.ordinal()).fill(boxType, value);
         }
     
         public boolean areAllNonAnnouncementColumnsCompleted() {
@@ -406,7 +408,7 @@ public class Game extends BaseEntity {
             return numOfEmptyBoxes;
         }  
 
-        public void fillBox(BoxType boxType, int value) { 
+        public void fill(BoxType boxType, int value) { 
             Box selectedBox = boxes.get(boxType.ordinal());
             selectedBox.fill(value);
         }

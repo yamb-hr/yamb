@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.api.payload.requests.DateRangeRequest;
 import com.tejko.yamb.api.payload.responses.ScoreboardResponse;
 import com.tejko.yamb.domain.constants.MessageConstants;
-import com.tejko.yamb.interfaces.BaseService;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.interfaces.services.ScoreService;
+import com.tejko.yamb.util.PayloadMapper;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 
@@ -28,10 +28,10 @@ import com.tejko.yamb.domain.repositories.ScoreRepository;
 public class ScoreServiceImpl implements ScoreService {
 
 	@Autowired
-	ScoreRepository scoreRepo;
+	private ScoreRepository scoreRepo;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	public Score getByExternalId(UUID externalId) {
 		return scoreRepo.findByExternalId(externalId)

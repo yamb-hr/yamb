@@ -14,14 +14,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.tejko.yamb.api.payload.responses.ErrorResponse;
 import com.tejko.yamb.domain.constants.MessageConstants;
-import com.tejko.yamb.util.Logger;
+import com.tejko.yamb.util.YambLogger;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Autowired
-    Logger logger;
+    YambLogger logger;
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {       

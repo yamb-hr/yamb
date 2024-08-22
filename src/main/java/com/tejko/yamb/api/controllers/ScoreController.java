@@ -18,17 +18,17 @@ import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.api.payload.responses.ScoreboardResponse;
 import com.tejko.yamb.interfaces.BaseController;
 import com.tejko.yamb.interfaces.services.ScoreService;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.util.PayloadMapper;
 
 @RestController
 @RequestMapping("/api/scores")
 public class ScoreController implements BaseController<ScoreResponse> {
 
 	@Autowired
-	ScoreService scoreService;
+	private ScoreService scoreService;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	@GetMapping("/{externalId}")
 	public ScoreResponse getByExternalId(@PathVariable UUID externalId) {

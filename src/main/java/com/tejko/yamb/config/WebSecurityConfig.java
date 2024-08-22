@@ -16,10 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.tejko.yamb.interfaces.services.PlayerService;
 import com.tejko.yamb.security.AuthEntryPoint;
 import com.tejko.yamb.security.AuthTokenFilter;
 import com.tejko.yamb.security.RecaptchaFilter;
-import com.tejko.yamb.services.PlayerService;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +27,7 @@ import com.tejko.yamb.services.PlayerService;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	PlayerService userDetailsService;
+	PlayerService playerService;
 
 	@Autowired
 	AuthEntryPoint unauthorizedHandler;
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		authenticationManagerBuilder.userDetailsService(playerService).passwordEncoder(passwordEncoder());
 	}
 
 	@Bean

@@ -16,16 +16,14 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import com.tejko.yamb.api.payload.WebSocketMessage;
 import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.enums.PlayerStatus;
-import com.tejko.yamb.security.JwtUtil;
+import com.tejko.yamb.domain.repositories.PlayerRepository;
+import com.tejko.yamb.interfaces.services.WebSocketService;
 
 @Service
-public class WebSocketService {
+public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    PlayerService playerService;
+    private PlayerRepository playerRepo;
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
@@ -34,13 +32,13 @@ public class WebSocketService {
 
     private Map<String, String> usernamePrincipalMap = new HashMap<>();
 
-    public WebSocketMessage publicMessage(WebSocketMessage message, Principal principal) throws Exception {
+    public WebSocketMessage publicMessage(WebSocketMessage message, Principal principal) {
         message.setSender(getUsernameFromPrincipal(principal.getName()));
         System.out.println("Message sent to all from " + message.getSender() + ": " + message.getContent());
         return message;
     }
 
-    public WebSocketMessage privateMessage(WebSocketMessage message, Principal principal) throws Exception {
+    public WebSocketMessage privateMessage(WebSocketMessage message, Principal principal) {
         message.setSender(getUsernameFromPrincipal(principal.getName()));
         simpMessagingTemplate.convertAndSendToUser(usernamePrincipalMap.get(message.getReceiver()).toString(),
                 "/private", message);
@@ -109,8 +107,8 @@ public class WebSocketService {
         return null;
     }
 
-    public String getPrincipalByPlayerId(UUID playerId) {
-        return usernamePrincipalMap.get(playerService.getByExternalId(playerId).getUsername());
+    public String getPrincipalByExternalId(UUID externalId) {
+        return usernamePrincipalMap.get(playerRepo.findByExternalId(externalId).get().getUsername());
     }
 
 }

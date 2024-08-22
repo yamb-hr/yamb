@@ -1,9 +1,10 @@
-package com.tejko.yamb.util;
+package com.tejko.yamb.unit.util;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.tejko.yamb.domain.enums.BoxType;
+import com.tejko.yamb.util.ScoreCalculator;
 
 public class ScoreCalculatorTest {
 

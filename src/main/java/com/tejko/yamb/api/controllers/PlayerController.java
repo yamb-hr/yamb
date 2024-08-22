@@ -13,22 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.services.PlayerService;
 import com.tejko.yamb.api.payload.responses.PlayerResponse;
 import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.interfaces.BaseController;
-import com.tejko.yamb.util.Mapper;
+import com.tejko.yamb.interfaces.services.PlayerService;
+import com.tejko.yamb.util.PayloadMapper;
 
 @RestController
 @RequestMapping("/api/players")
 public class PlayerController implements BaseController<PlayerResponse> {
 
 	@Autowired
-	PlayerService playerService;
+	private PlayerService playerService;
 
 	@Autowired
-	Mapper mapper;
+	private PayloadMapper mapper;
 
 	@GetMapping("/{externalId}")
 	public PlayerResponse getByExternalId(@PathVariable UUID externalId) {
