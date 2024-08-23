@@ -3,7 +3,6 @@ package com.tejko.yamb.interfaces.services;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
@@ -16,7 +15,7 @@ public interface PlayerService extends UserDetailsService, BaseService<Player> {
     
     public List<Score> getScoresByPlayerId(UUID externalId);
 
-    public UserDetails loadUserByUsername(String username);
+    public Player loadUserByUsername(String username);
 
     public String getPrincipalByExternalId(UUID externalId);
 

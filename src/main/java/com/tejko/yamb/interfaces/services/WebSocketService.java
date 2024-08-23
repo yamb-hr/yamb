@@ -11,9 +11,9 @@ import com.tejko.yamb.api.payload.WebSocketMessage;
 
 public interface WebSocketService {
 
-    public WebSocketMessage publicMessage(WebSocketMessage message, Principal principal);
+    public void publicMessage(WebSocketMessage message, Principal principal);
 
-    public WebSocketMessage privateMessage(WebSocketMessage message, Principal principal);
+    public void privateMessage(WebSocketMessage message, Principal principal);
 
     public void handleSessionConnected(SessionConnectEvent event);
 
@@ -21,7 +21,7 @@ public interface WebSocketService {
 
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event);
 
-    public void addPrincipal(String username, String principal);
+    public void addPrincipal(UUID externalId, String principal);
 
     public String getPrincipalByExternalId(UUID externalId);
     

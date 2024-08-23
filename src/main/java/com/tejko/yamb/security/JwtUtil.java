@@ -1,6 +1,7 @@
 package com.tejko.yamb.security;
 
-import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,46 +18,37 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtil {
 
-	@Value("${JWT_SECRET}")
+    @Value("${JWT_SECRET}")
     private String jwtSecret;
 
-	public String generateToken(String username) {
+    public String generateToken(UUID externalId) {
+    return Jwts.builder()
+        .setSubject(externalId.toString())
+        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .compact();
+    }
 
-		return Jwts.builder()
-			.setSubject(username)
-			.setIssuedAt(new Date())
-			.setExpiration(null)
-			.signWith(SignatureAlgorithm.HS512, jwtSecret)
-			.compact();
-	}
+    public Jws<Claims> parseToken(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+    }
 
-	public Jws<Claims> parseToken(String token) {
-		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-	}
+    public boolean validateToken(String token) {
+        try {
+            parseToken(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	public boolean validateToken(String token) {
-		try {
-			parseToken(token);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-	
-	public String extractUsernameFromToken(String token) {
-		try {
-			return parseToken(token).getBody().getSubject();
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    public Optional<UUID> extractExternalIdFromToken(String token) {
+        return Optional.ofNullable(parseToken(token).getBody().getSubject().toString())
+            .map(UUID::fromString);
+    }
 
-	public String extractTokenFromAuthHeader(HttpServletRequest request) {
-		String authorizationHeader = request.getHeader(SecurityConstants.HEADER_AUTHORIZATION);
-		if (authorizationHeader != null && authorizationHeader.startsWith(SecurityConstants.HEADER_AUTHORIZATION_PREFIX)) {
-			return authorizationHeader.substring(7, authorizationHeader.length());
-		}
-		return null;
-	}
-
+    public Optional<String> extractTokenFromAuthHeader(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(SecurityConstants.HEADER_AUTHORIZATION))
+            .filter(header -> header.startsWith(SecurityConstants.HEADER_AUTHORIZATION_PREFIX))
+            .map(header -> header.substring(7));
+    }
 }

@@ -1,6 +1,7 @@
 package com.tejko.yamb.security;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -8,60 +9,43 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.interfaces.services.PlayerService;
-import com.tejko.yamb.domain.constants.SecurityConstants;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-	@Autowired
-	JwtUtil jwtUtil;
+    @Autowired
+    JwtUtil jwtUtil;
 
-	@Autowired
-	PlayerService playerService;
+    @Autowired
+    PlayerService playerService;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-		if (!"/api/auth/login".equals(requestURI) && !"/api/auth/temp-player".equals(requestURI)) {
-			UserDetails userDetails = extractUserFromRequest(request);
-			if (userDetails != null) {
-				try {
-					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(authentication);
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-				}
-			}
-		}
-		filterChain.doFilter(request, response);
-	}
+        if (isProtectedEndpoint(requestURI)) {
+            extractUserFromRequest(request).ifPresent(player -> {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(player, null, player.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            });
+        }
+        filterChain.doFilter(request, response);
+    }
 
-	// try to extract user from token in auth header then from token cookie
-	private UserDetails extractUserFromRequest(HttpServletRequest request) {
-		String token = extractTokenFromAuthHeader(request);
-		try {
-			String username = jwtUtil.extractUsernameFromToken(token);
-			return playerService.loadUserByUsername(username);
-		} catch (Exception e) {
-			System.out.println(e.getLocalizedMessage());
-			// ignore
-		}
-		return null;
-	}
+    private boolean isProtectedEndpoint(String requestURI) {
+        return !"/api/auth/login".equals(requestURI) && !"/api/auth/temp-player".equals(requestURI);
+    }
 
-	private String extractTokenFromAuthHeader(HttpServletRequest request) {
-		String authorizationHeader = request.getHeader(SecurityConstants.HEADER_AUTHORIZATION);
-		if (authorizationHeader != null && authorizationHeader.startsWith(SecurityConstants.HEADER_AUTHORIZATION_PREFIX)) {
-			return authorizationHeader.substring(7, authorizationHeader.length());
-		}
-		return null;
-	}
-
+    private Optional<Player> extractUserFromRequest(HttpServletRequest request) {
+        return jwtUtil.extractTokenFromAuthHeader(request)
+            .flatMap(jwtUtil::extractExternalIdFromToken)
+            .flatMap(externalId -> Optional.ofNullable(playerService.getByExternalId(externalId)));
+    }
 }

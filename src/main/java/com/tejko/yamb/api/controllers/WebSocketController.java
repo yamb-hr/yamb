@@ -23,14 +23,14 @@ public class WebSocketController {
 
     @MessageMapping("/message")
     @SendTo("/chat/public")
-    public WebSocketMessage publicMessage(WebSocketMessage message, Principal principal) throws Exception {
-        return webSocketService.publicMessage(message, principal);
+    public void publicMessage(WebSocketMessage message, Principal principal) throws Exception {
+        webSocketService.publicMessage(message, principal);
     }
 
     @MessageMapping("/private-message")
     @SendToUser("/private")
-    public WebSocketMessage privateMessage(WebSocketMessage message, Principal principal) throws Exception {
-        return webSocketService.privateMessage(message, principal);
+    public void privateMessage(WebSocketMessage message, Principal principal) throws Exception {
+        webSocketService.privateMessage(message, principal);
     }
 
     @EventListener

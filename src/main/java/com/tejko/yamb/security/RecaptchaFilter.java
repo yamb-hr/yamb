@@ -8,22 +8,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.tejko.yamb.services.RecaptchaService;
+import com.tejko.yamb.interfaces.services.RecaptchaService;
 
 public class RecaptchaFilter extends OncePerRequestFilter {
 
     @Autowired
-    RecaptchaService recaptchaService;
+    private RecaptchaService recaptchaService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String requestURI = request.getRequestURI();
-        if ("/api/auth/register".equals(requestURI) || "/api/auth/temp-player".equals(requestURI)) {
-            
+        if (isProtectedEndpoint(request.getRequestURI())) {
             String recaptchaToken = request.getHeader("X-Recaptcha-Token");
 
             if (recaptchaToken == null || !recaptchaService.verifyRecaptcha(recaptchaToken)) {
@@ -35,4 +34,7 @@ public class RecaptchaFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private boolean isProtectedEndpoint(String requestURI) {
+        return "/api/auth/register".equals(requestURI) || "/api/auth/temp-player".equals(requestURI);
+    }
 }
