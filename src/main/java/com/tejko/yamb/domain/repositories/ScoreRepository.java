@@ -6,15 +6,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.tejko.yamb.interfaces.BaseRepository;
 import com.tejko.yamb.domain.models.Score;
 
-public interface ScoreRepository extends JpaRepository<Score, Long>, BaseRepository<Score> {
+public interface ScoreRepository extends JpaRepository<Score, Long> {
 
     List<Score> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
 
     List<Score> findTop30ByCreatedAtBetweenOrderByValueDesc(LocalDateTime from, LocalDateTime to);
-
+    
     List<Score> findTop30ByOrderByValueDesc();
 
     @Query("SELECT AVG(s.value) FROM Score s WHERE s.player.id = :playerId")

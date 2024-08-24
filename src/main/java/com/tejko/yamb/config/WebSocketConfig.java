@@ -13,9 +13,13 @@ import com.tejko.yamb.security.CustomHandshakeHandler;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    
+
+    private final CustomHandshakeHandler customHandshakeHandler;
+
     @Autowired
-    CustomHandshakeHandler customHandshakeHandler;
+    public WebSocketConfig(CustomHandshakeHandler customHandshakeHandler) {
+        this.customHandshakeHandler = customHandshakeHandler;
+    }
 
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
@@ -30,6 +34,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/chat", "/player");
         registry.setUserDestinationPrefix("/player");
-    }    
+    }
 
 }

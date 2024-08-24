@@ -2,8 +2,40 @@ package com.tejko.yamb.api.payload.responses;
 
 public class ErrorResponse {
 
-    public int status;
-    public String message;
-    public String type;
+    private int status;
+    private String message;
+    private String type;
+
+    public ErrorResponse() {}
+
+    public ErrorResponse(int status, String message, String type) {
+        this.status = status;
+        this.message = message;
+        this.type = type;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
     
 }

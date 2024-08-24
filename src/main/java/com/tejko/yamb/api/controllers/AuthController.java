@@ -10,15 +10,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.payload.requests.AuthRequest;
 import com.tejko.yamb.api.payload.responses.AuthResponse;
-import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.interfaces.services.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final AuthService authService;
+
     @Autowired
-    private AuthService authService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest playerCredentials) {
@@ -26,13 +30,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public Player register(@Valid @RequestBody AuthRequest playerCredentials) {
+    public RegisteredPlayer register(@Valid @RequestBody AuthRequest playerCredentials) {
         return authService.register(playerCredentials);
     }
 
-	@PostMapping("/temp-player")
-	public AuthResponse createTempPlayer(@RequestBody AuthRequest playerCredentials) {
-		return authService.createTempPlayer(playerCredentials);
+	@PostMapping("/anon")
+	public AuthResponse createAnonymousPlayer(@RequestBody AuthRequest playerCredentials) {
+		return authService.createAnonymousPlayer(playerCredentials);
 	}
 
 }

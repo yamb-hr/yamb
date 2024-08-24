@@ -24,15 +24,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     YambLogger logger;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception exception) {       
-        System.out.println(exception.getLocalizedMessage());
+    public ResponseEntity<ErrorResponse> handleException(Exception exception) { 
+        exception.printStackTrace();
         try {
             logger.error(exception);
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.message = exception.getLocalizedMessage();
+        errorResponse.setMessage(exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(BadCredentialsException exception) {       
         System.out.println(exception.getLocalizedMessage());
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.message = MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT;
+        errorResponse.setMessage(MessageConstants.ERROR_USERNAME_OR_PASSWORD_INCORRECT);
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
     
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         System.out.println(exception.getLocalizedMessage());
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.message = exception.getLocalizedMessage();
+        errorResponse.setMessage(exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         System.out.println(exception.getLocalizedMessage());
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.message = exception.getLocalizedMessage();
+        errorResponse.setMessage(exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
     
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         System.out.println(exception.getLocalizedMessage());  
         logger.error(exception);
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.message = exception.getLocalizedMessage();
+        errorResponse.setMessage(exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

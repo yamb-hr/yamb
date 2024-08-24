@@ -1,19 +1,17 @@
 package com.tejko.yamb.domain.models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Id;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tejko.yamb.domain.constants.GameConstants;
@@ -29,48 +27,74 @@ import com.tejko.yamb.domain.exceptions.LockedGameException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 import com.tejko.yamb.util.ScoreCalculator;
 
-@Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Game extends BaseEntity {
+@Document(collection = "games")
+public class Game {
 
-    @ManyToOne
-    @JoinColumn(name = "player_id", nullable = false)
-    private Player player;
+    @Id
+    private String id;
+    
+    @CreationTimestamp
+    @Field("created_at")
+    private LocalDateTime createdAt;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
+    @UpdateTimestamp
+    @Field("updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Field("player_id")
+    private Long playerId;
+    
+    @Field("player_name")
+    private String playerName;
+
+    @Field("sheet")
     private Sheet sheet;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
+    @Field("dices")
     private List<Dice> dices;
 
-    @Column
+    @Field("roll_count")
     private int rollCount;
-    
-    @Column
+
+    @Field("announcement")
     private BoxType announcement;
 
-    @Column
+    @Field("status")
     private GameStatus status;
 
     private Game() {}
 
-    private Game(Player player, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status) {
-        this.player = player;
+    private Game(Long playerId, String playerName, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status) {
+        this.playerId = playerId;
+        this.playerName = playerName;
         this.sheet = sheet;
         this.dices = dices;
         this.rollCount = rollCount;
         this.announcement = announcement;
-        this.status = status;
     }
 
-    public static Game getInstance(Player player) {
-        return new Game(player, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS);
+    public static Game getInstance(Long playerId, String playerName) {
+        return new Game(playerId, playerName, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS);
     }
 
-    public Player getPlayer() {
-        return player;
+    public String getId() {
+        return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Long getPlayerId() {
+        return playerId;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 
     public Sheet getSheet() {

@@ -1,23 +1,23 @@
 package com.tejko.yamb.interfaces.services;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.tejko.yamb.api.payload.responses.PlayerResponse;
 import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.Score;
-import com.tejko.yamb.interfaces.BaseService;
 
-public interface PlayerService extends UserDetailsService, BaseService<Player> {
+public interface PlayerService extends UserDetailsService {
+
+    public Player fetchById(Long id);
+
+    public PlayerResponse getById(Long id);
+
+    public List<PlayerResponse> getAll();
     
-    
-    public List<Score> getScoresByPlayerId(UUID externalId);
+    public List<ScoreResponse> getScoresByPlayerId(Long id);
 
-    public Player loadUserByUsername(String username);
-
-    public String getPrincipalByExternalId(UUID externalId);
-
-    public PlayerStatsResponse getPlayerStats(UUID externalId);
+    public PlayerStatsResponse getPlayerStats(Long id);
 }

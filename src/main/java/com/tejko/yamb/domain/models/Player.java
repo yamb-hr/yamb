@@ -1,82 +1,96 @@
 package com.tejko.yamb.domain.models;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tejko.yamb.domain.constants.SecurityConstants;
+@Entity(name = "player")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+public abstract class Player implements UserDetails {
 
-@Entity
-public class Player extends BaseEntity implements UserDetails {
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false, unique = true)
-    @Size(min = SecurityConstants.MIN_USERNAME_SIZE, max = SecurityConstants.MAX_USERNAME_SIZE)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column
-    @JsonIgnore
+    @Column(name = "password", nullable = false)
     private String password;
     
-    @Column
-    @JsonIgnore
-    private Boolean tempUser;
+    @Column(name = "active_game_id", nullable = true)
+    private String activeGameId;
     
     @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     private List<Score> scores;
     
     @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     private List<Log> logs;
-
-    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<Game> games;
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     @JoinTable(name = "player_role", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    @Transient
-    private Collection<? extends GrantedAuthority> authorities;
-
     protected Player() {}
 
-    private Player(String username, String password, boolean tempUser) {
+    protected Player(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
-        this.tempUser = tempUser;
+        this.roles = roles;
     }
 
-    public static Player getInstance(String username, String password, boolean tempUser) {
-        return new Player(username, password, tempUser);
+    public Long getId() {
+        return id;
     }
 
-    @Override
-    @JsonIgnore
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getLabel()));
-        }
-        return authorities;
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.getLabel()))
+            .collect(Collectors.toList());
     }
 
     public String getUsername() {
@@ -86,7 +100,7 @@ public class Player extends BaseEntity implements UserDetails {
     public void setUsername(String username) {
         this.username = username;
     }
-
+    
     public String getPassword() {
         return password;
     }
@@ -95,28 +109,20 @@ public class Player extends BaseEntity implements UserDetails {
         this.password = password;
     }
 
-    public boolean isTempUser() {   
-        return tempUser;
+    public String getActiveGameId() {
+        return activeGameId;
     }
 
-    public void setTempUser(boolean tempUser) {
-        this.tempUser = tempUser;
+    public void setActiveGameId(String activeGameId) {
+        this.activeGameId = activeGameId;
     }
 
     public List<Score> getScores() {
         return scores;
     }
 
-    public List<Log> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<Log> logs) {
-        this.logs = logs;
-    }
-
-    public List<Game> getGames() {
-        return games;
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
     }
 
     public Set<Role> getRoles() {
@@ -126,29 +132,20 @@ public class Player extends BaseEntity implements UserDetails {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
-    @Override
-    @JsonIgnore
+    
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override
-    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @Override
-    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @Override
-    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
-
 }

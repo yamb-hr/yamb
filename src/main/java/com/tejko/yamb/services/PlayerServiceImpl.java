@@ -1,78 +1,79 @@
 package com.tejko.yamb.services;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.api.payload.responses.PlayerResponse;
 import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.payload.responses.ScoreResponse;
 import com.tejko.yamb.domain.constants.MessageConstants;
 import com.tejko.yamb.interfaces.services.PlayerService;
-import com.tejko.yamb.interfaces.services.WebSocketService;
+import com.tejko.yamb.util.ObjectMapper;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
-    @Autowired
-    private PlayerRepository playerRepo;
+    private final PlayerRepository playerRepo;
+    private final ScoreRepository scoreRepo;
+    private final ObjectMapper mapper;
 
     @Autowired
-    private ScoreRepository scoreRepo;
-
-    @Autowired
-    private WebSocketService webSocketService;
-
-    public Player getByExternalId(UUID externalId) {
-        return playerRepo.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
+    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, ObjectMapper mapper) {
+        this.playerRepo = playerRepo;
+        this.scoreRepo = scoreRepo;
+        this.mapper = mapper;
     }
 
-    public List<Player> getAll(Integer page, Integer size, String sort, String direction) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.fromString(direction), sort));
-        return playerRepo.findAll(pageable).getContent();
+    @Override
+    public Player fetchById(java.lang.Long id) {
+        return playerRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
     }
 
-    public List<Score> getScoresByPlayerId(UUID externalId) {
-        Player player = playerRepo.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
-        return scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+    @Override
+    public PlayerResponse getById(Long id) {
+        Player player = fetchById(id);
+        return mapper.mapToResponse(player);
     }
 
+    @Override
+    public List<PlayerResponse> getAll() {
+        List<Player> players = playerRepo.findAll();
+        return players.stream().map(mapper::mapToResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScoreResponse> getScoresByPlayerId(Long id) {
+        Player player = fetchById(id);
+        List<Score> scores = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+        return scores.stream().map(mapper::mapToResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public Player loadUserByUsername(String username) throws UsernameNotFoundException {
-        Player player = playerRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
+        Player player = playerRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
         return player;
     }
 
-    public void deleteByExternalId(UUID externalId) {
-        playerRepo.deleteByExternalId(externalId);
-    }
-
-    public String getPrincipalByExternalId(UUID externalId) {
-        return webSocketService.getPrincipalByExternalId(externalId);
-    }
-
-    public PlayerStatsResponse getPlayerStats(UUID externalId) {
-        Player player = playerRepo.findByExternalId(externalId)
+    @Override
+    public PlayerStatsResponse getPlayerStats(Long id) {
+        Player player = playerRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_PLAYER_NOT_FOUND));
 
         PlayerStatsResponse stats = new PlayerStatsResponse();
 
-        stats.lastActivity = playerRepo.findLastActivityByPlayerId(player.getId());
-        stats.averageScore = scoreRepo.findAverageValueByPlayerId(player.getId());
-        stats.topScore = scoreRepo.findTopValueByPlayerId(player.getId());
-        stats.gamesPlayed = scoreRepo.countByPlayerId(player.getId());
+        stats.setLastActivity(playerRepo.findLastActivityByPlayerId(player.getId()));
+        stats.setAverageScore(scoreRepo.findAverageValueByPlayerId(player.getId()));
+        stats.setTopScore(scoreRepo.findTopValueByPlayerId(player.getId()));
+        stats.setGamesPlayed(scoreRepo.countByPlayerId(player.getId()));
 
         return stats;
     }

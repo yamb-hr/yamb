@@ -17,9 +17,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.interfaces.services.PlayerService;
+import com.tejko.yamb.interfaces.services.RecaptchaService;
 import com.tejko.yamb.security.AuthEntryPoint;
 import com.tejko.yamb.security.AuthTokenFilter;
+import com.tejko.yamb.security.JwtUtil;
 import com.tejko.yamb.security.RecaptchaFilter;
 
 @Configuration
@@ -27,20 +30,30 @@ import com.tejko.yamb.security.RecaptchaFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	PlayerService playerService;
+	private final PlayerService playerService;
+	private final AuthEntryPoint unauthorizedHandler;
+	private final JwtUtil jwtUtil;
+	private final PlayerRepository playerRepository;
+	private final RecaptchaService recaptchaService;
+
 
 	@Autowired
-	AuthEntryPoint unauthorizedHandler;
+	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaService recaptchaService) {
+		this.playerService = playerService;
+		this.unauthorizedHandler = unauthorizedHandler;
+		this.jwtUtil = jwtUtil;
+		this.playerRepository = playerRepository;
+		this.recaptchaService = recaptchaService;
+	}
 
 	@Bean
 	public AuthTokenFilter authTokenFilter() {
-		return new AuthTokenFilter();
+		return new AuthTokenFilter(jwtUtil, playerRepository);
 	}
 
 	@Bean
 	public RecaptchaFilter recaptchaFilter() {
-		return new RecaptchaFilter();
+		return new RecaptchaFilter(recaptchaService);
 	}
 
 	@Override

@@ -13,8 +13,12 @@ import com.tejko.yamb.domain.repositories.RoleRepository;
 @Component
 public class Startup implements ApplicationRunner {
 
+    private final RoleRepository roleRepo;
+
     @Autowired
-    RoleRepository roleRepo;
+    public Startup(RoleRepository roleRepo) {
+        this.roleRepo = roleRepo;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

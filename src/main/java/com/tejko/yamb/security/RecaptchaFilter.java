@@ -15,8 +15,12 @@ import com.tejko.yamb.interfaces.services.RecaptchaService;
 
 public class RecaptchaFilter extends OncePerRequestFilter {
 
+    private final RecaptchaService recaptchaService;
+
     @Autowired
-    private RecaptchaService recaptchaService;
+    public RecaptchaFilter(RecaptchaService recaptchaService) {
+        this.recaptchaService = recaptchaService;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)

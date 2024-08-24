@@ -1,7 +1,6 @@
 package com.tejko.yamb.interfaces.services;
 
 import java.security.Principal;
-import java.util.UUID;
 
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -20,9 +19,5 @@ public interface WebSocketService {
     public void handleSessionDisconnect(SessionDisconnectEvent event);
 
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event);
-
-    public void addPrincipal(UUID externalId, String principal);
-
-    public String getPrincipalByExternalId(UUID externalId);
     
 }

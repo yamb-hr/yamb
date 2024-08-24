@@ -15,23 +15,21 @@ import com.tejko.yamb.domain.exceptions.DiceRollRequiredException;
 import com.tejko.yamb.domain.exceptions.LockedGameException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.domain.models.Player;
 
 public class GameTest {
 
-    private Player player;
 
+    private Game game;
     private static final int[] DICE_TO_ROLL = {0, 1, 2, 3, 4};
 
     @BeforeEach
-    public void setup() {
-        player = Player.getInstance("username", "password", true);
+    public void setUp() {
+        game = Game.getInstance(1L, "Test");
     }
+
 
     @Test
     public void testRoll_Success() {
-        Game game = Game.getInstance(player);
-
         game.roll(DICE_TO_ROLL);
 
         assertEquals(1, game.getRollCount());
@@ -39,7 +37,6 @@ public class GameTest {
 
     @Test
     public void testRoll_LimitExceeded() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);
         game.roll(DICE_TO_ROLL);
         game.roll(DICE_TO_ROLL);
@@ -51,7 +48,6 @@ public class GameTest {
 
     @Test
     public void testRoll_FinishedGame() {
-        Game game = Game.getInstance(player);
         finishGame(game);
 
         assertThrows(LockedGameException.class, () -> {    
@@ -61,7 +57,6 @@ public class GameTest {
 
     @Test
     public void testRoll_AnnouncementRequired() {
-        Game game = Game.getInstance(player);
         for (Integer i = 0; i < BoxType.values().length; i++) {    
             game.roll(DICE_TO_ROLL);
             game.fill(ColumnType.DOWNWARDS, BoxType.values()[i]);
@@ -83,7 +78,6 @@ public class GameTest {
     
     @Test
     public void testFill_Success() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);
         
         game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
@@ -93,7 +87,6 @@ public class GameTest {
 
     @Test
     public void testFill_DiceRollRequired() {
-        Game game = Game.getInstance(player);
         assertThrows(DiceRollRequiredException.class, () -> {    
             game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
         });
@@ -101,7 +94,6 @@ public class GameTest {
 
     @Test
     public void testFill_BoxUnavailable() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);                        
         game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
         game.roll(DICE_TO_ROLL);       
@@ -113,7 +105,6 @@ public class GameTest {
 
     @Test
     public void testFill_BoxNotAnnounced() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);    
         game.announce(BoxType.ONES);    
         
@@ -124,7 +115,6 @@ public class GameTest {
     
     @Test
     public void testAnnounce_Success() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);
         
         game.announce(BoxType.ONES);
@@ -134,7 +124,6 @@ public class GameTest {
 
     @Test
     public void testAnnounce_AnnouncementAlreadyDeclared() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);
         
         game.announce(BoxType.ONES);
@@ -146,7 +135,6 @@ public class GameTest {
 
     @Test
     public void testAnnounce_AnnouncementUnavailable() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);
         game.roll(DICE_TO_ROLL);
 
@@ -157,7 +145,6 @@ public class GameTest {
 
     @Test
     public void testAnnounce_DiceRollRequired() {
-        Game game = Game.getInstance(player);
         assertThrows(DiceRollRequiredException.class, () -> {    
             game.announce(BoxType.ONES);
         });
@@ -165,7 +152,6 @@ public class GameTest {
     
     @Test
     public void testRestart_Success() {
-        Game game = Game.getInstance(player);
         game.roll(DICE_TO_ROLL);        
         
         game.restart();
@@ -175,7 +161,6 @@ public class GameTest {
     
     @Test
     public void testRestart_FinishedGame() {
-        Game game = Game.getInstance(player);
         finishGame(game);
 
         assertThrows(LockedGameException.class, () -> {    

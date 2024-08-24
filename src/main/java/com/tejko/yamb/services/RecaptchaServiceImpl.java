@@ -20,6 +20,7 @@ public class RecaptchaServiceImpl implements RecaptchaService {
     @Value("${RECAPTCHA_SECRET_KEY}")
     private String recaptchaSecretKey;
 
+    @Override
     public boolean verifyRecaptcha(String recaptchaToken) {
         String url = UriComponentsBuilder.fromHttpUrl("https://www.google.com/recaptcha/api/siteverify")
                 .queryParam("secret", recaptchaSecretKey)

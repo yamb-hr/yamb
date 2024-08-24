@@ -16,21 +16,24 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.interfaces.services.PlayerService;
+import com.tejko.yamb.domain.repositories.PlayerRepository;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final PlayerRepository playerRepo;
 
     @Autowired
-    PlayerService playerService;
+    public AuthTokenFilter(JwtUtil jwtUtil, PlayerRepository playerRepo) {
+        this.jwtUtil = jwtUtil;
+        this.playerRepo = playerRepo;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
         if (isProtectedEndpoint(requestURI)) {
-            extractUserFromRequest(request).ifPresent(player -> {
+            extractPlayerFromRequest(request).ifPresent(player -> {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(player, null, player.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -43,9 +46,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         return !"/api/auth/login".equals(requestURI) && !"/api/auth/temp-player".equals(requestURI);
     }
 
-    private Optional<Player> extractUserFromRequest(HttpServletRequest request) {
+    private Optional<Player> extractPlayerFromRequest(HttpServletRequest request) {
         return jwtUtil.extractTokenFromAuthHeader(request)
-            .flatMap(jwtUtil::extractExternalIdFromToken)
-            .flatMap(externalId -> Optional.ofNullable(playerService.getByExternalId(externalId)));
+            .flatMap(jwtUtil::extractIdFromToken)
+            .flatMap(id -> Optional.ofNullable(playerRepo.findById(id).orElse(null)));
     }
 }

@@ -18,8 +18,12 @@ import com.tejko.yamb.interfaces.services.WebSocketService;
 @RestController
 public class WebSocketController {
 
+    private final WebSocketService webSocketService;
+
     @Autowired
-    private WebSocketService webSocketService;
+    public WebSocketController(WebSocketService webSocketService) {
+        this.webSocketService = webSocketService;
+    }
 
     @MessageMapping("/message")
     @SendTo("/chat/public")

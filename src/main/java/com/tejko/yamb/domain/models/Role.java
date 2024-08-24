@@ -2,14 +2,22 @@ package com.tejko.yamb.domain.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@Entity
-public class Role extends BaseEntity {
+@Entity(name = "role")
+public class Role {
 
-	@Column
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+	@Column(name = "label", nullable = false, unique = true)
 	private String label;
 
-	@Column
+	@Column(name = "description")
     private String description;
 
     private Role() {}

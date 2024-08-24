@@ -1,21 +1,30 @@
 package com.tejko.yamb.interfaces.services;
 
-import java.util.UUID;
+import java.util.List;
 
 import com.tejko.yamb.api.payload.requests.ActionRequest;
+import com.tejko.yamb.api.payload.requests.GameRequest;
+import com.tejko.yamb.api.payload.responses.GameResponse;
 import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.interfaces.BaseService;
 
-public interface GameService extends BaseService<Game> {
+public interface GameService {
 
-    public Game play();
+    public Game fetchById(String id);
 
-    public Game rollByExternalId(UUID externalId, ActionRequest actionRequest);
+    public GameResponse getById(String id);
 
-    public Game announceByExternalId(UUID externalId, ActionRequest actionRequest);
+    public List<GameResponse> getAll();
 
-    public Game fillByExternalId(UUID externalId, ActionRequest actionRequest);
+    public GameResponse create(GameRequest request);
 
-    public Game restartByExternalId(UUID externalId);
+    public GameResponse rollById(String id, ActionRequest actionRequest);
+
+    public GameResponse announceById(String id, ActionRequest actionRequest);
+
+    public GameResponse fillById(String id, ActionRequest actionRequest);
+
+    public GameResponse restartById(String id);
     
+    public void deleteById(String id);
+
 }

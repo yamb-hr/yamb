@@ -1,35 +1,34 @@
 package com.tejko.yamb.api.payload;
 
 import java.time.LocalDateTime;
-
 import com.tejko.yamb.domain.enums.MessageType;
 
 public class WebSocketMessage {
 
-    private String sender;
-    private String receiver;
+    private Long senderId;
+    private Long receiverId;
     private MessageType type;
     private Object content;
     private LocalDateTime time;
 
-    public WebSocketMessage(String sender, String receiver, MessageType type, Object content) {
-        this.sender = sender;
-        this.receiver = receiver;
+    public WebSocketMessage(Long senderId, Long receiverId, MessageType type, Object content) {
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.type = type;
         this.content = content;
         this.time = LocalDateTime.now();
     }
     
-    public String getSender() {
-        return sender;
+    public Long getSenderId() {
+        return senderId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
     }
 
-    public String getReceiver() {
-        return receiver;
+    public Long getReceiverId() {
+        return receiverId;
     }
 
     public MessageType getType() {
@@ -46,7 +45,7 @@ public class WebSocketMessage {
 
     @Override
     public String toString() {
-        return type + " [" + time + "] " + sender + ": " + content + " -> " + receiver;
+        return type + " [" + time + "] " + senderId + ": " + content + " -> " + receiverId;
     }
 
 }
