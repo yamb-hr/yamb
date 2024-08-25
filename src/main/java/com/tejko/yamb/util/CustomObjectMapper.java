@@ -16,8 +16,6 @@ import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
 
-import io.swagger.v3.core.util.Json;
-
 @Component
 public class CustomObjectMapper {
 
@@ -90,8 +88,10 @@ public class CustomObjectMapper {
     public LogResponse mapToResponse(Log log) {
         LogResponse logResponse = new LogResponse();
         logResponse.setId(log.getId());
-        logResponse.setPlayer(mapToResponse(log.getPlayer()));
-        logResponse.setData(Json.pretty(log.getData()));
+        if (log.getPlayer() != null) {
+            logResponse.setPlayer(mapToResponse(log.getPlayer()));
+        }
+        logResponse.setData(log.getData());
         logResponse.setMessage(log.getMessage());
         logResponse.setLevel(log.getLevel());
         logResponse.setCreatedAt(log.getCreatedAt());

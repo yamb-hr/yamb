@@ -56,16 +56,17 @@ public class GameServiceImpl implements GameService {
     public GameResponse create(GameRequest gameRequest) {
         Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();
         validateCreate(gameRequest, authenticatedPlayer.getId());
-        Game game = Game.getInstance(gameRequest.getPlayerId(), authenticatedPlayer.getUsername());
-        gameRepo.save(game);
+
+        Game game = gameRepo.findByPlayerIdAndStatus(gameRequest.getPlayerId(), GameStatus.IN_PROGRESS)
+            .orElseGet(() -> gameRepo.save(Game.getInstance(gameRequest.getPlayerId(), authenticatedPlayer.getUsername())));
+
         return mapper.mapToResponse(game);
     }
 
+
     private void validateCreate(GameRequest gameRequest, Long authenticatedPlayerId) {
-        if (gameRequest.getPlayerId() != authenticatedPlayerId) {
-            throw new IllegalArgumentException("Player id is required");
-        } else if (gameRepo.existsByPlayerIdAndStatus(gameRequest.getPlayerId(), GameStatus.IN_PROGRESS)) {
-            throw new IllegalArgumentException("Active game already exists for player with id: " + gameRequest.getPlayerId());
+        if (!gameRequest.getPlayerId().equals(authenticatedPlayerId)) {
+            throw new IllegalArgumentException(MessageConstants.ERROR_FORBIDDEN);
         }
     }
 

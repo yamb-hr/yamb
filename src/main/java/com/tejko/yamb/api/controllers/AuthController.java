@@ -34,7 +34,7 @@ public class AuthController {
         return authService.register(playerCredentials);
     }
 
-	@PostMapping("/anon")
+	@PostMapping("/anonymous")
 	public AuthResponse createAnonymousPlayer(@RequestBody AuthRequest playerCredentials) {
 		return authService.createAnonymousPlayer(playerCredentials);
 	}

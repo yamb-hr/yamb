@@ -45,25 +45,25 @@ public class GameController {
 	}
 
 	@PutMapping("/{id}/roll")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
+	@PreAuthorize("isAuthenticated()")
 	public GameResponse rollById(@PathVariable String id, @RequestBody ActionRequest action) {
 		return  gameService.rollById(id, action);
 	}
 
 	@PutMapping("/{id}/announce")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
+	@PreAuthorize("isAuthenticated()")
 	public GameResponse announceById(@PathVariable String id, @RequestBody ActionRequest action) {
 		return  gameService.announceById(id, action);
 	}
 
 	@PutMapping("/{id}/fill")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
+	@PreAuthorize("isAuthenticated()")
 	public GameResponse fillById(@PathVariable String id, @RequestBody ActionRequest action) {
 		return gameService.fillById(id, action);
 	}
 
 	@PutMapping("/{id}/restart")
-	@PreAuthorize("isAuthenticated() && @permissionManager.hasGamePermission(authentication, #id)")
+	@PreAuthorize("isAuthenticated()")
 	public GameResponse restartById(@PathVariable String id) {
 		return gameService.restartById(id);
 	}

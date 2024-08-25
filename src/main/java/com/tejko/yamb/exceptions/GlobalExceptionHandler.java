@@ -25,7 +25,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) { 
-        System.out.println(exception.getLocalizedMessage());
+        // System.out.println(exception.getLocalizedMessage());
+        exception.printStackTrace();
         try {
             logger.error(exception);
         } catch (Exception e) {
