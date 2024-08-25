@@ -1,9 +1,9 @@
 package com.tejko.yamb.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "recaptcha.key")
 public class RecaptchaConfig {
 

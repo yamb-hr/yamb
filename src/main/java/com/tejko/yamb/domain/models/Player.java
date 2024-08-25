@@ -53,9 +53,6 @@ public abstract class Player implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
     
-    @Column(name = "active_game_id", nullable = true)
-    private String activeGameId;
-    
     @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
     private List<Score> scores;
     
@@ -107,14 +104,6 @@ public abstract class Player implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getActiveGameId() {
-        return activeGameId;
-    }
-
-    public void setActiveGameId(String activeGameId) {
-        this.activeGameId = activeGameId;
     }
 
     public List<Score> getScores() {

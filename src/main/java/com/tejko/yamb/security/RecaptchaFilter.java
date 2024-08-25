@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.tejko.yamb.interfaces.services.RecaptchaService;
+import com.tejko.yamb.domain.services.interfaces.RecaptchaService;
 
 public class RecaptchaFilter extends OncePerRequestFilter {
 

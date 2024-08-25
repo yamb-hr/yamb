@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.payload.requests.ActionRequest;
-import com.tejko.yamb.api.payload.requests.GameRequest;
-import com.tejko.yamb.api.payload.responses.GameResponse;
-import com.tejko.yamb.interfaces.services.GameService;
+import com.tejko.yamb.api.dto.requests.ActionRequest;
+import com.tejko.yamb.api.dto.requests.GameRequest;
+import com.tejko.yamb.api.dto.responses.GameResponse;
+import com.tejko.yamb.domain.services.interfaces.GameService;
 
 @RestController
 @RequestMapping("/api/games")

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.payload.responses.LogResponse;
-import com.tejko.yamb.interfaces.services.LogService;
+import com.tejko.yamb.api.dto.responses.LogResponse;
+import com.tejko.yamb.domain.services.interfaces.LogService;
 
 @RestController
 @RequestMapping("/api/logs")

@@ -18,12 +18,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.tejko.yamb.domain.repositories.PlayerRepository;
-import com.tejko.yamb.interfaces.services.PlayerService;
-import com.tejko.yamb.interfaces.services.RecaptchaService;
+import com.tejko.yamb.domain.services.interfaces.PlayerService;
+import com.tejko.yamb.domain.services.interfaces.RecaptchaService;
 import com.tejko.yamb.security.AuthEntryPoint;
 import com.tejko.yamb.security.AuthTokenFilter;
-import com.tejko.yamb.security.JwtUtil;
 import com.tejko.yamb.security.RecaptchaFilter;
+import com.tejko.yamb.util.JwtUtil;
 
 @Configuration
 @EnableWebSecurity

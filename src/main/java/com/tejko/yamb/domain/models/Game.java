@@ -8,8 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.persistence.Id;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,13 +18,13 @@ import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.exceptions.AnnouncementAlreadyDeclaredException;
-import com.tejko.yamb.domain.exceptions.AnnouncementUnavailableException;
-import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
-import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
-import com.tejko.yamb.domain.exceptions.DiceRollRequiredException;
-import com.tejko.yamb.domain.exceptions.LockedGameException;
-import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
+import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyDeclaredException;
+import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
+import com.tejko.yamb.exceptions.custom.AnnouncementUnavailableException;
+import com.tejko.yamb.exceptions.custom.BoxUnavailableException;
+import com.tejko.yamb.exceptions.custom.DiceRollRequiredException;
+import com.tejko.yamb.exceptions.custom.LockedGameException;
+import com.tejko.yamb.exceptions.custom.RollLimitExceededException;
 import com.tejko.yamb.util.ScoreCalculator;
 
 @Document(collection = "games")
@@ -32,12 +32,12 @@ public class Game {
 
     @Id
     private String id;
-    
-    @CreationTimestamp
+
+    @CreatedDate
     @Field("created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     @Field("updated_at")
     private LocalDateTime updatedAt;
     
@@ -71,6 +71,7 @@ public class Game {
         this.dices = dices;
         this.rollCount = rollCount;
         this.announcement = announcement;
+        this.status = status;
     }
 
     public static Game getInstance(Long playerId, String playerName) {

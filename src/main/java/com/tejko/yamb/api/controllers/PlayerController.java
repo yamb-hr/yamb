@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.payload.responses.PlayerResponse;
-import com.tejko.yamb.api.payload.responses.PlayerStatsResponse;
-import com.tejko.yamb.api.payload.responses.ScoreResponse;
-import com.tejko.yamb.interfaces.services.PlayerService;
+import com.tejko.yamb.api.dto.responses.PlayerResponse;
+import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.ScoreResponse;
+import com.tejko.yamb.domain.services.interfaces.PlayerService;
 
 @RestController
 @RequestMapping("/api/players")

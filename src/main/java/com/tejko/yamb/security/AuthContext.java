@@ -9,6 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.RegisteredPlayer;
+
 @Component
 public class AuthContext {
 
@@ -19,20 +22,20 @@ public class AuthContext {
         this.authenticationManager = authenticationManager;
     }
 
-    public Optional<Long> getAuthenticatedPlayerId() {
+    public Optional<Player> getAuthenticatedPlayer() {
         try {
-            return Optional.of(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()));
+            return Optional.of((Player) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    public Long authenticate(String username, String password) {
+    public RegisteredPlayer authenticate(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(username, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return Long.valueOf(authentication.getName());
+        return (RegisteredPlayer) authentication.getPrincipal();
     }
     
 }

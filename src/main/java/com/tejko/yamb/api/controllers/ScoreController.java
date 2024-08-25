@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.payload.responses.ScoreResponse;
-import com.tejko.yamb.api.payload.responses.ScoreboardResponse;
-import com.tejko.yamb.interfaces.services.ScoreService;
+import com.tejko.yamb.api.dto.responses.ScoreResponse;
+import com.tejko.yamb.api.dto.responses.ScoreboardResponse;
+import com.tejko.yamb.domain.services.interfaces.ScoreService;
 
 @RestController
 @RequestMapping("/api/scores")

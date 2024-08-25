@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
+import com.tejko.yamb.util.JwtUtil;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 

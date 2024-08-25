@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tejko.yamb.api.payload.requests.AuthRequest;
-import com.tejko.yamb.api.payload.responses.AuthResponse;
+import com.tejko.yamb.api.dto.requests.AuthRequest;
+import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.domain.models.RegisteredPlayer;
-import com.tejko.yamb.interfaces.services.AuthService;
+import com.tejko.yamb.domain.services.interfaces.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
