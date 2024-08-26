@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
+import com.tejko.yamb.domain.enums.GameStatus;
 
 public class GameResponse {
  
@@ -16,10 +17,12 @@ public class GameResponse {
     private List<DiceResponse> dices;
     private int rollCount;
     private BoxType announcement;
+    private GameStatus status;
+    private int totalSum;
 
     public GameResponse() {}
 
-    public GameResponse(String id, LocalDateTime createdAt, LocalDateTime updatedAt, ShortPlayerResponse player, SheetResponse sheet, List<DiceResponse> dices, int rollCount, BoxType announcement) {
+    public GameResponse(String id, LocalDateTime createdAt, LocalDateTime updatedAt, ShortPlayerResponse player, SheetResponse sheet, List<DiceResponse> dices, int rollCount, BoxType announcement, GameStatus status, int totalSum) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -28,6 +31,8 @@ public class GameResponse {
         this.dices = dices;
         this.rollCount = rollCount;
         this.announcement = announcement;
+        this.status = status;
+        this.totalSum = totalSum;
     }
 
     public String getId() {
@@ -92,6 +97,22 @@ public class GameResponse {
 
     public void setAnnouncement(BoxType announcement) {
         this.announcement = announcement;
+    }
+
+    public GameStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
+    }
+
+    public int getTotalSum() {
+        return totalSum;
+    }
+
+    public void setTotalSum(int totalSum) {
+        this.totalSum = totalSum;
     }
 
     public static class DiceResponse {

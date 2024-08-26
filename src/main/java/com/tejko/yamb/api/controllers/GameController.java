@@ -68,4 +68,16 @@ public class GameController {
 		return gameService.restartById(id);
 	}
 
+	@PutMapping("/{id}/finish")
+	@PreAuthorize("isAuthenticated()")
+	public GameResponse finishById(@PathVariable String id) {
+		return gameService.finishById(id);
+	}
+	
+	@PutMapping("/{id}/complete")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public GameResponse completeById(@PathVariable String id) {
+		return gameService.completeById(id);
+	}
+
 }

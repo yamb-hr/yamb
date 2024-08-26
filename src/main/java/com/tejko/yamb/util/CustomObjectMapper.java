@@ -2,6 +2,7 @@ package com.tejko.yamb.util;
 
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 import com.tejko.yamb.api.dto.responses.GameResponse;
@@ -13,6 +14,7 @@ import com.tejko.yamb.api.dto.responses.ShortPlayerResponse;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
 
@@ -26,6 +28,7 @@ public class CustomObjectMapper {
         playerResponse.setUpdatedAt(player.getUpdatedAt());
         playerResponse.setName(player.getUsername());
         playerResponse.setRoles(player.getRoles().stream().map(role -> mapToResponse(role)).collect(Collectors.toList()));
+        playerResponse.setRegistered(Hibernate.getClass(player).equals(RegisteredPlayer.class));
         return playerResponse;
     }
 
@@ -50,11 +53,13 @@ public class CustomObjectMapper {
         gameResponse.setId(game.getId());
         gameResponse.setCreatedAt(game.getCreatedAt());
         gameResponse.setUpdatedAt(game.getUpdatedAt());
+        gameResponse.setStatus(game.getStatus());
         gameResponse.setPlayer(new ShortPlayerResponse(game.getPlayerId(), game.getPlayerName()));
         gameResponse.setSheet(mapToResponse(game.getSheet()));
         gameResponse.setDices(game.getDices().stream().map(dice -> mapToResponse(dice)).collect(Collectors.toList()));
         gameResponse.setRollCount(game.getRollCount());
         gameResponse.setAnnouncement(game.getAnnouncement());
+        gameResponse.setTotalSum(game.getTotalSum());
         return gameResponse;
     }
 

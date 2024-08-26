@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
 
         RegisteredPlayer player;
 
-        if (authenticatedPlayer.isPresent() && authenticatedPlayer.get() instanceof AnonymousPlayer) {
+        if (authenticatedPlayer.isPresent() && Hibernate.getClass(authenticatedPlayer.get()).equals(AnonymousPlayer.class)) {
             if (!authenticatedPlayer.get().getUsername().equals(authRequest.getUsername())) {
                 validateUsername(authRequest.getUsername());
             }

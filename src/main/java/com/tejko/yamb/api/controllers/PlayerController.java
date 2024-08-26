@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tejko.yamb.api.dto.responses.GlobalPlayerStats;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
-import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.PlayerStats;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.domain.services.interfaces.PlayerService;
 
@@ -39,8 +40,13 @@ public class PlayerController {
 	}
 
 	@GetMapping("/{id}/stats")
-    public PlayerStatsResponse getPlayerStats(@PathVariable Long id) {
+    public PlayerStats getPlayerStats(@PathVariable Long id) {
         return playerService.getPlayerStats(id);
+    }
+
+	@GetMapping("/stats")
+    public GlobalPlayerStats getGlobalStats() {
+        return playerService.getGlobalStats();
     }
 
 }

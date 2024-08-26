@@ -2,23 +2,25 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.util.List;
 
-public class ScoreboardResponse {
+public class GlobalScoreStats {
 
-    private long gamesPlayed;
+    private long scoreCount;
     private double averageScore;
-    private int topScore;
+    private ScoreResponse highScore;
     private List<ScoreResponse> topToday;
     private List<ScoreResponse> topThisWeek;
     private List<ScoreResponse> topThisMonth;
     private List<ScoreResponse> topThisYear;
     private List<ScoreResponse> topAllTime;
 
-    public ScoreboardResponse() {}
+    public GlobalScoreStats() {}
 
-    public ScoreboardResponse(long gamesPlayed, double averageScore, int topScore, List<ScoreResponse> topToday, List<ScoreResponse> topThisWeek, List<ScoreResponse> topThisMonth, List<ScoreResponse> topThisYear, List<ScoreResponse> topAllTime) {
-        this.gamesPlayed = gamesPlayed;
+    public GlobalScoreStats(long scoreCount, double averageScore, ScoreResponse highScore, List<ScoreResponse> topToday,
+            List<ScoreResponse> topThisWeek, List<ScoreResponse> topThisMonth, List<ScoreResponse> topThisYear,
+            List<ScoreResponse> topAllTime) {
+        this.scoreCount = scoreCount;
         this.averageScore = averageScore;
-        this.topScore = topScore;
+        this.highScore = highScore;
         this.topToday = topToday;
         this.topThisWeek = topThisWeek;
         this.topThisMonth = topThisMonth;
@@ -26,12 +28,12 @@ public class ScoreboardResponse {
         this.topAllTime = topAllTime;
     }
 
-    public long getGamesPlayed() {
-        return gamesPlayed;
+    public long getScoreCount() {
+        return scoreCount;
     }
 
-    public void setGamesPlayed(long gamesPlayed) {
-        this.gamesPlayed = gamesPlayed;
+    public void setScoreCount(long scoreCount) {
+        this.scoreCount = scoreCount;
     }
 
     public double getAverageScore() {
@@ -42,12 +44,12 @@ public class ScoreboardResponse {
         this.averageScore = averageScore;
     }
 
-    public int getTopScore() {
-        return topScore;
+    public ScoreResponse getHighScore() {
+        return highScore;
     }
 
-    public void setTopScore(int topScore) {
-        this.topScore = topScore;
+    public void setHighScore(ScoreResponse highScore) {
+        this.highScore = highScore;
     }
 
     public List<ScoreResponse> getTopToday() {
@@ -89,5 +91,5 @@ public class ScoreboardResponse {
     public void setTopAllTime(List<ScoreResponse> topAllTime) {
         this.topAllTime = topAllTime;
     }
-
+    
 }

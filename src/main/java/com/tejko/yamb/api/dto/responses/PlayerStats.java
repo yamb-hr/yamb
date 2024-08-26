@@ -2,20 +2,20 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 
-public class PlayerStatsResponse {
+public class PlayerStats {
 
     private LocalDateTime lastActivity;
     private double averageScore;
-    private int topScore;
-    private long gamesPlayed;
+    private ScoreResponse highScore;
+    private long scoreCount;
 
-    public PlayerStatsResponse() {}
+    public PlayerStats() {}
 
-    public PlayerStatsResponse(LocalDateTime lastActivity, double averageScore, int topScore, long gamesPlayed) {
+    public PlayerStats(LocalDateTime lastActivity, double averageScore, ScoreResponse highScore, long scoreCount) {
         this.lastActivity = lastActivity;
         this.averageScore = averageScore;
-        this.topScore = topScore;
-        this.gamesPlayed = gamesPlayed;
+        this.highScore = highScore;
+        this.scoreCount = scoreCount;
     }
 
     public LocalDateTime getLastActivity() {
@@ -34,20 +34,20 @@ public class PlayerStatsResponse {
         this.averageScore = averageScore;
     }
 
-    public int getTopScore() {
-        return topScore;
+    public ScoreResponse getHighScore() {
+        return highScore;
     }
 
-    public void setTopScore(int topScore) {
-        this.topScore = topScore;
+    public void setHighScore(ScoreResponse highScore) {
+        this.highScore = highScore;
     }
 
-    public long getGamesPlayed() {
-        return gamesPlayed;
+    public long getScoreCount() {
+        return scoreCount;
     }
 
-    public void setGamesPlayed(long gamesPlayed) {
-        this.gamesPlayed = gamesPlayed;
+    public void setScoreCount(long scoreCount) {
+        this.scoreCount = scoreCount;
     }
 
 }

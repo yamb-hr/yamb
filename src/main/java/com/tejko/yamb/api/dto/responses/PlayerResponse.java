@@ -10,19 +10,19 @@ public class PlayerResponse {
     private LocalDateTime updatedAt;
     private String name;
     private List<RoleResponse> roles;
-    private boolean tempUser;
+    private boolean isRegistered;
 
    
     public PlayerResponse() {
     }
 
-    public PlayerResponse(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, List<RoleResponse> roles, boolean tempUser) {
+    public PlayerResponse(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, List<RoleResponse> roles, boolean isRegistered) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.name = name;
         this.roles = roles;
-        this.tempUser = tempUser;
+        this.isRegistered = isRegistered;
     }
 
     public Long getId() {
@@ -65,12 +65,12 @@ public class PlayerResponse {
         this.roles = roles;
     }
 
-    public boolean isTempUser() {
-        return tempUser;
+    public boolean isRegistered() {
+        return isRegistered;
     }
 
-    public void setTempUser(boolean tempUser) {
-        this.tempUser = tempUser;
+    public void setRegistered(boolean isRegistered) {
+        this.isRegistered = isRegistered;
     }
 
 }

@@ -24,7 +24,9 @@ public interface GameService {
     public GameResponse fillById(String id, ActionRequest actionRequest);
 
     public GameResponse restartById(String id);
-    
-    public void deleteById(String id);
+
+    public GameResponse completeById(String id);
+
+    public GameResponse finishById(String id);
 
 }

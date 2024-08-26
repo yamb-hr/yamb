@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.tejko.yamb.api.dto.responses.GlobalPlayerStats;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
-import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.PlayerStats;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.domain.models.Player;
 
@@ -19,5 +20,7 @@ public interface PlayerService extends UserDetailsService {
     
     public List<ScoreResponse> getScoresByPlayerId(Long id);
 
-    public PlayerStatsResponse getPlayerStats(Long id);
+    public PlayerStats getPlayerStats(Long id);
+
+    public GlobalPlayerStats getGlobalStats();
 }

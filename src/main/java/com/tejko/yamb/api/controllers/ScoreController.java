@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.api.dto.responses.ScoreboardResponse;
+import com.tejko.yamb.api.dto.responses.GlobalScoreStats;
 import com.tejko.yamb.domain.services.interfaces.ScoreService;
 
 @RestController
@@ -29,9 +29,9 @@ public class ScoreController {
 		return scoreService.getAll();
 	}
 
-	@GetMapping("/scoreboard")
-	public ScoreboardResponse getScoreboard() {
-		return scoreService.getScoreboard();
+	@GetMapping("/stats")
+	public GlobalScoreStats getGlobalStats() {
+		return scoreService.getGlobalStats();
 	}
 
 }

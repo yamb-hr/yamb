@@ -9,111 +9,110 @@ import com.tejko.yamb.util.ScoreCalculator;
 public class ScoreCalculatorTest {
 
     @Test
-    public void testCalculateSum() {
+    void testCalculateSum_Max() {
         int[] diceValues = {6, 6, 6, 6, 6};
         Assertions.assertEquals(30, ScoreCalculator.calculateScore(diceValues, BoxType.MAX));
     }
 
     @Test
-    void testCalculateSumByBoxType() {
+    void testCalculateSum_Sixes() {
         int[] diceValues = {6, 6, 6, 1, 1};
         Assertions.assertEquals(18, ScoreCalculator.calculateScore(diceValues, BoxType.SIXES));
     }
 
     @Test
-    void testCalculateSumByBoxTypeWithoutSpecifiedBox() {
+    void testCalculateSum_Sixes_NoSixes() {
         int[] diceValues = {1, 1, 1, 1, 1};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.SIXES));
     }
 
     @Test
-    void testCalculateTrips() {
+    void testCalculateTrips_ValidTrips() {
         int[] diceValues = {6, 6, 6, 1, 1};
         Assertions.assertEquals(28, ScoreCalculator.calculateScore(diceValues, BoxType.TRIPS));
     }
 
     @Test
-    void testCalculateTripsWithFourOfAKind() {
+    void testCalculateTrips_FourOfAKind() {
         int[] diceValues = {6, 6, 6, 6, 1};
         Assertions.assertEquals(28, ScoreCalculator.calculateScore(diceValues, BoxType.TRIPS));
     }
 
     @Test
-    void testCalculateTripsWithTwoOfAKind() {
+    void testCalculateTrips_TwoOfAKind() {
         int[] diceValues = {6, 6, 1, 1, 2};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.TRIPS));
     }
 
     @Test
-    void testCalculateStraightWithSmallStraight() {
+    void testCalculateStraight_SmallStraight() {
         int[] diceValues = {1, 2, 3, 4, 5};
         Assertions.assertEquals(35, ScoreCalculator.calculateScore(diceValues, BoxType.STRAIGHT));
     }
 
     @Test
-    void testCalculateStraightWithLargeStraight() {
+    void testCalculateStraight_LargeStraight() {
         int[] diceValues = {2, 3, 4, 5, 6};
         Assertions.assertEquals(45, ScoreCalculator.calculateScore(diceValues, BoxType.STRAIGHT));
     }
 
     @Test
-    void testCalculateStraightWithoutStraight() {
+    void testCalculateStraight_NoStraight() {
         int[] diceValues = {2, 3, 4, 5, 5};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.STRAIGHT));
     }
 
     @Test
-    void testCalculateBoat() {
+    void testCalculateBoat_ValidBoat() {
         int[] diceValues = {6, 6, 6, 1, 1};
         Assertions.assertEquals(50, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));
     }
 
     @Test
-    void testCalculateBoatAlt() {
+    void testCalculateBoat_AlternateValidBoat() {
         int[] diceValues = {4, 4, 5, 5, 4};
         Assertions.assertEquals(52, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));
     }
 
     @Test
-    void testCalculateBoatWithFourOfAKind() {
+    void testCalculateBoat_FourOfAKind() {
         int[] diceValues = {6, 6, 6, 6, 1};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));
     }
 
     @Test
-    void testCalculateBoatWithTwoPairs() {
+    void testCalculateBoat_TwoPairs() {
         int[] diceValues = {6, 6, 1, 1, 2};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.BOAT));
     }
 
     @Test
-    void testCalculateCarriage() {
+    void testCalculateCarriage_ValidCarriage() {
         int[] diceValues = {6, 6, 6, 6, 1};
         Assertions.assertEquals(64, ScoreCalculator.calculateScore(diceValues, BoxType.CARRIAGE));
     }
 
     @Test
-    void testCalculateCarriageWithFiveOfAKind() {
+    void testCalculateCarriage_FiveOfAKind() {
         int[] diceValues = {6, 6, 6, 6, 6};
         Assertions.assertEquals(64, ScoreCalculator.calculateScore(diceValues, BoxType.CARRIAGE));
     }
 
     @Test
-    void testCalculateCarriageWithThreeOfAKind() {
+    void testCalculateCarriage_ThreeOfAKind() {
         int[] diceValues = {6, 6, 6, 1, 1};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.CARRIAGE));
     }
 
     @Test
-    void testCalculateYamb() {
+    void testCalculateYamb_ValidYamb() {
         int[] diceValues = {6, 6, 6, 6, 6};
         Assertions.assertEquals(80, ScoreCalculator.calculateScore(diceValues, BoxType.YAMB));
     }
 
     @Test
-    void testCalculateYambWithFourOfAKind() {
+    void testCalculateYamb_FourOfAKind() {
         int[] diceValues = {6, 6, 6, 6, 1};
         Assertions.assertEquals(0, ScoreCalculator.calculateScore(diceValues, BoxType.YAMB));
     }
-
 }

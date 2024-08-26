@@ -12,7 +12,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.api.dto.responses.ScoreboardResponse;
+import com.tejko.yamb.api.dto.responses.GlobalScoreStats;
 import com.tejko.yamb.util.CustomObjectMapper;
 import com.tejko.yamb.domain.constants.MessageConstants;
 import com.tejko.yamb.domain.models.Score;
@@ -54,7 +54,7 @@ public class ScoreServiceImpl implements ScoreService {
 	}
 
     @Override
-	public ScoreboardResponse getScoreboard() {
+	public GlobalScoreStats getGlobalStats() {
 		LocalDate today = LocalDate.now();
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime startOfToday = today.atStartOfDay();
@@ -62,16 +62,18 @@ public class ScoreServiceImpl implements ScoreService {
 		LocalDateTime startOfMonth = today.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
 		LocalDateTime startOfYear = today.with(TemporalAdjusters.firstDayOfYear()).atStartOfDay();
 
-		ScoreboardResponse scoreboard = new ScoreboardResponse();
-		scoreboard.setTopToday(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfToday, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		scoreboard.setTopThisWeek(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfWeek, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		scoreboard.setTopThisMonth(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfMonth, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		scoreboard.setTopThisYear(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfYear, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		scoreboard.setTopAllTime(scoreRepo.findTop30ByOrderByValueDesc().stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		scoreboard.setGamesPlayed(scoreRepo.count());
-		scoreboard.setAverageScore(scoreRepo.findAverageValue());
+		GlobalScoreStats globalStats = new GlobalScoreStats();
+		globalStats.setScoreCount(scoreRepo.count());
+		globalStats.setAverageScore(scoreRepo.findAverageValue());
+		globalStats.setHighScore(scoreRepo.findTop1ByOrderByValueDesc().map(mapper::mapToResponse).orElse(null));
+		globalStats.setTopToday(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfToday, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
+		globalStats.setTopThisWeek(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfWeek, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
+		globalStats.setTopThisMonth(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfMonth, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
+		globalStats.setTopThisYear(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfYear, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
+		globalStats.setTopAllTime(scoreRepo.findTop30ByOrderByValueDesc().stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
 		
-		return scoreboard;
+		
+		return globalStats;
 	}
 
 }

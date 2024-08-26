@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,15 +17,18 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     
     List<Score> findTop30ByOrderByValueDesc();
 
-    @Query("SELECT AVG(s.value) FROM Score s WHERE s.player.id = :playerId")
-    Double findAverageValueByPlayerId(Long playerId);
-
-    @Query("SELECT MAX(s.value) FROM Score s WHERE s.player.id = :playerId")
-    Integer findTopValueByPlayerId(Long playerId);
+    Optional<Score> findTop1ByOrderByValueDesc();
 
     long countByPlayerId(Long playerId);
 
-    @Query("SELECT AVG(s.value) FROM Score s")
+    Optional<Score> findTop1ByPlayerIdOrderByValueDesc(Long playerId);
+
+    Optional<Score> findTop1ByPlayerIdOrderByCreatedAtDesc(Long playerId);
+    
+    @Query("SELECT AVG(s.value) FROM score s")
     Double findAverageValue();
+
+    @Query("SELECT AVG(s.value) FROM score s WHERE s.player.id = :playerId")
+    Double findAverageValueByPlayerId(Long playerId);
 
 }

@@ -13,7 +13,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
@@ -130,7 +129,6 @@ public class Game {
         return dices;
     }
 
-    @JsonIgnore
     public boolean isAnnouncementRequired() {
         return rollCount == 1 && announcement == null && sheet.areAllNonAnnouncementColumnsCompleted();
     }
@@ -151,7 +149,6 @@ public class Game {
         rollCount += 1;
     }
 
-    @JsonIgnore
     public int[] getDiceValues() {
         return dices.stream().map(Dice::getValue).mapToInt(Number::intValue).toArray();
     }
@@ -160,7 +157,7 @@ public class Game {
         validatefillAction(columnType, boxType);
         sheet.fill(columnType, boxType, ScoreCalculator.calculateScore(getDiceValues(), boxType));
         if (sheet.isCompleted() ) {
-            status = GameStatus.FINISHED;
+            status = GameStatus.COMPLETED;
         }
         rollCount = 0;
         announcement = null;
@@ -179,12 +176,18 @@ public class Game {
         dices = generateDices();
     }
 
+    public void finish() {
+        validateFinishAction();
+        status = GameStatus.FINISHED;
+    }
+
+
     private void validateRollAction() {
         if (rollCount == 3) {
             throw new RollLimitExceededException();
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
-        } else if (status == GameStatus.FINISHED) {
+        } else if (status != GameStatus.IN_PROGRESS) {
             throw new LockedGameException();
         }
     }
@@ -194,6 +197,8 @@ public class Game {
 			throw new DiceRollRequiredException();
         } else if (!isBoxAvailable(columnType, boxType)) {
             throw new BoxUnavailableException();
+        } else if (status != GameStatus.IN_PROGRESS) {
+            throw new LockedGameException();
         }
     }
 
@@ -204,12 +209,20 @@ public class Game {
             throw new DiceRollRequiredException();
         } else if (rollCount > 1) {
             throw new AnnouncementUnavailableException();
+        } else if (status != GameStatus.IN_PROGRESS) {
+            throw new LockedGameException();
         }
     }
 
     private void validateRestartAction() {
-        if (status == GameStatus.FINISHED) {
+        if (status != GameStatus.IN_PROGRESS) {
             throw new LockedGameException();
+        }
+    }
+
+    private void validateFinishAction() {
+        if (status != GameStatus.COMPLETED) {
+            throw new IllegalArgumentException("Game is not yet completed");
         }
     }
 
@@ -229,6 +242,27 @@ public class Game {
             return boxType == announcement;
         }
         return false;
+    }
+
+    public void complete() {
+        int[] diceToRoll = {0, 1, 2, 3, 4};
+        for (int i = 0; i < BoxType.values().length; i++) {    
+            roll(diceToRoll);
+            fill(ColumnType.DOWNWARDS, BoxType.values()[i]);
+        }
+        for (int i = BoxType.values().length - 1; i >= 0; i--) {    
+            roll(diceToRoll);
+            fill(ColumnType.UPWARDS, BoxType.values()[i]);
+        }
+        for (int i = 0; i < BoxType.values().length; i++) {    
+            roll(diceToRoll);
+            fill(ColumnType.FREE, BoxType.values()[i]);
+        }
+        for (int i = 0; i < BoxType.values().length-1; i++) {    
+            roll(diceToRoll);
+            announce(BoxType.values()[i]);
+            fill(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);
+        }
     }
 
     public static class Dice implements Serializable {
@@ -287,7 +321,6 @@ public class Game {
             return columns;
         }
     
-        @JsonIgnore
         public int getTopSectionSum() {  
             int topSectionSum = 0;
             for (GameColumn column : columns) {
@@ -296,7 +329,6 @@ public class Game {
             return topSectionSum;
         }
     
-        @JsonIgnore
         public int getMiddleSectionSum() {
             int middleSectionSum = 0;
             for (GameColumn column : columns) {
@@ -305,7 +337,6 @@ public class Game {
             return middleSectionSum;
         }
     
-        @JsonIgnore
         public int getBottomSectionSum() {
             int bottomSectionSum = 0;
             for (GameColumn column : columns) {
@@ -314,12 +345,10 @@ public class Game {
             return bottomSectionSum;
         }
         
-        @JsonIgnore
         public int getTotalSum() { 
             return getTopSectionSum() + getMiddleSectionSum() + getBottomSectionSum();
         }
         
-        @JsonIgnore
         public boolean isCompleted() {
             for (GameColumn column : columns) {
                 if (!column.isCompleted()) {
@@ -379,7 +408,6 @@ public class Game {
             return boxes;
         }
 
-        @JsonIgnore
         public int getTopSectionSum() {
             int topSectionSum = 0;
             for (BoxType boxType : GameConstants.TOP_SECTION) {
@@ -394,7 +422,6 @@ public class Game {
             return topSectionSum;
         }
 
-        @JsonIgnore
         public int getMiddleSectionSum() {
             int middleSectionSum = 0;
             Box ones = boxes.get(BoxType.ONES.ordinal());
@@ -406,7 +433,6 @@ public class Game {
             return middleSectionSum;
         }
 
-        @JsonIgnore
         public int getBottomSectionSum() {
             int bottomSectionSum = 0;
             for (BoxType boxType : GameConstants.BOTTOM_SECTION) {
@@ -418,7 +444,6 @@ public class Game {
             return bottomSectionSum;
         }
 
-        @JsonIgnore
         public boolean isCompleted() {
             return getNumOfEmptyBoxes() == 0;
         }

@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-@Entity
+@Entity(name="score")
 public class Score {
 
 	@Id

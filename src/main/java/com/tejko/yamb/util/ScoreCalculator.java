@@ -133,7 +133,6 @@ public class ScoreCalculator {
             }
         }
         return sum; // if count has not reached given number for any dice value return 0
-    
 	}
 
 }

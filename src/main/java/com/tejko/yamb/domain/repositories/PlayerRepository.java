@@ -1,11 +1,11 @@
 package com.tejko.yamb.domain.repositories;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.tejko.yamb.domain.models.Player;
 
@@ -14,8 +14,15 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     Optional<Player> findByUsername(String username);
 
     boolean existsByUsername(String username);
+    
+    Optional<Player> findTop1ByOrderByCreatedAtDesc();
 
-    @Query(value = "SELECT MAX(s.created_at) FROM score s WHERE s.player_id = :playerId", nativeQuery = true)
-    LocalDateTime findLastActivityByPlayerId(@Param("playerId") Long playerId);
+    Optional<Player> findTop1ByOrderByCreatedAtAsc();
+
+    @Query("SELECT p FROM player p JOIN p.scores s GROUP BY p.id ORDER BY COUNT(s) DESC")
+    Page<Player> findPlayerWithMostScores(Pageable pageable);
+
+    @Query("SELECT p FROM player p JOIN p.scores s GROUP BY p.id ORDER BY AVG(s.value) DESC")
+    Page<Player> findPlayerWithHighestAverageScore(Pageable pageable);
 
 }

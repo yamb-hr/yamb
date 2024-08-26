@@ -50,6 +50,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private Optional<Player> extractPlayerFromRequest(HttpServletRequest request) {
         return jwtUtil.extractTokenFromAuthHeader(request)
             .flatMap(jwtUtil::extractIdFromToken)
-            .flatMap(id -> Optional.ofNullable(playerRepo.findById(id).orElse(null)));
+            .flatMap(playerRepo::findById);
     }
 }
