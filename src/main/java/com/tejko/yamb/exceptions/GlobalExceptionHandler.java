@@ -1,6 +1,7 @@
 package com.tejko.yamb.exceptions;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -20,8 +21,14 @@ import com.tejko.yamb.util.CustomLogger;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private final MessageSource messageSource;
+    private final CustomLogger logger;
+
     @Autowired
-    CustomLogger logger;
+    public GlobalExceptionHandler(MessageSource messageSource, CustomLogger logger) {
+        this.messageSource = messageSource;
+        this.logger = logger;
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
