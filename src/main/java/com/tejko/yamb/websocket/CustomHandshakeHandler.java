@@ -13,16 +13,19 @@ import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.tejko.yamb.util.I18nUtil;
 import com.tejko.yamb.util.JwtUtil;
 
 @Component
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
     private final JwtUtil jwtUtil;
+    private final I18nUtil i18nUtil;
 
     @Autowired
-    public CustomHandshakeHandler(JwtUtil jwtUtil) {
+    public CustomHandshakeHandler(JwtUtil jwtUtil, I18nUtil i18nUtil) {
         this.jwtUtil = jwtUtil;
+        this.i18nUtil = i18nUtil;
     }
 
     @Override
@@ -37,6 +40,6 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
         return token.filter(jwtUtil::validateToken)
             .flatMap(jwtUtil::extractIdFromToken)
             .map(StompPrincipal::new)
-            .orElseThrow(() -> new HandshakeFailureException("Authentication failed"));
+            .orElseThrow(() -> new HandshakeFailureException(i18nUtil.getMessage("error.handshake_failed")));
     }
 }

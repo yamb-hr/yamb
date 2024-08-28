@@ -3,6 +3,7 @@ package com.tejko.yamb.api.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,26 +27,28 @@ public class LogController {
 
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public LogResponse getById(@PathVariable Long id) {
-		return logService.getById(id);
+	public ResponseEntity<LogResponse> getById(@PathVariable Long id) {
+		return ResponseEntity.ok(logService.getById(id));
 	}
 
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<LogResponse> getAll() {
-		return logService.getAll();
+	public ResponseEntity<List<LogResponse>> getAll() {
+		return ResponseEntity.ok(logService.getAll());
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public void deleteById(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteById(@PathVariable Long id) {
 		logService.deleteById(id);
+    	return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public void deleteAll() {
+	public ResponseEntity<Void> deleteAll() {
 		logService.deleteAll();
+    	return ResponseEntity.noContent().build();
 	}
 
 }

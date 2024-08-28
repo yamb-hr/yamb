@@ -19,10 +19,12 @@ public class GameResponse {
     private BoxType announcement;
     private GameStatus status;
     private int totalSum;
+    private boolean isNew;
 
     public GameResponse() {}
 
-    public GameResponse(String id, LocalDateTime createdAt, LocalDateTime updatedAt, ShortPlayerResponse player, SheetResponse sheet, List<DiceResponse> dices, int rollCount, BoxType announcement, GameStatus status, int totalSum) {
+    public GameResponse(String id, LocalDateTime createdAt, LocalDateTime updatedAt, ShortPlayerResponse player, SheetResponse sheet, 
+            List<DiceResponse> dices, int rollCount, BoxType announcement, GameStatus status, int totalSum, boolean isNew) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -33,6 +35,7 @@ public class GameResponse {
         this.announcement = announcement;
         this.status = status;
         this.totalSum = totalSum;
+        this.isNew = isNew;
     }
 
     public String getId() {
@@ -113,6 +116,14 @@ public class GameResponse {
 
     public void setTotalSum(int totalSum) {
         this.totalSum = totalSum;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     public static class DiceResponse {

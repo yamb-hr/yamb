@@ -21,7 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -35,12 +35,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 public abstract class Player implements UserDetails {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -50,24 +50,23 @@ public abstract class Player implements UserDetails {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-    
-    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Score> scores;
-    
-    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE)
+
+    @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Log> logs;
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     @JoinTable(name = "player_role", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private PlayerPreferences preferences;
+
     protected Player() {}
 
-    protected Player(String username, String password, Set<Role> roles) {
+    protected Player(String username, Set<Role> roles) {
         this.username = username;
-        this.password = password;
         this.roles = roles;
     }
 
@@ -83,13 +82,7 @@ public abstract class Player implements UserDetails {
         return updatedAt;
     }
 
-    @Transient
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.getLabel()))
-            .collect(Collectors.toList());
-    }
-
+    @Override  
     public String getUsername() {
         return username;
     }
@@ -98,22 +91,10 @@ public abstract class Player implements UserDetails {
         this.username = username;
     }
     
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public List<Score> getScores() {
         return scores;
     }
-
-    public void setScores(List<Score> scores) {
-        this.scores = scores;
-    }
-
+    
     public Set<Role> getRoles() {
         return roles;
     }
@@ -121,19 +102,38 @@ public abstract class Player implements UserDetails {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
+    public PlayerPreferences getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(PlayerPreferences preferences) {
+        this.preferences = preferences;
+    }
     
+    @Override  
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.getLabel()))
+            .collect(Collectors.toList());
+    }
+
+    @Override    
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @Override  
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @Override  
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @Override  
     public boolean isEnabled() {
         return true;
     }

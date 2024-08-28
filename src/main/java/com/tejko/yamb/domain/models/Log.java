@@ -1,9 +1,11 @@
 package com.tejko.yamb.domain.models;
 
+import java.lang.System.Logger.Level;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,38 +23,39 @@ import org.hibernate.annotations.TypeDef;
 public class Log {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id")
+    // player is null for system logs
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "player_id", nullable = true)
     private Player player;
 
     @Type(type = "jsonb")
-    @Column(name= "data" , columnDefinition = "jsonb")
+    @Column(name = "data", nullable = true, columnDefinition = "jsonb")
     private Object data;
 
-    @Column(name = "message")
+    @Column(name = "message", nullable = false)
     private String message;
-    
-    @Column(name = "level")
-    private String level;
-    
-    private Log() {}
 
-    private Log(Player player, String message, Object data, String level) {
+    @Column(name = "level", nullable = false)
+    private Level level;
+    
+    protected Log() {}
+
+    protected Log(Player player, String message, Object data, Level level) {
         this.player = player;
         this.message = message;
         this.data = data;
         this.level = level;
     }
 
-    public static Log getInstance(Player player, String message, Object data, String level) {
+    public static Log getInstance(Player player, String message, Object data, Level level) {
         return new Log(player, message, data, level);
     }
 
@@ -76,7 +79,7 @@ public class Log {
         return message;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 

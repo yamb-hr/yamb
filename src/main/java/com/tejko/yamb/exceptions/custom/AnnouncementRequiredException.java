@@ -1,11 +1,9 @@
 package com.tejko.yamb.exceptions.custom;
 
-import com.tejko.yamb.domain.constants.MessageConstants;
+public class AnnouncementRequiredException extends GameStateException {
 
-public class AnnouncementRequiredException extends IllegalStateException {
-
-    public AnnouncementRequiredException() {
-        super(MessageConstants.ERROR_ANNOUNCEMENT_REQUIRED);
+    public AnnouncementRequiredException(Object... args) {
+        super("error.announcement_required", args);
     }
     
 }

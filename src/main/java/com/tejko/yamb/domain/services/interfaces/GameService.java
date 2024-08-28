@@ -15,7 +15,7 @@ public interface GameService {
 
     public List<GameResponse> getAll();
 
-    public GameResponse create(GameRequest request);
+    public GameResponse getOrCreate(GameRequest request);
 
     public GameResponse rollById(String id, ActionRequest actionRequest);
 

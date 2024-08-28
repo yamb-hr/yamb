@@ -1,6 +1,7 @@
 package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
+import java.lang.System.Logger.Level;
 
 public class LogResponse  {
 
@@ -9,11 +10,11 @@ public class LogResponse  {
     private PlayerResponse player;
     private Object data;
     private String message;
-    private String level;
+    private Level level;
 
     public LogResponse() {}
 
-    public LogResponse(Long id, LocalDateTime createdAt, PlayerResponse player, Object data, String message, String level) {
+    public LogResponse(Long id, LocalDateTime createdAt, PlayerResponse player, Object data, String message, Level level) {
         this.id = id;
         this.createdAt = createdAt;
         this.player = player;
@@ -62,11 +63,11 @@ public class LogResponse  {
         this.message = message;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
 

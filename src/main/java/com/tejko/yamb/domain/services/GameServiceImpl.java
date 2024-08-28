@@ -1,23 +1,25 @@
 package com.tejko.yamb.domain.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
-import com.tejko.yamb.domain.constants.MessageConstants;
 import com.tejko.yamb.domain.enums.GameStatus;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.util.CustomObjectMapper;
+import com.tejko.yamb.util.I18nUtil;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.services.interfaces.GameService;
 import com.tejko.yamb.domain.repositories.GameRepository;
@@ -25,17 +27,17 @@ import com.tejko.yamb.domain.repositories.GameRepository;
 @Service
 public class GameServiceImpl implements GameService {
 
-    private final AuthContext authContext;
     private final GameRepository gameRepo;
     private final ScoreRepository scoreRepo;
     private final CustomObjectMapper mapper;
+    private final I18nUtil i18nUtil;
 
     @Autowired
-    public GameServiceImpl(AuthContext authContext, GameRepository gameRepo, ScoreRepository scoreRepo, CustomObjectMapper mapper) {
-        this.authContext = authContext;
+    public GameServiceImpl(GameRepository gameRepo, ScoreRepository scoreRepo, CustomObjectMapper mapper, I18nUtil i18nUtil) {
         this.gameRepo = gameRepo;
         this.scoreRepo = scoreRepo;
         this.mapper = mapper;
+        this.i18nUtil = i18nUtil;
     }
 
     @Override
@@ -47,25 +49,27 @@ public class GameServiceImpl implements GameService {
     @Override
     public List<GameResponse> getAll() {
         List<Game> games = gameRepo.findAll();
-        return games.stream().map(mapper::mapToResponse).collect(Collectors.toList());
+        return mapper.mapCollection(games, mapper::mapToResponse, ArrayList::new);
     }
 
     @Override
-    public GameResponse create(GameRequest gameRequest) {
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();
-        checkPermission(gameRequest.getPlayerId(), authenticatedPlayer.getId());
+    public GameResponse getOrCreate(GameRequest gameRequest) {
+        Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer().get();
+        checkPermission(gameRequest.getPlayerId());
 
-        Game game = gameRepo.findByPlayerIdAndStatusIn(gameRequest.getPlayerId(), Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED))
-            .orElseGet(() -> gameRepo.save(Game.getInstance(gameRequest.getPlayerId(), authenticatedPlayer.getUsername())));
+        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(gameRequest.getPlayerId(), Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
+        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(gameRequest.getPlayerId(), authenticatedPlayer.getUsername())));
 
-        return mapper.mapToResponse(game);
+        GameResponse response = mapper.mapToResponse(game);
+        response.setNew(!existingGame.isPresent());
+
+        return response;
     }
 
     @Override
     public GameResponse rollById(String id, ActionRequest actionRequest) {
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();
         Game game = fetchById(id);
-        checkPermission(game.getPlayerId(), authenticatedPlayer.getId());
+        checkPermission(game.getPlayerId());
         game.roll(actionRequest.getDiceToRoll());
         gameRepo.save(game);
         return mapper.mapToResponse(game);
@@ -73,9 +77,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameResponse announceById(String id, ActionRequest actionRequest) {
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();
         Game game = fetchById(id);
-        checkPermission(game.getPlayerId(), authenticatedPlayer.getId());
+        checkPermission(game.getPlayerId());
         game.announce(actionRequest.getBoxType());
         gameRepo.save(game);
         return mapper.mapToResponse(game);
@@ -83,12 +86,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameResponse fillById(String id, ActionRequest actionRequest) {    
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();    
         Game game = fetchById(id);
-        checkPermission(game.getPlayerId(), authenticatedPlayer.getId());
+        checkPermission(game.getPlayerId());
         game.fill(actionRequest.getColumnType(), actionRequest.getBoxType());
         if (game.getStatus() == GameStatus.COMPLETED) {
-            Player player = authContext.getAuthenticatedPlayer().get();
+            Player player = AuthContext.getAuthenticatedPlayer().get();
             Score score = Score.getInstance(player, game.getTotalSum());
             scoreRepo.save(score);
         }
@@ -106,9 +108,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameResponse restartById(String id) {      
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();  
         Game game = fetchById(id);
-        checkPermission(game.getPlayerId(), authenticatedPlayer.getId());
+        checkPermission(game.getPlayerId());
         game.restart();
         gameRepo.save(game);
         return mapper.mapToResponse(game);
@@ -116,24 +117,24 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game fetchById(String id) {
-        return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_GAME_NOT_FOUND));
+        return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
     public GameResponse finishById(String id) {
-        Player authenticatedPlayer = authContext.getAuthenticatedPlayer().get();
         Game game = fetchById(id);
-        checkPermission(game.getPlayerId(), authenticatedPlayer.getId());
+        checkPermission(game.getPlayerId());
         game.finish();
         gameRepo.save(game);
         return mapper.mapToResponse(game);
     }
 
-    
-    private void checkPermission(Long playerId, Long authenticatedPlayerId) {
-        if (!playerId.equals(authenticatedPlayerId)) {
-            throw new IllegalArgumentException(MessageConstants.ERROR_FORBIDDEN);
+    private void checkPermission(Long playerId) {
+        Optional<Player> authenticatedPlayerId = AuthContext.getAuthenticatedPlayer();  
+        if (playerId == null || !authenticatedPlayerId.isPresent() || !authenticatedPlayerId.get().getId().equals(playerId)) {
+            throw new AccessDeniedException(i18nUtil.getMessage("error.access_denied"));
         }
     }
+
 
 }

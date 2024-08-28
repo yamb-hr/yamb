@@ -3,21 +3,16 @@ package com.tejko.yamb.api.dto.requests;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class AuthRequest {
+public class AnonymousPlayerRequest {
 
     @NotBlank(message = "{error.username_required}")
     @Size(min = 5, max = 15, message = "{error.username_length_invalid}")
     private String username;
 
-    @NotBlank(message = "{error.password_required}")
-    @Size(min = 8, message = "{error.password_length_invalid}")
-    private String password;
+    public AnonymousPlayerRequest() {}
 
-    public AuthRequest() {}
-
-    public AuthRequest(String username, String password) {
+    public AnonymousPlayerRequest(String username) {
         this.username = username;
-        this.password = password;
     }
 
     public String getUsername() {
@@ -28,11 +23,4 @@ public class AuthRequest {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

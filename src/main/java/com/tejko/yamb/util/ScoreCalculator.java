@@ -1,5 +1,7 @@
 package com.tejko.yamb.util;
 
+import org.hibernate.cfg.NotYetImplementedException;
+
 import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 
@@ -28,7 +30,7 @@ public class ScoreCalculator {
 			case YAMB:
 				return calculateYamb(diceValues);
 			default: 
-			 	throw new IllegalArgumentException("Invalid BoxType: " + boxType);
+			 	throw new NotYetImplementedException();
 		}
 	}
 

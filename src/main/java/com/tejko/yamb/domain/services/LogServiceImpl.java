@@ -1,7 +1,7 @@
 package com.tejko.yamb.domain.services;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -11,7 +11,6 @@ import com.tejko.yamb.api.dto.requests.LogRequest;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.util.CustomObjectMapper;
-import com.tejko.yamb.domain.constants.MessageConstants;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.repositories.LogRepository;
@@ -21,19 +20,17 @@ import com.tejko.yamb.domain.services.interfaces.LogService;
 public class LogServiceImpl implements LogService {
 
     private final LogRepository logRepo;
-    private final AuthContext authContext;
     private final CustomObjectMapper mapper;
 
     @Autowired
-    public LogServiceImpl(LogRepository logRepo, AuthContext authContext, CustomObjectMapper mapper) {
+    public LogServiceImpl(LogRepository logRepo, CustomObjectMapper mapper) {
         this.logRepo = logRepo;
-        this.authContext = authContext;
         this.mapper = mapper;
     }
 
     @Override
     public Log fetchById(Long id) {
-        Log log = logRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ERROR_LOG_NOT_FOUND));
+        Log log = logRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
         return log;
     }
 
@@ -46,12 +43,12 @@ public class LogServiceImpl implements LogService {
     @Override
     public List<LogResponse> getAll() {
         List<Log> logs = logRepo.findAll();
-        return logs.stream().map(mapper::mapToResponse).collect(Collectors.toList());
+        return mapper.mapCollection(logs, mapper::mapToResponse, ArrayList::new);
     }
 
     @Override
     public LogResponse create(LogRequest logRequest) {
-        Player player = authContext.getAuthenticatedPlayer().orElse(null);
+        Player player = AuthContext.getAuthenticatedPlayer().orElse(null);
         Log log = Log.getInstance(player, logRequest.getMessage(), logRequest.getData(), logRequest.getLevel());
         logRepo.save(log);
         return mapper.mapToResponse(log);

@@ -22,28 +22,36 @@ public class RecaptchaServiceImpl implements RecaptchaService {
 
     @Override
     public boolean verifyRecaptcha(String recaptchaToken) {
-        String url = UriComponentsBuilder.fromHttpUrl("https://www.google.com/recaptcha/api/siteverify")
-                .queryParam("secret", recaptchaSecretKey)
-                .queryParam("response", recaptchaToken)
-                .toUriString();
-    
-        RestTemplate restTemplate = new RestTemplate();
+        String url = buildRecaptchaVerificationUrl(recaptchaToken);
+
         try {
+            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Map<String, Object>>() {}
             );
-    
-            return Optional.ofNullable(responseEntity.getBody())
-                    .map(body -> (Boolean) body.getOrDefault("success", false))
-                    .orElse(false);
-    
+
+            return extractSuccessFromResponse(responseEntity);
+
         } catch (Exception e) {
-            System.out.println("Recaptcha verification failed: " + e.getMessage());
+            System.out.println("Failed to verify recaptcha: " + e.getMessage());
             return false;
         }
+    }
+
+    private String buildRecaptchaVerificationUrl(String recaptchaToken) {
+        return UriComponentsBuilder.fromHttpUrl("https://www.google.com/recaptcha/api/siteverify")
+                .queryParam("secret", recaptchaSecretKey)
+                .queryParam("response", recaptchaToken)
+                .toUriString();
+    }
+
+    private boolean extractSuccessFromResponse(ResponseEntity<Map<String, Object>> responseEntity) {
+        return Optional.ofNullable(responseEntity.getBody())
+                .map(body -> (Boolean) body.getOrDefault("success", false))
+                .orElse(false);
     }
     
 }

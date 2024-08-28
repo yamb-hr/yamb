@@ -20,9 +20,9 @@ public class Role {
 	@Column(name = "description")
     private String description;
 
-    private Role() {}
+    protected Role() {}
 
-    private Role(String label) {
+    protected Role(String label) {
         this.label = label;
     }
 

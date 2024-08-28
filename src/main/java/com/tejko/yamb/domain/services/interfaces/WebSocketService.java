@@ -10,9 +10,9 @@ import com.tejko.yamb.api.dto.WebSocketMessage;
 
 public interface WebSocketService {
 
-    public void publicMessage(WebSocketMessage message, Principal principal);
+    public void publicMessage(WebSocketMessage messageRequest, Principal principal);
 
-    public void privateMessage(WebSocketMessage message, Principal principal);
+    public void privateMessage(WebSocketMessage messageRequest, Principal principal);
 
     public void handleSessionConnected(SessionConnectEvent event);
 

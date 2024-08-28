@@ -1,17 +1,21 @@
 package com.tejko.yamb.api.dto.responses;
 
+import java.time.Instant;
+
 public class ErrorResponse {
 
     private int status;
+    private String error;
     private String message;
-    private String type;
-
+    private Instant timestamp;
+    
     public ErrorResponse() {}
 
-    public ErrorResponse(int status, String message, String type) {
+    public ErrorResponse(int status, String error, String message, Instant timestamp) {
         this.status = status;
+        this.error = error;
         this.message = message;
-        this.type = type;
+        this.timestamp = timestamp;
     }
 
     public int getStatus() {
@@ -22,6 +26,14 @@ public class ErrorResponse {
         this.status = status;
     }
 
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -30,12 +42,12 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public String getType() {
-        return type;
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
-    
+
 }

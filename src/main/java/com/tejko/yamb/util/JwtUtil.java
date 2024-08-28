@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.domain.constants.SecurityConstants;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -29,31 +27,32 @@ public class JwtUtil {
     }
 
     public Jws<Claims> parseToken(String token) {
-        try {
-            return Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token);
-        } catch (JwtException e) {
-            throw new IllegalArgumentException("Invalid token", e);
-        }
+        return Jwts.parser()
+            .setSigningKey(jwtSecret)
+            .parseClaimsJws(token);
     }
 
     public boolean validateToken(String token) {
         try {
             parseToken(token);
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (JwtException e) {
             return false;
         }
     }
 
     public Optional<Long> extractIdFromToken(String token) {
-        return Optional.ofNullable(parseToken(token).getBody().getSubject()).map(Long::parseLong);
+        if (validateToken(token)) {
+            return Optional.ofNullable(parseToken(token).getBody().getSubject()).map(Long::parseLong);
+        } else {
+            return Optional.empty();
+        }
     }
+    
 
     public Optional<String> extractTokenFromAuthHeader(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(SecurityConstants.HEADER_AUTHORIZATION))
-            .filter(header -> header.startsWith(SecurityConstants.HEADER_AUTHORIZATION_PREFIX))
+        return Optional.ofNullable(request.getHeader("Authorization"))
+            .filter(header -> header.startsWith("Bearer "))
             .map(header -> header.substring(7));
     }
 }

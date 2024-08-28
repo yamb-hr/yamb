@@ -1,8 +1,9 @@
 package com.tejko.yamb.util;
 
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ResourceBundle;
+import java.lang.System.Logger;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,9 +13,7 @@ import com.tejko.yamb.api.dto.requests.LogRequest;
 import com.tejko.yamb.domain.services.interfaces.LogService;
 
 @Component
-public class CustomLogger {
-
-    private static final Logger logger = Logger.getLogger(CustomLogger.class.getName());
+public class CustomLogger implements Logger {
 
     private final LogService logService;
     private final ObjectMapper objectMapper;
@@ -25,31 +24,40 @@ public class CustomLogger {
         this.objectMapper = objectMapper;
     }
 
-    public void log(String message, Object data, Level level) {
-        logger.log(level, message);
-        logService.create(new LogRequest(message, data, level.getName()));
-    }
-
-    public void log(String message) {
-        log(message, null, Level.INFO);
-    }
-
-    public void log(String message, Object data) {
-        log(message, data, Level.INFO);
-    }
-
     public void error(Exception exception) {
         String message = exception.getLocalizedMessage();
-        String data = exception.getClass().getName();
         try {
-            data = objectMapper.writeValueAsString(
+            String data = objectMapper.writeValueAsString(
                 Arrays.stream(exception.getStackTrace())
+                    .filter(element -> element.getClassName().startsWith("com.tejko"))
                     .map(StackTraceElement::toString)
                     .toArray(String[]::new));
+            logService.create(new LogRequest(message, data, Level.ERROR));
         } catch (Exception e) {
-            System.err.println("Failed to serialize stack trace: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println("Error while saving log: " + e.getLocalizedMessage());
         } finally {
-            log(message, data, Level.SEVERE);
+            log(Level.ERROR, null, message, exception);
         }
+    }
+
+    @Override
+    public String getName() {
+        return "CustomLogger";
+    }
+
+    @Override
+    public boolean isLoggable(Level level) {
+        return true;
+    }
+
+    @Override
+    public void log(Level level, ResourceBundle bundle, String message, Throwable thrown) {
+        System.out.println("\n-> " + LocalDateTime.now() + " " + level + " " + getName() + ": " + message + "\n");
+    }
+
+    @Override
+    public void log(Level level, ResourceBundle bundle, String format, Object... params) {
+        System.out.println("\n-> " + LocalDateTime.now() + " " + level + " " + getName() + ": " + format + "\n");
     }
 }

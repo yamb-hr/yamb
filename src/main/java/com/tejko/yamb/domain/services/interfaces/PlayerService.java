@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStats;
+import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStats;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
@@ -23,4 +25,11 @@ public interface PlayerService extends UserDetailsService {
     public PlayerStats getPlayerStats(Long id);
 
     public GlobalPlayerStats getGlobalStats();
+
+    public PlayerPreferencesResponse getPreferencesByPlayerId(Long playerId);
+    
+    public PlayerPreferencesResponse setPreferencesByPlayerId(Long playerId, PlayerPreferencesRequest playerPreferencesRequest);
+
+    public void deleteInactivePlayers();
+    
 }

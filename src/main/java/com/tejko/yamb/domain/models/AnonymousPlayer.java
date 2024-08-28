@@ -1,7 +1,6 @@
 package com.tejko.yamb.domain.models;
 
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -10,15 +9,19 @@ import javax.persistence.Entity;
 @DiscriminatorValue("ANONYMOUS")
 public class AnonymousPlayer extends Player {
 
-    private AnonymousPlayer() {}
+    protected AnonymousPlayer() {}
 
-    private AnonymousPlayer(String username, String password, Set<Role> roles) {
-        super(username, password, roles);
+    protected AnonymousPlayer(String username, Set<Role> roles) {
+        super(username, roles);
     }
 
     public static AnonymousPlayer getInstance(String username, Set<Role> roles) {
-        String password = UUID.randomUUID().toString();
-        return new AnonymousPlayer(username, password, roles);
+        return new AnonymousPlayer(username, roles);
+    }
+    
+    @Override
+    public String getPassword() {
+        return null;
     }
    
 }

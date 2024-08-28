@@ -3,6 +3,7 @@ package com.tejko.yamb.domain.services;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,6 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void publicMessage(WebSocketMessage message, Principal principal) {
         Long senderId = Long.valueOf(principal.getName());
         message.setSenderId(senderId);
-        System.out.println("Message sent to all from Player ID " + senderId + ": " + message.getContent());
         simpMessagingTemplate.convertAndSend("/chat/public", message);
     }
 
@@ -40,10 +40,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void privateMessage(WebSocketMessage message, Principal principal) {
         Long senderId = Long.valueOf(principal.getName());
         message.setSenderId(senderId);
-
         Long receiverId = message.getReceiverId();
         simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/private", message);
-        System.out.println("Message sent to Player ID " + receiverId + " from Player ID " + senderId + ": " + message.getContent());
     }
 
     @Override
@@ -67,12 +65,7 @@ public class WebSocketServiceImpl implements WebSocketService {
             Long playerId = Long.valueOf(user.getName());
             playerSessionRegistry.updatePlayerStatus(playerId, PlayerStatus.OFFLINE);
             System.out.println("Player ID " + playerId + " has disconnected...");
-            try {
-                WebSocketMessage message = new WebSocketMessage(null, null, MessageType.PLAYERS, playerSessionRegistry.getPlayerStatusMap());
-                simpMessagingTemplate.convertAndSend("/chat/public", message);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            sendPublicChatMessage(playerId);
         } else {
             System.out.println("Session disconnect event received with no user information.");
         }
@@ -96,11 +89,11 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     
     private void sendPublicChatMessage(Long playerId) {
+        WebSocketMessage message = new WebSocketMessage(playerId, null, MessageType.PLAYERS, playerSessionRegistry.getPlayerStatusMap());
         try {
-            WebSocketMessage message = new WebSocketMessage(null, playerId, MessageType.PLAYERS, playerSessionRegistry.getPlayerStatusMap());
             simpMessagingTemplate.convertAndSend("/chat/public", message);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (MessagingException e) {
+            System.out.println("Error sending public chat message: " + e.getMessage());
         }
     }
 }

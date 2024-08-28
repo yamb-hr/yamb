@@ -12,4 +12,6 @@ public interface GameRepository extends MongoRepository<Game, String> {
     
     Optional<Game> findByPlayerIdAndStatusIn(Long playerId, List<GameStatus> statuses);
 
+    boolean existsByPlayerIdAndStatusIn(Long playerId, List<GameStatus> statuses);
+
 }

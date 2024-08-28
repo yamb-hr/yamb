@@ -17,12 +17,13 @@ import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyDeclaredException;
+import com.tejko.yamb.exceptions.custom.GameNotCompletedException;
+import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
-import com.tejko.yamb.exceptions.custom.AnnouncementUnavailableException;
+import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;
 import com.tejko.yamb.exceptions.custom.BoxUnavailableException;
-import com.tejko.yamb.exceptions.custom.DiceRollRequiredException;
-import com.tejko.yamb.exceptions.custom.LockedGameException;
+import com.tejko.yamb.exceptions.custom.RollRequiredException;
+import com.tejko.yamb.exceptions.custom.GameLockedException;
 import com.tejko.yamb.exceptions.custom.RollLimitExceededException;
 import com.tejko.yamb.util.ScoreCalculator;
 
@@ -61,9 +62,9 @@ public class Game {
     @Field("status")
     private GameStatus status;
 
-    private Game() {}
+    protected Game() {}
 
-    private Game(Long playerId, String playerName, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status) {
+    protected Game(Long playerId, String playerName, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.sheet = sheet;
@@ -188,41 +189,41 @@ public class Game {
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
         } else if (status != GameStatus.IN_PROGRESS) {
-            throw new LockedGameException();
+            throw new GameLockedException();
         }
     }
 
     private void validatefillAction(ColumnType columnType, BoxType boxType) {
         if (rollCount == 0) {
-			throw new DiceRollRequiredException();
+			throw new RollRequiredException();
         } else if (!isBoxAvailable(columnType, boxType)) {
             throw new BoxUnavailableException();
         } else if (status != GameStatus.IN_PROGRESS) {
-            throw new LockedGameException();
+            throw new GameLockedException();
         }
     }
 
     private void validateAnnouncementAction(BoxType boxType) {
         if (announcement != null) {
-            throw new AnnouncementAlreadyDeclaredException();
+            throw new AnnouncementAlreadyMadeException();
         } else if (rollCount == 0) {
-            throw new DiceRollRequiredException();
+            throw new RollRequiredException();
         } else if (rollCount > 1) {
-            throw new AnnouncementUnavailableException();
+            throw new AnnouncementNotAllowedException();
         } else if (status != GameStatus.IN_PROGRESS) {
-            throw new LockedGameException();
+            throw new GameLockedException();
         }
     }
 
     private void validateRestartAction() {
         if (status != GameStatus.IN_PROGRESS) {
-            throw new LockedGameException();
+            throw new GameLockedException();
         }
     }
 
     private void validateFinishAction() {
         if (status != GameStatus.COMPLETED) {
-            throw new IllegalArgumentException("Game is not yet completed");
+            throw new GameNotCompletedException();
         }
     }
 

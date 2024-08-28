@@ -1,24 +1,26 @@
 package com.tejko.yamb.api.dto;
 
 import java.time.LocalDateTime;
+
 import com.tejko.yamb.domain.enums.MessageType;
 
 public class WebSocketMessage {
 
     private Long senderId;
     private Long receiverId;
-    private MessageType type;
     private Object content;
-    private LocalDateTime time;
+    private MessageType type;
+    private final LocalDateTime timestamp = LocalDateTime.now();
+
+    public WebSocketMessage() {}
 
     public WebSocketMessage(Long senderId, Long receiverId, MessageType type, Object content) {
         this.senderId = senderId;
         this.receiverId = receiverId;
-        this.type = type;
         this.content = content;
-        this.time = LocalDateTime.now();
+        this.type = type;
     }
-    
+
     public Long getSenderId() {
         return senderId;
     }
@@ -31,21 +33,28 @@ public class WebSocketMessage {
         return receiverId;
     }
 
-    public MessageType getType() {
-        return type;
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
     }
 
     public Object getContent() {
         return content;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public void setContent(Object content) {
+        this.content = content;
     }
 
-    @Override
-    public String toString() {
-        return type + " [" + time + "] " + senderId + ": " + content + " -> " + receiverId;
+    public MessageType getType() {
+        return type;
     }
 
+    public void setType(MessageType type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    
 }

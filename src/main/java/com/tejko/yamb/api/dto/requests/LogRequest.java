@@ -1,14 +1,23 @@
 package com.tejko.yamb.api.dto.requests;
 
+import java.lang.System.Logger.Level;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class LogRequest {
 
+    @NotBlank(message = "{error.message_required}")
     private String message;
+
     private Object data;
-    private String level;
+
+    @NotNull(message = "{error.level_required}")
+    private Level level;
     
     public LogRequest() {}
 
-    public LogRequest(String message, Object data, String level) {
+    public LogRequest(String message, Object data, Level level) {
         this.message = message;
         this.data = data;
         this.level = level;
@@ -30,11 +39,11 @@ public class LogRequest {
         this.data = data;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
     

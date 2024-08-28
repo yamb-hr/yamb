@@ -1,13 +1,22 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStats;
+import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStats;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
@@ -25,28 +34,43 @@ public class PlayerController {
 	}
 
 	@GetMapping("/{id}")
-	public PlayerResponse getById(@PathVariable Long id) {
-		return playerService.getById(id);
+	public ResponseEntity<PlayerResponse> getById(@PathVariable Long id) {
+		return ResponseEntity.ok(playerService.getById(id));
 	}
 
 	@GetMapping("")
-	public List<PlayerResponse> getAll() {
-		return playerService.getAll();
+	public ResponseEntity<List<PlayerResponse>> getAll() {
+		return ResponseEntity.ok(playerService.getAll());
 	}
 
+	@GetMapping("/stats")
+    public ResponseEntity<GlobalPlayerStats> getGlobalStats() {
+        return ResponseEntity.ok(playerService.getGlobalStats());
+    }
+
 	@GetMapping("/{id}/scores")
-	public List<ScoreResponse> getScoresByPlayerId(@PathVariable Long id) {
-		return playerService.getScoresByPlayerId(id);
+	public ResponseEntity<List<ScoreResponse>> getScoresByPlayerId(@PathVariable Long id) {
+		return ResponseEntity.ok(playerService.getScoresByPlayerId(id));
 	}
 
 	@GetMapping("/{id}/stats")
-    public PlayerStats getPlayerStats(@PathVariable Long id) {
-        return playerService.getPlayerStats(id);
+    public ResponseEntity<PlayerStats> getPlayerStats(@PathVariable Long id) {
+        return ResponseEntity.ok(playerService.getPlayerStats(id));
     }
 
-	@GetMapping("/stats")
-    public GlobalPlayerStats getGlobalStats() {
-        return playerService.getGlobalStats();
+	@GetMapping("{id}/preferences")
+    public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerId(@PathVariable Long id) {
+        return ResponseEntity.ok(playerService.getPreferencesByPlayerId(id));
     }
 
+	@PutMapping("{id}/preferences")
+    public ResponseEntity<PlayerPreferencesResponse> setPreferencesByPlayerId(@PathVariable Long id, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
+        return ResponseEntity.ok(playerService.setPreferencesByPlayerId(id, playerPreferencesRequest));
+    }
+
+	@DeleteMapping("/inactive")
+    public ResponseEntity<Void> deleteInactivePlayers() {
+		playerService.deleteInactivePlayers();
+    	return ResponseEntity.noContent().build();
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.PlayerPreferences;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
@@ -24,5 +25,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     @Query("SELECT p FROM player p JOIN p.scores s GROUP BY p.id ORDER BY AVG(s.value) DESC")
     Page<Player> findPlayerWithHighestAverageScore(Pageable pageable);
+
+    @Query("SELECT p FROM player p JOIN p.scores s GROUP BY p.id ORDER BY AVG(s.value) DESC")
+    Optional<PlayerPreferences> findPreferencesByPlayerId(Long playerId);
 
 }

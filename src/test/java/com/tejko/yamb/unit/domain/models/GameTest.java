@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyDeclaredException;
+import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
-import com.tejko.yamb.exceptions.custom.AnnouncementUnavailableException;
+import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;
 import com.tejko.yamb.exceptions.custom.BoxUnavailableException;
-import com.tejko.yamb.exceptions.custom.DiceRollRequiredException;
-import com.tejko.yamb.exceptions.custom.LockedGameException;
+import com.tejko.yamb.exceptions.custom.RollRequiredException;
+import com.tejko.yamb.exceptions.custom.GameLockedException;
 import com.tejko.yamb.exceptions.custom.RollLimitExceededException;
 
 public class GameTest {
@@ -50,7 +50,7 @@ public class GameTest {
     public void testRoll_FinishedGame() {
         finishGame(game);
 
-        assertThrows(LockedGameException.class, () -> {    
+        assertThrows(GameLockedException.class, () -> {    
             game.roll(DICE_TO_ROLL);
         });
     }
@@ -87,7 +87,7 @@ public class GameTest {
 
     @Test
     public void testFill_DiceRollRequired() {
-        assertThrows(DiceRollRequiredException.class, () -> {    
+        assertThrows(RollRequiredException.class, () -> {    
             game.fill(ColumnType.DOWNWARDS, BoxType.ONES);
         });
     }
@@ -128,7 +128,7 @@ public class GameTest {
         
         game.announce(BoxType.ONES);
 
-        assertThrows(AnnouncementAlreadyDeclaredException.class, () -> {    
+        assertThrows(AnnouncementAlreadyMadeException.class, () -> {    
             game.announce(BoxType.TWOS);
         });
     }
@@ -138,14 +138,14 @@ public class GameTest {
         game.roll(DICE_TO_ROLL);
         game.roll(DICE_TO_ROLL);
 
-        assertThrows(AnnouncementUnavailableException.class, () -> {    
+        assertThrows(AnnouncementNotAllowedException.class, () -> {    
             game.announce(BoxType.ONES);
         });
     }
 
     @Test
     public void testAnnounce_DiceRollRequired() {
-        assertThrows(DiceRollRequiredException.class, () -> {    
+        assertThrows(RollRequiredException.class, () -> {    
             game.announce(BoxType.ONES);
         });
     }
@@ -163,7 +163,7 @@ public class GameTest {
     public void testRestart_FinishedGame() {
         finishGame(game);
 
-        assertThrows(LockedGameException.class, () -> {    
+        assertThrows(GameLockedException.class, () -> {    
             game.restart();;
         });
     }

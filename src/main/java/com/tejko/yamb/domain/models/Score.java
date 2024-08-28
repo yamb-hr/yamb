@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,24 +17,24 @@ import org.hibernate.annotations.CreationTimestamp;
 public class Score {
 
 	@Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-	@ManyToOne
-	@JoinColumn(name = "player_id", nullable = false)
-	private Player player;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "player_id", nullable = false, updatable = false)
+    private Player player;
 
-	@Column(name = "value", nullable = false)
-	private int value;
+    @Column(name = "value", nullable = false, updatable = false)
+    private int value;
 
 	protected Score() {}
 
-	private Score(Player player, int value) {
+	protected Score(Player player, int value) {
 		this.player = player;
 		this.value = value;
 	}

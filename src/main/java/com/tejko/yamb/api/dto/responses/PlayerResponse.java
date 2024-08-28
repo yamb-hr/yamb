@@ -1,7 +1,7 @@
 package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 public class PlayerResponse {
 
@@ -9,14 +9,15 @@ public class PlayerResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private List<RoleResponse> roles;
+    private Set<RoleResponse> roles;
     private boolean isRegistered;
 
    
     public PlayerResponse() {
     }
 
-    public PlayerResponse(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, List<RoleResponse> roles, boolean isRegistered) {
+    public PlayerResponse(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, 
+    Set<RoleResponse> roles, boolean isRegistered) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -57,11 +58,11 @@ public class PlayerResponse {
         this.name = name;
     }
 
-    public List<RoleResponse> getRoles() {
+    public Set<RoleResponse> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<RoleResponse> roles) {
+    public void setRoles(Set<RoleResponse> roles) {
         this.roles = roles;
     }
 
