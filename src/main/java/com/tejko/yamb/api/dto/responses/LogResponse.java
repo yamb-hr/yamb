@@ -1,7 +1,8 @@
 package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
-import java.lang.System.Logger.Level;
+
+import ch.qos.logback.classic.Level;
 
 public class LogResponse  {
 

@@ -1,18 +1,18 @@
 package com.tejko.yamb.api.dto.requests;
 
-import java.lang.System.Logger.Level;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import ch.qos.logback.classic.Level;
+
 public class LogRequest {
 
-    @NotBlank(message = "{error.message_required}")
+    @NotBlank(message = "error.message_required")
     private String message;
 
     private Object data;
 
-    @NotNull(message = "{error.level_required}")
+    @NotNull(message = "error.level_required")
     private Level level;
     
     public LogRequest() {}

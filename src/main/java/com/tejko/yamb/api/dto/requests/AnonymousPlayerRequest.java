@@ -5,8 +5,8 @@ import javax.validation.constraints.Size;
 
 public class AnonymousPlayerRequest {
 
-    @NotBlank(message = "{error.username_required}")
-    @Size(min = 5, max = 15, message = "{error.username_length_invalid}")
+    @NotBlank(message = "error.username_required")
+    @Size(min = 5, max = 15, message = "error.username_length_invalid")
     private String username;
 
     public AnonymousPlayerRequest() {}

@@ -1,16 +1,19 @@
 package com.tejko.yamb.exceptions;
 
 import java.time.Instant;
+import java.util.Arrays;
 
 import javax.persistence.PersistenceException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,21 +22,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.tejko.yamb.api.dto.responses.ErrorResponse;
 import com.tejko.yamb.exceptions.custom.GameStateException;
-import com.tejko.yamb.util.CustomLogger;
 import com.tejko.yamb.util.I18nUtil;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final CustomLogger logger;
     private final I18nUtil i18nUtil;
 
     @Autowired
-    public GlobalExceptionHandler(CustomLogger logger, I18nUtil i18nUtil) {
-        this.logger = logger;
+    public GlobalExceptionHandler(I18nUtil i18nUtil) {
         this.i18nUtil = i18nUtil;
     }
 
@@ -71,58 +72,72 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }    
 
     protected ResponseEntity<Object> handleBadRequest(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
-        ErrorResponse errorResponse = createErrorResponse(ex, status);
-        return handleExceptionInternal(ex, errorResponse, headers, status, request);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
-        System.out.println("---------------------------------------------------\n------------------------------------------------");
-        logException(ex);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        HttpHeaders headers = new HttpHeaders();
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     protected ResponseEntity<Object> handleUnauthorized(BadCredentialsException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     protected ResponseEntity<Object> handleForbidden(AccessDeniedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     protected ResponseEntity<Object> handleNotFound(ResourceNotFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     protected ResponseEntity<Object> handleUnsupported(UnsupportedOperationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     protected ResponseEntity<Object> handleInternalServerError(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        logException(ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
-    private void logException(Exception ex) {
-        try {
-            logger.error(ex);
-        } catch (Exception e) {
-            ex.printStackTrace();
-            System.out.println("Logging failed: " + e.getLocalizedMessage());
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        StringBuilder messageBuilder = new StringBuilder();
+
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            String messageKey = error.getDefaultMessage();
+            String errorMessage = i18nUtil.getMessage(messageKey);
+
+            if (messageBuilder.length() > 0) {
+                messageBuilder.append(", ");
+            }
+            messageBuilder.append(errorMessage);
+        });
+
+        String message = messageBuilder.toString().trim();
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), status.getReasonPhrase(), message, Instant.now(), null);
+        
+        return handleExceptionInternal(ex, errorResponse, headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        String customErrorMessage;
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof JsonParseException) {
+            customErrorMessage = "error.invalid_json";
+        } else if (cause instanceof MismatchedInputException) {
+            customErrorMessage = "error.invalid_request_body";
+        } else {
+            customErrorMessage = "error.invalid_request_body";
         }
+
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), status.getReasonPhrase(), customErrorMessage, Instant.now(), ex.getLocalizedMessage());
+
+        return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
     private ErrorResponse createErrorResponse(Exception ex, HttpStatus status) {
@@ -138,7 +153,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     
         errorResponse.setError(status.getReasonPhrase());
         errorResponse.setTimestamp(Instant.now());
+        errorResponse.setDetail(trimStackTrace(ex.getStackTrace()));
         
         return errorResponse;
+    }
+
+    private String trimStackTrace(StackTraceElement[] stackTrace) {
+        StringBuilder messageBuilder = new StringBuilder();
+    
+        Arrays.asList(stackTrace).forEach(stackTraceElement -> {
+            String errorMessage = stackTraceElement.toString();
+            messageBuilder.append(errorMessage);
+        });
+    
+        return messageBuilder.toString().trim();
     }
 }

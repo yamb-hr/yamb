@@ -1,6 +1,5 @@
 package com.tejko.yamb.domain.models;
 
-import java.lang.System.Logger.Level;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -13,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
+import ch.qos.logback.classic.Level;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;

@@ -1,16 +1,13 @@
 package com.tejko.yamb.domain.services.interfaces;
 
-import com.tejko.yamb.api.dto.requests.AnonymousPlayerRequest;
-import com.tejko.yamb.api.dto.requests.AuthRequest;
-import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.domain.models.RegisteredPlayer;
 
 public interface AuthService {
 
-    public AuthResponse login(AuthRequest authRequest);
+    public String login(String username, String password);
 
-    public RegisteredPlayer register(AuthRequest authRequest);
+    public RegisteredPlayer register(String username, String password);
 
-    public AuthResponse createAnonymousPlayer(AnonymousPlayerRequest authRequest);
+    public String createAnonymousPlayer(String username);
     
 }

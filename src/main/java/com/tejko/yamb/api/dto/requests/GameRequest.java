@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 
 public class GameRequest {
 
-    @NotNull(message = "{error.player_id_required}")
+    @NotNull(message = "error.player_id_required")
     private Long playerId;
 
     public GameRequest() {}

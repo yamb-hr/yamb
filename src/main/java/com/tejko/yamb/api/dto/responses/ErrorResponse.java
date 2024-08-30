@@ -8,14 +8,16 @@ public class ErrorResponse {
     private String error;
     private String message;
     private Instant timestamp;
+    private String detail;
     
     public ErrorResponse() {}
 
-    public ErrorResponse(int status, String error, String message, Instant timestamp) {
+    public ErrorResponse(int status, String error, String message, Instant timestamp, String detail) {
         this.status = status;
         this.error = error;
         this.message = message;
         this.timestamp = timestamp;
+        this.detail = detail;
     }
 
     public int getStatus() {
@@ -48,6 +50,14 @@ public class ErrorResponse {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
 }
