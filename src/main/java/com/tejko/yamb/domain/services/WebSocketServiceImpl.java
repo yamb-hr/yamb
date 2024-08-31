@@ -11,22 +11,22 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import com.tejko.yamb.api.dto.WebSocketMessage;
 import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.enums.PlayerStatus;
+import com.tejko.yamb.domain.models.WebSocketMessage;
 import com.tejko.yamb.domain.services.interfaces.WebSocketService;
 import com.tejko.yamb.websocket.PlayerSessionRegistry;
 
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
     private final PlayerSessionRegistry playerSessionRegistry;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public WebSocketServiceImpl(SimpMessagingTemplate simpMessagingTemplate, PlayerSessionRegistry playerSessionRegistry) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
+    public WebSocketServiceImpl(PlayerSessionRegistry playerSessionRegistry, SimpMessagingTemplate simpMessagingTemplate) {
         this.playerSessionRegistry = playerSessionRegistry;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Override

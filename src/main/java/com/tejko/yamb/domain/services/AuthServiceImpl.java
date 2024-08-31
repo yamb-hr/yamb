@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.domain.models.AnonymousPlayer;
 import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.PlayerWithToken;
 import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RoleRepository;
 import com.tejko.yamb.domain.services.interfaces.AuthService;
 import com.tejko.yamb.security.AuthContext;
-import com.tejko.yamb.util.I18nUtil;
 import com.tejko.yamb.util.JwtUtil;
 
 @Service
@@ -33,23 +33,22 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepo;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder encoder;
-    private final I18nUtil i18nUtil;
 
     @Autowired
     public AuthServiceImpl(AuthenticationManager authManager, PlayerRepository playerRepo, RoleRepository roleRepo, 
-            JwtUtil jwtUtil, PasswordEncoder encoder, I18nUtil i18nUtil) {
+            JwtUtil jwtUtil, PasswordEncoder encoder) {
         this.authManager = authManager;
         this.playerRepo = playerRepo;
         this.roleRepo = roleRepo;
         this.jwtUtil = jwtUtil;
         this.encoder = encoder;
-        this.i18nUtil = i18nUtil;
     }
 
     @Override
-    public String login(String username, String password) {
+    public PlayerWithToken login(String username, String password) {
         RegisteredPlayer player = authenticate(username, password);
-        return jwtUtil.generateToken(player.getId());
+        PlayerWithToken playerWithToken = new PlayerWithToken(player, jwtUtil.generateToken(player.getId()));
+        return playerWithToken;
     }
 
     @Override
@@ -74,17 +73,18 @@ public class AuthServiceImpl implements AuthService {
     }
     
     @Override
-    public String createAnonymousPlayer(String username) {
+    public PlayerWithToken createAnonymousPlayer(String username) {
         validateUsername(username);
         AnonymousPlayer player = AnonymousPlayer.getInstance(username, getDefaultRoles());
 
         player = playerRepo.save(player);
-        return jwtUtil.generateToken(player.getId());
+        PlayerWithToken playerWithToken = new PlayerWithToken(player, jwtUtil.generateToken(player.getId()));
+        return playerWithToken;
     }
 
     private void validateUsername(String username) {
         if (playerRepo.existsByUsername(username)) {
-            throw new IllegalArgumentException(i18nUtil.getMessage("error.username_taken"));
+            throw new IllegalArgumentException("error.username_taken");
         }
     }
 
@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
     private Set<Role> getDefaultRoles() {
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepo.findByLabel("USER")
-            .orElseThrow(() -> new ResourceNotFoundException(i18nUtil.getMessage("error.not_found.role")));
+            .orElseThrow(() -> new ResourceNotFoundException("error.not_found.role"));
         roles.add(userRole);
         return roles;
     }

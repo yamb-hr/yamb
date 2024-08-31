@@ -1,4 +1,4 @@
-package com.tejko.yamb.api.dto.responses;
+package com.tejko.yamb.domain.models;
 
 import java.time.LocalDateTime;
 
@@ -6,12 +6,12 @@ public class PlayerStats {
 
     private LocalDateTime lastActivity;
     private double averageScore;
-    private ScoreResponse highScore;
+    private Score highScore;
     private long scoreCount;
 
     public PlayerStats() {}
 
-    public PlayerStats(LocalDateTime lastActivity, double averageScore, ScoreResponse highScore, long scoreCount) {
+    public PlayerStats(LocalDateTime lastActivity, double averageScore, Score highScore, long scoreCount) {
         this.lastActivity = lastActivity;
         this.averageScore = averageScore;
         this.highScore = highScore;
@@ -34,11 +34,11 @@ public class PlayerStats {
         this.averageScore = averageScore;
     }
 
-    public ScoreResponse getHighScore() {
+    public Score getHighScore() {
         return highScore;
     }
 
-    public void setHighScore(ScoreResponse highScore) {
+    public void setHighScore(Score highScore) {
         this.highScore = highScore;
     }
 

@@ -298,11 +298,11 @@ public class Game {
 
     public static class Sheet implements Serializable {
 
-        private List<GameColumn> columns;
+        private List<Column> columns;
     
         private Sheet() { }
     
-        private Sheet(List<GameColumn> columns) {
+        private Sheet(List<Column> columns) {
             this.columns = columns;
         }
     
@@ -310,21 +310,21 @@ public class Game {
             return new Sheet(generateColumns());
         }
     
-        private static List<GameColumn> generateColumns() {
-            List<GameColumn> columns = new ArrayList<>();
+        private static List<Column> generateColumns() {
+            List<Column> columns = new ArrayList<>();
             for (ColumnType columnType : ColumnType.values()) {
-                columns.add(GameColumn.getInstance(columnType));
+                columns.add(Column.getInstance(columnType));
             }
             return columns;
         }
     
-        public List<GameColumn> getColumns() {
+        public List<Column> getColumns() {
             return columns;
         }
     
         public int getTopSectionSum() {  
             int topSectionSum = 0;
-            for (GameColumn column : columns) {
+            for (Column column : columns) {
                 topSectionSum += column.getTopSectionSum();
             }
             return topSectionSum;
@@ -332,7 +332,7 @@ public class Game {
     
         public int getMiddleSectionSum() {
             int middleSectionSum = 0;
-            for (GameColumn column : columns) {
+            for (Column column : columns) {
                 middleSectionSum += column.getMiddleSectionSum();
             }
             return middleSectionSum;
@@ -340,7 +340,7 @@ public class Game {
     
         public int getBottomSectionSum() {
             int bottomSectionSum = 0;
-            for (GameColumn column : columns) {
+            for (Column column : columns) {
                 bottomSectionSum += column.getBottomSectionSum();
             }
             return bottomSectionSum;
@@ -351,7 +351,7 @@ public class Game {
         }
         
         public boolean isCompleted() {
-            for (GameColumn column : columns) {
+            for (Column column : columns) {
                 if (!column.isCompleted()) {
                     return false;
                 }
@@ -364,7 +364,7 @@ public class Game {
         }
     
         public boolean areAllNonAnnouncementColumnsCompleted() {
-            for (GameColumn column : columns) {
+            for (Column column : columns) {
                 if (column.getType() != ColumnType.ANNOUNCEMENT && !column.isCompleted()) {
                     return false;
                 }
@@ -373,20 +373,20 @@ public class Game {
         }
     }
 
-    public static class GameColumn implements Serializable { 
+    public static class Column implements Serializable { 
 
         private ColumnType type;
         private List<Box> boxes;
 
-        private GameColumn() {}
+        private Column() {}
 
-        private GameColumn (ColumnType type, List<Box> boxes) {
+        private Column (ColumnType type, List<Box> boxes) {
             this.type = type; 
             this.boxes = boxes;
         }
         
-        public static GameColumn getInstance(ColumnType type) {
-            return new GameColumn(type, generateBoxes(type));
+        public static Column getInstance(ColumnType type) {
+            return new Column(type, generateBoxes(type));
         }
 
         private static List<Box> generateBoxes(ColumnType columnType) {

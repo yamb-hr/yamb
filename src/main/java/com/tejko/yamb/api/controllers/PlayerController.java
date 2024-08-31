@@ -1,9 +1,11 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
-import com.tejko.yamb.api.dto.responses.GlobalPlayerStats;
+import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
-import com.tejko.yamb.api.dto.responses.PlayerStats;
+import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
+import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.services.interfaces.PlayerService;
 
 @RestController
@@ -27,45 +30,54 @@ import com.tejko.yamb.domain.services.interfaces.PlayerService;
 public class PlayerController {
 
 	private final PlayerService playerService;
+	private final ModelMapper modelMapper;
 
 	@Autowired
-	public PlayerController(PlayerService playerService) {
+	public PlayerController(PlayerService playerService, ModelMapper modelMapper) {
 		this.playerService = playerService;
+		this.modelMapper = modelMapper;
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<PlayerResponse> getById(@PathVariable Long id) {
-		return ResponseEntity.ok(playerService.getById(id));
+		PlayerResponse playerResponse = modelMapper.map(playerService.getById(id), PlayerResponse.class);
+		return ResponseEntity.ok(playerResponse);
 	}
 
 	@GetMapping("")
 	public ResponseEntity<List<PlayerResponse>> getAll() {
-		return ResponseEntity.ok(playerService.getAll());
+		List<PlayerResponse> playerResponses = playerService.getAll().stream().map(player -> modelMapper.map(player, PlayerResponse.class)).collect(Collectors.toList());
+		return ResponseEntity.ok(playerResponses);
 	}
 
 	@GetMapping("/stats")
-    public ResponseEntity<GlobalPlayerStats> getGlobalStats() {
-        return ResponseEntity.ok(playerService.getGlobalStats());
+    public ResponseEntity<GlobalPlayerStatsResponse> getGlobalStats() {
+		GlobalPlayerStatsResponse globalPlayerStatsResponse = modelMapper.map(playerService.getGlobalStats(), GlobalPlayerStatsResponse.class);
+        return ResponseEntity.ok(globalPlayerStatsResponse);
     }
 
 	@GetMapping("/{id}/scores")
 	public ResponseEntity<List<ScoreResponse>> getScoresByPlayerId(@PathVariable Long id) {
-		return ResponseEntity.ok(playerService.getScoresByPlayerId(id));
+		List<ScoreResponse> scoreResponses = playerService.getScoresByPlayerId(id).stream().map(score -> modelMapper.map(score, ScoreResponse.class)).collect(Collectors.toList());
+		return ResponseEntity.ok(scoreResponses);
 	}
 
 	@GetMapping("/{id}/stats")
-    public ResponseEntity<PlayerStats> getPlayerStats(@PathVariable Long id) {
-        return ResponseEntity.ok(playerService.getPlayerStats(id));
+    public ResponseEntity<PlayerStatsResponse> getPlayerStats(@PathVariable Long id) {
+		PlayerStatsResponse playerStatsResponse = modelMapper.map(playerService.getPlayerStats(id), PlayerStatsResponse.class);
+        return ResponseEntity.ok(playerStatsResponse);
     }
 
 	@GetMapping("{id}/preferences")
     public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerId(@PathVariable Long id) {
-        return ResponseEntity.ok(playerService.getPreferencesByPlayerId(id));
+		PlayerPreferencesResponse playerPreferencesResponse = modelMapper.map(playerService.getPreferencesByPlayerId(id), PlayerPreferencesResponse.class);
+        return ResponseEntity.ok(playerPreferencesResponse);
     }
 
 	@PutMapping("{id}/preferences")
     public ResponseEntity<PlayerPreferencesResponse> setPreferencesByPlayerId(@PathVariable Long id, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
-        return ResponseEntity.ok(playerService.setPreferencesByPlayerId(id, playerPreferencesRequest));
+		PlayerPreferencesResponse playerPreferencesResponse = modelMapper.map(playerService.setPreferencesByPlayerId(id, modelMapper.map(playerPreferencesRequest, PlayerPreferences.class)), PlayerPreferencesResponse.class);
+        return ResponseEntity.ok(playerPreferencesResponse);
     }
 
 	@DeleteMapping("/inactive")

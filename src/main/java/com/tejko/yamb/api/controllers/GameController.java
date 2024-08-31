@@ -1,11 +1,12 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,64 +26,73 @@ import com.tejko.yamb.domain.services.interfaces.GameService;
 public class GameController {
 
 	private final GameService gameService;
+	private final ModelMapper modelMapper;
 
 	@Autowired
-	public GameController(GameService gameService) {
+	public GameController(GameService gameService, ModelMapper modelMapper) {
 		this.gameService = gameService;
+		this.modelMapper = modelMapper;
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<GameResponse> getById(@PathVariable String id) {
+		GameResponse gameResponse = modelMapper.map(gameService.getById(id), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@GetMapping("")
 	public ResponseEntity<List<GameResponse>> getAll() {
-		return ResponseEntity.ok(gameService.getAll());
-	}
-
-	@GetMapping("/{id}")
-	public ResponseEntity<GameResponse> getById(@PathVariable String id) {
-		return ResponseEntity.ok(gameService.getById(id));
+		List<GameResponse> gameResponses = gameService.getAll().stream().map(game -> modelMapper.map(game, GameResponse.class)).collect(Collectors.toList());
+		return ResponseEntity.ok(gameResponses);
 	}
 
 	@PutMapping("")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> getOrCreate(@Valid @RequestBody GameRequest gameRequest) {
-		GameResponse response = gameService.getOrCreate(gameRequest);
-		HttpStatus status = response.isNew() ? HttpStatus.CREATED : HttpStatus.OK;
-		return new ResponseEntity<>(response, status);
+		GameResponse gameResponse = modelMapper.map(gameService.getOrCreate(gameRequest.getPlayerId()), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@PutMapping("/{id}/roll")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> rollById(@PathVariable String id, @Valid @RequestBody ActionRequest action) {
-		return ResponseEntity.ok(gameService.rollById(id, action));
+	public ResponseEntity<GameResponse> rollById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = modelMapper.map(gameService.rollById(id, actionRequest.getDiceToRoll()), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@PutMapping("/{id}/announce")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> announceById(@PathVariable String id, @Valid @RequestBody ActionRequest action) {
-		return ResponseEntity.ok(gameService.announceById(id, action));
+	public ResponseEntity<GameResponse> announceById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = modelMapper.map(gameService.announceById(id, actionRequest.getBoxType()), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@PutMapping("/{id}/fill")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> fillById(@PathVariable String id, @Valid @RequestBody ActionRequest action) {
-		return ResponseEntity.ok(gameService.fillById(id, action));
+	public ResponseEntity<GameResponse> fillById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = modelMapper.map(gameService.fillById(id, actionRequest.getColumnType(), actionRequest.getBoxType()), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@PutMapping("/{id}/restart")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> restartById(@PathVariable String id) {
-		return ResponseEntity.ok(gameService.restartById(id));
+		GameResponse gameResponse = modelMapper.map(gameService.restartById(id), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 	@PutMapping("/{id}/finish")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> finishById(@PathVariable String id) {
-		return ResponseEntity.ok(gameService.finishById(id));
+		GameResponse gameResponse = modelMapper.map(gameService.finishById(id), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 	
 	@PutMapping("/{id}/complete")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<GameResponse> completeById(@PathVariable String id) {
-		return ResponseEntity.ok(gameService.completeById(id));
+		GameResponse gameResponse = modelMapper.map(gameService.completeById(id), GameResponse.class);
+		return ResponseEntity.ok(gameResponse);
 	}
 
 }

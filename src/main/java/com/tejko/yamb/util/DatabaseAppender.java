@@ -9,9 +9,10 @@ import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.services.interfaces.LogService;
+import com.tejko.yamb.security.AuthContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tejko.yamb.api.dto.requests.LogRequest;
 
 public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
 
@@ -41,7 +42,8 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
                                 .map(StackTraceElement::toString)
                                 .collect(Collectors.toList())
                 );
-                logService.create(new LogRequest(message, stackTraceData, Level.ERROR));
+                
+                logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer().orElse(null), message, stackTraceData, Level.ERROR));
             }
         } catch (Exception e) {
             e.printStackTrace();

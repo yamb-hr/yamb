@@ -4,6 +4,7 @@ import java.net.URI;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,33 +24,35 @@ import com.tejko.yamb.domain.services.interfaces.AuthService;
 public class AuthController {
 
     private final AuthService authService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, ModelMapper modelMapper) {
         this.authService = authService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest authRequest) {
-        AuthResponse response = authService.login(authRequest);
-        return ResponseEntity.ok(response);
+        AuthResponse authResponse = modelMapper.map(authService.login(authRequest.getUsername(), authRequest.getPassword()), AuthResponse.class);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/register")
     public ResponseEntity<RegisteredPlayer> register(@Valid @RequestBody AuthRequest authRequest) {
-        RegisteredPlayer player = authService.register(authRequest);
+        RegisteredPlayer registeredPlayer = modelMapper.map(authService.register(authRequest.getUsername(), authRequest.getPassword()), RegisteredPlayer.class);
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(player.getId())
+            .buildAndExpand(registeredPlayer.getId())
             .toUri();
-        return ResponseEntity.created(location).body(player);
+        return ResponseEntity.created(location).body(registeredPlayer);
     }
 
     @PostMapping("/anonymous")
-    public ResponseEntity<AuthResponse> createAnonymousPlayer(@Valid @RequestBody AnonymousPlayerRequest authRequest) {
-        AuthResponse response = authService.createAnonymousPlayer(authRequest);
-        return ResponseEntity.created(null).body(response);
+    public ResponseEntity<AuthResponse> createAnonymousPlayer(@Valid @RequestBody AnonymousPlayerRequest anonymousPlayerRequest) {
+        AuthResponse authResponse = modelMapper.map(authService.createAnonymousPlayer(anonymousPlayerRequest.getUsername()), AuthResponse.class);
+        return ResponseEntity.created(null).body(authResponse);
     }
 
 }

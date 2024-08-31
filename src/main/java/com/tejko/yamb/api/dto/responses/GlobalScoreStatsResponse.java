@@ -2,7 +2,7 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.util.List;
 
-public class GlobalScoreStats {
+public class GlobalScoreStatsResponse {
 
     private long scoreCount;
     private double averageScore;
@@ -13,20 +13,7 @@ public class GlobalScoreStats {
     private List<ScoreResponse> topThisYear;
     private List<ScoreResponse> topAllTime;
 
-    public GlobalScoreStats() {}
-
-    public GlobalScoreStats(long scoreCount, double averageScore, ScoreResponse highScore, List<ScoreResponse> topToday,
-            List<ScoreResponse> topThisWeek, List<ScoreResponse> topThisMonth, List<ScoreResponse> topThisYear,
-            List<ScoreResponse> topAllTime) {
-        this.scoreCount = scoreCount;
-        this.averageScore = averageScore;
-        this.highScore = highScore;
-        this.topToday = topToday;
-        this.topThisWeek = topThisWeek;
-        this.topThisMonth = topThisMonth;
-        this.topThisYear = topThisYear;
-        this.topAllTime = topAllTime;
-    }
+    public GlobalScoreStatsResponse() {}
 
     public long getScoreCount() {
         return scoreCount;

@@ -1,7 +1,9 @@
 package com.tejko.yamb.api.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,22 +21,26 @@ import com.tejko.yamb.domain.services.interfaces.LogService;
 public class LogController {
 
 	private final LogService logService;
+	private final ModelMapper modelMapper;
 
 	@Autowired
-	public LogController(LogService logService) {
+	public LogController(LogService logService, ModelMapper modelMapper) {
 		this.logService = logService;
+		this.modelMapper = modelMapper;
 	}
 
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<LogResponse> getById(@PathVariable Long id) {
-		return ResponseEntity.ok(logService.getById(id));
+		LogResponse logResponse = modelMapper.map(logService.getById(id), LogResponse.class);
+		return ResponseEntity.ok(logResponse);
 	}
 
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<List<LogResponse>> getAll() {
-		return ResponseEntity.ok(logService.getAll());
+		List<LogResponse> logResponses = logService.getAll().stream().map(log -> modelMapper.map(log, LogResponse.class)).collect(Collectors.toList());
+		return ResponseEntity.ok(logResponses);
 	}
 
 	@DeleteMapping("/{id}")

@@ -4,18 +4,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.api.dto.responses.GlobalScoreStats;
-import com.tejko.yamb.util.CustomObjectMapper;
-import com.tejko.yamb.util.I18nUtil;
+import com.tejko.yamb.domain.models.GlobalScoreStats;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.services.interfaces.ScoreService;
@@ -24,31 +19,21 @@ import com.tejko.yamb.domain.services.interfaces.ScoreService;
 public class ScoreServiceImpl implements ScoreService {
 
 	private final ScoreRepository scoreRepo;
-	private final CustomObjectMapper mapper;
-	private final I18nUtil i18nUtil;
 
 	@Autowired
-	public ScoreServiceImpl(ScoreRepository scoreRepo, CustomObjectMapper mapper, I18nUtil i18nUtil) {
+	public ScoreServiceImpl(ScoreRepository scoreRepo) {
 		this.scoreRepo = scoreRepo;
-		this.mapper = mapper;
-		this.i18nUtil = i18nUtil;
 	}
 
 	@Override
-	public Score fetchById(Long id) {
-		return scoreRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(i18nUtil.getMessage("error.not_found.score")));
+	public Score getById(Long id) {
+		return scoreRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("error.not_found.score"));
 	}
 
     @Override
-	public ScoreResponse getById(Long id) {
-		Score score = fetchById(id);
-		return mapper.mapToResponse(score);
-	}
-
-    @Override
-	public List<ScoreResponse> getAll() {
+	public List<Score> getAll() {
 		List<Score> scores = scoreRepo.findAll();
-        return mapper.mapCollection(scores, mapper::mapToResponse, ArrayList::new);
+        return scores;
 	}
 
     @Override
@@ -68,12 +53,12 @@ public class ScoreServiceImpl implements ScoreService {
 		GlobalScoreStats globalStats = new GlobalScoreStats();
 		globalStats.setScoreCount(scoreRepo.count());
 		globalStats.setAverageScore(scoreRepo.findAverageValue());
-		globalStats.setHighScore(scoreRepo.findTop1ByOrderByValueDesc().map(mapper::mapToResponse).orElse(null));
-		globalStats.setTopToday(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfToday, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		globalStats.setTopThisWeek(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfWeek, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		globalStats.setTopThisMonth(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfMonth, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		globalStats.setTopThisYear(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfYear, now).stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
-		globalStats.setTopAllTime(scoreRepo.findTop30ByOrderByValueDesc().stream().map(score -> mapper.mapToResponse(score)).collect(Collectors.toList()));
+		globalStats.setHighScore(scoreRepo.findTop1ByOrderByValueDesc().orElse(null));
+		globalStats.setTopToday(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfToday, now));
+		globalStats.setTopThisWeek(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfWeek, now));
+		globalStats.setTopThisMonth(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfMonth, now));
+		globalStats.setTopThisYear(scoreRepo.findTop30ByCreatedAtBetweenOrderByValueDesc(startOfYear, now));
+		globalStats.setTopAllTime(scoreRepo.findTop30ByOrderByValueDesc());
 		
 		
 		return globalStats;

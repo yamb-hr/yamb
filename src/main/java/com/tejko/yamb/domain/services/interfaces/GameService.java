@@ -16,7 +16,7 @@ public interface GameService {
 
     public Game rollById(String id, int[] diceToRoll);
 
-    public Game announceById(String id, BoxType announcement);
+    public Game announceById(String id, BoxType boxType);
 
     public Game fillById(String id, ColumnType columnType, BoxType boxType);
 

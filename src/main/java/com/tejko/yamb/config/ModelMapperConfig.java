@@ -2,6 +2,8 @@ package com.tejko.yamb.config;
 
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
+import org.modelmapper.config.Configuration.AccessLevel;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,60 +29,57 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         
-        // Set the matching strategy to STRICT for precise mapping
         modelMapper.getConfiguration()
                    .setMatchingStrategy(MatchingStrategies.STRICT)
                    .setFieldMatchingEnabled(true)
-                   .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+                   .setFieldAccessLevel(AccessLevel.PRIVATE);
 
-        // Custom mappings
         configureMappings(modelMapper);
-
         return modelMapper;
     }
 
     private void configureMappings(ModelMapper modelMapper) {
+        TypeMap<Player, PlayerResponse> playerTypeMap = modelMapper.createTypeMap(Player.class, PlayerResponse.class);
+        
+        playerTypeMap.addMapping(Player::getUsername, PlayerResponse::setName)
+                     .addMapping(src -> Hibernate.getClass(src).equals(RegisteredPlayer.class), PlayerResponse::setRegistered);
 
-        modelMapper.typeMap(Player.class, PlayerResponse.class)
-            .addMapping(Player::getUsername, PlayerResponse::setName)
-            .addMapping(src -> Hibernate.getClass(src).equals(RegisteredPlayer.class), PlayerResponse::setRegistered);
+        modelMapper.createTypeMap(PlayerPreferences.class, PlayerPreferencesResponse.class);
 
-        modelMapper.typeMap(PlayerPreferences.class, PlayerPreferencesResponse.class);
+        TypeMap<Score, ScoreResponse> scoreTypeMap = modelMapper.createTypeMap(Score.class, ScoreResponse.class);
+        scoreTypeMap.addMapping(Score::getPlayer, ScoreResponse::setPlayer);
 
-        modelMapper.typeMap(Score.class, ScoreResponse.class)
-            .addMapping(Score::getPlayer, ScoreResponse::setPlayer);
+        TypeMap<Role, RoleResponse> roleTypeMap = modelMapper.createTypeMap(Role.class, RoleResponse.class);
+        roleTypeMap.addMapping(Role::getLabel, RoleResponse::setName)
+                   .addMapping(Role::getDescription, RoleResponse::setDescription);
 
-        modelMapper.typeMap(Role.class, RoleResponse.class)
-            .addMapping(Role::getLabel, RoleResponse::setName)
-            .addMapping(Role::getDescription, RoleResponse::setDescription);
+        TypeMap<Game, GameResponse> gameTypeMap = modelMapper.createTypeMap(Game.class, GameResponse.class);
+        gameTypeMap.addMapping(Game::getId, GameResponse::setId)
+                   .addMapping(Game::getPlayerId, (dest, v) -> dest.getPlayer().setId((Long) v))
+                   .addMapping(Game::getPlayerName, (dest, v) -> dest.getPlayer().setName((String) v))
+                   .addMapping(Game::getSheet, GameResponse::setSheet)
+                   .addMapping(Game::getDices, GameResponse::setDices);
 
-        modelMapper.typeMap(Game.class, GameResponse.class)
-            .addMapping(Game::getId, GameResponse::setId)
-            .addMapping(Game::getPlayerId, (dest, v) -> dest.getPlayer().setId((Long) v))
-            .addMapping(Game::getPlayerName, (dest, v) -> dest.getPlayer().setName((String) v))
-            .addMapping(Game::getSheet, GameResponse::setSheet)
-            .addMapping(Game::getDices, GameResponse::setDices);
+        modelMapper.createTypeMap(Game.Sheet.class, GameResponse.SheetResponse.class)
+                   .addMapping(Game.Sheet::getColumns, GameResponse.SheetResponse::setColumns);
 
-        modelMapper.typeMap(Game.Sheet.class, GameResponse.SheetResponse.class)
-            .addMapping(Game.Sheet::getColumns, GameResponse.SheetResponse::setColumns);
+        modelMapper.createTypeMap(Game.Column.class, GameResponse.ColumnResponse.class)
+                   .addMapping(Game.Column::getType, GameResponse.ColumnResponse::setType)
+                   .addMapping(Game.Column::getBoxes, GameResponse.ColumnResponse::setBoxes);
 
-        modelMapper.typeMap(Game.GameColumn.class, GameResponse.ColumnResponse.class)
-            .addMapping(Game.GameColumn::getType, GameResponse.ColumnResponse::setType)
-            .addMapping(Game.GameColumn::getBoxes, GameResponse.ColumnResponse::setBoxes);
+        modelMapper.createTypeMap(Game.Box.class, GameResponse.BoxResponse.class)
+                   .addMapping(Game.Box::getType, GameResponse.BoxResponse::setType)
+                   .addMapping(Game.Box::getValue, GameResponse.BoxResponse::setValue);
 
-        modelMapper.typeMap(Game.Box.class, GameResponse.BoxResponse.class)
-            .addMapping(Game.Box::getType, GameResponse.BoxResponse::setType)
-            .addMapping(Game.Box::getValue, GameResponse.BoxResponse::setValue);
+        modelMapper.createTypeMap(Game.Dice.class, GameResponse.DiceResponse.class)
+                   .addMapping(Game.Dice::getIndex, GameResponse.DiceResponse::setIndex)
+                   .addMapping(Game.Dice::getValue, GameResponse.DiceResponse::setValue);
 
-        modelMapper.typeMap(Game.Dice.class, GameResponse.DiceResponse.class)
-            .addMapping(Game.Dice::getIndex, GameResponse.DiceResponse::setIndex)
-            .addMapping(Game.Dice::getValue, GameResponse.DiceResponse::setValue);
-
-        modelMapper.typeMap(Log.class, LogResponse.class)
-            .addMapping(Log::getPlayer, LogResponse::setPlayer)
-            .addMapping(Log::getData, LogResponse::setData)
-            .addMapping(Log::getMessage, LogResponse::setMessage)
-            .addMapping(Log::getLevel, LogResponse::setLevel)
-            .addMapping(Log::getCreatedAt, LogResponse::setCreatedAt);
+        TypeMap<Log, LogResponse> logTypeMap = modelMapper.createTypeMap(Log.class, LogResponse.class);
+        logTypeMap.addMapping(Log::getPlayer, LogResponse::setPlayer)
+                  .addMapping(Log::getData, LogResponse::setData)
+                  .addMapping(Log::getMessage, LogResponse::setMessage)
+                  .addMapping(Log::getLevel, LogResponse::setLevel)
+                  .addMapping(Log::getCreatedAt, LogResponse::setCreatedAt);
     }
 }

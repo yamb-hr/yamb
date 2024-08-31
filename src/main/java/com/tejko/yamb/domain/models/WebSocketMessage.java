@@ -1,4 +1,4 @@
-package com.tejko.yamb.api.dto;
+package com.tejko.yamb.domain.models;
 
 import java.time.LocalDateTime;
 

@@ -1,6 +1,6 @@
 package com.tejko.yamb.api.dto.responses;
 
-public class GlobalPlayerStats {
+public class GlobalPlayerStatsResponse {
 
     private long playerCount;
     private long mostScoresByAnyPlayer;
@@ -11,20 +11,7 @@ public class GlobalPlayerStats {
     private PlayerResponse newestPlayer;
     private PlayerResponse oldestPlayer;
 
-    public GlobalPlayerStats() {}
-
-    public GlobalPlayerStats(long playerCount, long mostScoresByAnyPlayer, PlayerResponse playerWithMostScores,
-            double highestAverageScoreByAnyPlayer, PlayerResponse playerWithHighestAverageScore, ScoreResponse highScore,
-            PlayerResponse newestPlayer, PlayerResponse oldestPlayer) {
-        this.playerCount = playerCount;
-        this.mostScoresByAnyPlayer = mostScoresByAnyPlayer;
-        this.playerWithMostScores = playerWithMostScores;
-        this.highestAverageScoreByAnyPlayer = highestAverageScoreByAnyPlayer;
-        this.playerWithHighestAverageScore = playerWithHighestAverageScore;
-        this.highScore = highScore;
-        this.newestPlayer = newestPlayer;
-        this.oldestPlayer = oldestPlayer;
-    }
+    public GlobalPlayerStatsResponse() {}
 
     public long getPlayerCount() {
         return playerCount;
