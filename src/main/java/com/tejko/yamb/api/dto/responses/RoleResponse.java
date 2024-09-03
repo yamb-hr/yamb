@@ -7,11 +7,6 @@ public class RoleResponse {
 
     public RoleResponse() {}
 
-    public RoleResponse(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
     public String getName() {
         return name;
     }

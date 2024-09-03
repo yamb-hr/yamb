@@ -52,7 +52,12 @@ public class AuthController {
     @PostMapping("/anonymous")
     public ResponseEntity<AuthResponse> createAnonymousPlayer(@Valid @RequestBody AnonymousPlayerRequest anonymousPlayerRequest) {
         AuthResponse authResponse = modelMapper.map(authService.createAnonymousPlayer(anonymousPlayerRequest.getUsername()), AuthResponse.class);
-        return ResponseEntity.created(null).body(authResponse);
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(authResponse.getPlayer().getId())
+            .toUri();
+        return ResponseEntity.created(location).body(authResponse);
     }
 
 }

@@ -13,31 +13,15 @@ public class GameResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private ShortPlayerResponse player;
-    private SheetResponse sheet;
-    private List<DiceResponse> dices;
+    private Sheet sheet;
+    private List<Dice> dices;
     private int rollCount;
     private BoxType announcement;
     private GameStatus status;
     private int totalSum;
-    private boolean isNew;
 
     public GameResponse() {}
-
-    public GameResponse(String id, LocalDateTime createdAt, LocalDateTime updatedAt, ShortPlayerResponse player, SheetResponse sheet, 
-            List<DiceResponse> dices, int rollCount, BoxType announcement, GameStatus status, int totalSum, boolean isNew) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.player = player;
-        this.sheet = sheet;
-        this.dices = dices;
-        this.rollCount = rollCount;
-        this.announcement = announcement;
-        this.status = status;
-        this.totalSum = totalSum;
-        this.isNew = isNew;
-    }
-
+    
     public String getId() {
         return id;
     }
@@ -70,19 +54,19 @@ public class GameResponse {
         this.player = player;
     }
 
-    public SheetResponse getSheet() {
+    public Sheet getSheet() {
         return sheet;
     }
 
-    public void setSheet(SheetResponse sheet) {
+    public void setSheet(Sheet sheet) {
         this.sheet = sheet;
     }
 
-    public List<DiceResponse> getDices() {
+    public List<Dice> getDices() {
         return dices;
     }
 
-    public void setDices(List<DiceResponse> dices) {
+    public void setDices(List<Dice> dices) {
         this.dices = dices;
     }
 
@@ -118,22 +102,14 @@ public class GameResponse {
         this.totalSum = totalSum;
     }
 
-    public boolean isNew() {
-        return isNew;
-    }
-
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
-    }
-
-    public static class DiceResponse {
+    public static class Dice {
 
         private int index;
         private int value;
 
-        public DiceResponse() {}
+        public Dice() {}
 
-        public DiceResponse(int index, int value) {
+        public Dice(int index, int value) {
             this.index = index;
             this.value = value;
         }
@@ -156,34 +132,34 @@ public class GameResponse {
     
     }
 
-    public static class SheetResponse {
+    public static class Sheet {
 
-        private List<ColumnResponse> columns;
+        private List<Column> columns;
 
-        public SheetResponse() {}
+        public Sheet() {}
 
-        public SheetResponse(List<ColumnResponse> columns) {
+        public Sheet(List<Column> columns) {
             this.columns = columns;
         }
 
-        public List<ColumnResponse> getColumns() {
+        public List<Column> getColumns() {
             return columns;
         }
 
-        public void setColumns(List<ColumnResponse> columns) {
+        public void setColumns(List<Column> columns) {
             this.columns = columns;
         }
 
     }
 
-    public static class ColumnResponse {
+    public static class Column {
 
         private ColumnType type;
-        private List<BoxResponse> boxes;
+        private List<Box> boxes;
 
-        public ColumnResponse() {}
+        public Column() {}
 
-        public ColumnResponse(ColumnType type, List<BoxResponse> boxes) {
+        public Column(ColumnType type, List<Box> boxes) {
             this.type = type;
             this.boxes = boxes;
         }
@@ -196,24 +172,24 @@ public class GameResponse {
             this.type = type;
         }
 
-        public List<BoxResponse> getBoxes() {
+        public List<Box> getBoxes() {
             return boxes;
         }
 
-        public void setBoxes(List<BoxResponse> boxes) {
+        public void setBoxes(List<Box> boxes) {
             this.boxes = boxes;
         }
 
     }
 
-    public static class BoxResponse {
+    public static class Box {
 
         private BoxType type;
         private Integer value;
 
-        public BoxResponse() {}
+        public Box() {}
 
-        public BoxResponse(BoxType type, Integer value) {
+        public Box(BoxType type, Integer value) {
             this.type = type;
             this.value = value;
         }

@@ -11,13 +11,6 @@ public class ScoreResponse {
 
     public ScoreResponse() {}
 
-    public ScoreResponse(Long id, LocalDateTime createdAt, PlayerResponse player, int value) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.player = player;
-        this.value = value;
-    }
-
     public Long getId() {
         return id;
     }

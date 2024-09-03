@@ -7,11 +7,6 @@ public class PlayerPreferencesResponse {
 
     public PlayerPreferencesResponse() {}
 
-    public PlayerPreferencesResponse(String language, String theme) {
-        this.language = language;
-        this.theme = theme;
-    }
-
     public String getLanguage() {
         return language;
     }

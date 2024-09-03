@@ -1,5 +1,6 @@
 package com.tejko.yamb.api.controllers;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.GameRequest;
@@ -50,6 +52,14 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> getOrCreate(@Valid @RequestBody GameRequest gameRequest) {
 		GameResponse gameResponse = modelMapper.map(gameService.getOrCreate(gameRequest.getPlayerId()), GameResponse.class);
+		if (gameResponse.getCreatedAt().equals(gameResponse.getUpdatedAt())) {
+			URI location = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(gameResponse.getId())
+				.toUri();
+			return ResponseEntity.created(location).body(gameResponse);
+		}
 		return ResponseEntity.ok(gameResponse);
 	}
 

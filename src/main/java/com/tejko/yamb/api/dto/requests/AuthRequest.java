@@ -10,7 +10,7 @@ public class AuthRequest {
     private String username;
 
     @NotBlank(message = "error.password_required")
-    @Size(min = 8, message = "error.password_length_invalid")
+    @Size(min = 6, message = "error.password_length_invalid")
     private String password;
 
     public AuthRequest() {}

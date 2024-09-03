@@ -12,19 +12,7 @@ public class PlayerResponse {
     private Set<RoleResponse> roles;
     private boolean isRegistered;
 
-   
-    public PlayerResponse() {
-    }
-
-    public PlayerResponse(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, 
-    Set<RoleResponse> roles, boolean isRegistered) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.name = name;
-        this.roles = roles;
-        this.isRegistered = isRegistered;
-    }
+    public PlayerResponse() {}
 
     public Long getId() {
         return id;

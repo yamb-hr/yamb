@@ -6,12 +6,7 @@ public class AuthResponse {
     private String token;
 
     public AuthResponse() {}
-
-    public AuthResponse(PlayerResponse player, String token) {
-        this.player = player;
-        this.token = token;
-    }
-
+    
     public PlayerResponse getPlayer() {
         return player;
     }

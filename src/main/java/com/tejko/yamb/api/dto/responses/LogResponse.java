@@ -15,15 +15,6 @@ public class LogResponse  {
 
     public LogResponse() {}
 
-    public LogResponse(Long id, LocalDateTime createdAt, PlayerResponse player, Object data, String message, Level level) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.player = player;
-        this.data = data;
-        this.message = message;
-        this.level = level;
-    }
-
     public Long getId() {
         return id;
     }
