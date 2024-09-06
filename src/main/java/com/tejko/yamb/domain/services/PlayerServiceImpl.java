@@ -40,7 +40,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public List<Player> getAll() {
-        List<Player> players = playerRepo.findAll();
+        List<Player> players = playerRepo.findAllByOrderByCreatedAtDesc();
         return players;
     }
 

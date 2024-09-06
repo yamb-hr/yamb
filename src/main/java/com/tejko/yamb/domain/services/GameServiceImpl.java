@@ -39,7 +39,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<Game> getAll() {
-        List<Game> games = gameRepo.findAll();
+        List<Game> games = gameRepo.findAllByOrderByUpdatedAt();
         return games;
     }
 

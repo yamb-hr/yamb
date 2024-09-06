@@ -28,7 +28,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public List<Log> getAll() {
-        List<Log> logs = logRepo.findAll();
+        List<Log> logs = logRepo.findAllByOrderByCreatedAtDesc();
         return logs;
     }
 

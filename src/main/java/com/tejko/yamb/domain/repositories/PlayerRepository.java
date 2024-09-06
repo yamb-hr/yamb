@@ -1,5 +1,6 @@
 package com.tejko.yamb.domain.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -28,5 +29,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     @Query("SELECT p FROM player p JOIN p.scores s GROUP BY p.id ORDER BY AVG(s.value) DESC")
     Optional<PlayerPreferences> findPreferencesByPlayerId(Long playerId);
+    
+    List<Player> findAllByOrderByCreatedAtDesc();
 
 }

@@ -31,4 +31,6 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     @Query("SELECT AVG(s.value) FROM score s WHERE s.player.id = :playerId")
     Double findAverageValueByPlayerId(Long playerId);
 
+    List<Score> findAllByOrderByCreatedAtDesc();
+
 }

@@ -32,7 +32,7 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
 	public List<Score> getAll() {
-		List<Score> scores = scoreRepo.findAll();
+		List<Score> scores = scoreRepo.findAllByOrderByCreatedAtDesc();
         return scores;
 	}
 
