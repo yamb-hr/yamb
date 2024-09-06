@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,23 +53,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisteredPlayer register(String username, String password) {
         Optional<Player> authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
-
+    
         RegisteredPlayer player;
-
-        if (authenticatedPlayer.isPresent() && Hibernate.getClass(authenticatedPlayer.get()).equals(AnonymousPlayer.class)) {
+    
+        if (authenticatedPlayer.isPresent() && authenticatedPlayer.get() instanceof AnonymousPlayer) {
             if (!authenticatedPlayer.get().getUsername().equals(username)) {
                 validateUsername(username);
             }
-            player = (RegisteredPlayer) authenticatedPlayer.get();
-            player.setUsername(username);
-            player.setPassword(encoder.encode(password));
+            AnonymousPlayer anonymousPlayer = (AnonymousPlayer) authenticatedPlayer.get();
+            player = RegisteredPlayer.getInstance(username, encoder.encode(password), anonymousPlayer.getRoles());
         } else {
             validateUsername(username);
             player = RegisteredPlayer.getInstance(username, encoder.encode(password), getDefaultRoles());
         }
-
+    
         return playerRepo.save(player);
     }
+    
     
     @Override
     public PlayerWithToken createAnonymousPlayer(String username) {
