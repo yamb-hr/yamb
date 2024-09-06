@@ -2,14 +2,13 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 
-public class ScoreResponse {
+public class ShortScoreResponse {
 
     private Long id;
     private LocalDateTime createdAt;
-    private ShortPlayerResponse player;
     private int value;
 
-    public ScoreResponse() {}
+    public ShortScoreResponse() {}
 
     public Long getId() {
         return id;
@@ -25,14 +24,6 @@ public class ScoreResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public ShortPlayerResponse getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(ShortPlayerResponse player) {
-        this.player = player;
     }
 
     public int getValue() {

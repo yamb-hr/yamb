@@ -10,15 +10,10 @@ public class AuthRequest {
     private String username;
 
     @NotBlank(message = "error.password_required")
-    @Size(min = 6, message = "error.password_length_invalid")
+    @Size(min = 5, max = 15, message = "error.password_length_invalid")
     private String password;
 
     public AuthRequest() {}
-
-    public AuthRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
     public String getUsername() {
         return username;

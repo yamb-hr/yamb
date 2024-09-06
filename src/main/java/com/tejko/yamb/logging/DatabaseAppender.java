@@ -1,13 +1,14 @@
-package com.tejko.yamb.util;
+package com.tejko.yamb.logging;
 
 import ch.qos.logback.core.AppenderBase;
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import org.slf4j.event.Level;
 
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.services.interfaces.LogService;
@@ -26,8 +27,12 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     protected void append(ILoggingEvent eventObject) {
+        if (!eventObject.getLevel().isGreaterOrEqual(ch.qos.logback.classic.Level.ERROR)) {
+            return;
+        }
+
         try {
-            String message = eventObject.getFormattedMessage();
+            String message = eventObject.getThrowableProxy().getClassName() + ": " + eventObject.getThrowableProxy().getMessage();
             String stackTraceData = null;
 
             IThrowableProxy throwableProxy = eventObject.getThrowableProxy();
@@ -42,12 +47,10 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
                                 .map(StackTraceElement::toString)
                                 .collect(Collectors.toList())
                 );
-                
-                logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer().orElse(null), message, stackTraceData, Level.ERROR));
             }
+            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer().orElse(null), message, stackTraceData, Level.ERROR));
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to log to database: " + e.getLocalizedMessage());
+            System.err.println("Failed to log to database: " + e.getLocalizedMessage());
         }
     }
 }

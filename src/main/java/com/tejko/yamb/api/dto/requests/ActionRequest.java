@@ -11,12 +11,6 @@ public class ActionRequest {
 
     public ActionRequest() {}
 
-    public ActionRequest(int[] diceToRoll, ColumnType columnType, BoxType boxType) {
-        this.diceToRoll = diceToRoll;
-        this.columnType = columnType;
-        this.boxType = boxType;
-    }
-
     public int[] getDiceToRoll() {
         return diceToRoll;
     }

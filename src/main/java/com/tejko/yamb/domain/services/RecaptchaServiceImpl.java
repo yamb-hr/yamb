@@ -3,6 +3,8 @@ package com.tejko.yamb.domain.services;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -16,6 +18,8 @@ import com.tejko.yamb.domain.services.interfaces.RecaptchaService;
 
 @Service
 public class RecaptchaServiceImpl implements RecaptchaService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecaptchaServiceImpl.class);
 
     @Value("${RECAPTCHA_SECRET_KEY}")
     private String recaptchaSecretKey;
@@ -36,7 +40,7 @@ public class RecaptchaServiceImpl implements RecaptchaService {
             return extractSuccessFromResponse(responseEntity);
 
         } catch (Exception e) {
-            System.out.println("Failed to verify recaptcha: " + e.getMessage());
+            logger.info("Failed to verify recaptcha: " + e.getMessage());
             return false;
         }
     }

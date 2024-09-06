@@ -12,11 +12,6 @@ public class PlayerPreferencesRequest {
 
     public PlayerPreferencesRequest() {}
 
-    public PlayerPreferencesRequest(String language, String theme) {
-        this.language = language;
-        this.theme = theme;
-    }
-
     public String getLanguage() {
         return language;
     }

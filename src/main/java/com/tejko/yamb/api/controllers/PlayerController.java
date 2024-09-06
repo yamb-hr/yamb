@@ -21,7 +21,7 @@ import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
-import com.tejko.yamb.api.dto.responses.ScoreResponse;
+import com.tejko.yamb.api.dto.responses.ShortScoreResponse;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.services.interfaces.PlayerService;
 
@@ -57,8 +57,8 @@ public class PlayerController {
     }
 
 	@GetMapping("/{id}/scores")
-	public ResponseEntity<List<ScoreResponse>> getScoresByPlayerId(@PathVariable Long id) {
-		List<ScoreResponse> scoreResponses = playerService.getScoresByPlayerId(id).stream().map(score -> modelMapper.map(score, ScoreResponse.class)).collect(Collectors.toList());
+	public ResponseEntity<List<ShortScoreResponse>> getScoresByPlayerId(@PathVariable Long id) {
+		List<ShortScoreResponse> scoreResponses = playerService.getScoresByPlayerId(id).stream().map(score -> modelMapper.map(score, ShortScoreResponse.class)).collect(Collectors.toList());
 		return ResponseEntity.ok(scoreResponses);
 	}
 

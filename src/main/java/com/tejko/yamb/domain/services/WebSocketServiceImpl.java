@@ -2,6 +2,8 @@ package com.tejko.yamb.domain.services;
 
 import java.security.Principal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,6 +21,8 @@ import com.tejko.yamb.websocket.PlayerSessionRegistry;
 
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketServiceImpl.class);
 
     private final PlayerSessionRegistry playerSessionRegistry;
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -51,9 +55,9 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (user != null) {
             Long playerId = Long.valueOf(user.getName());
             playerSessionRegistry.updatePlayerStatus(playerId, PlayerStatus.ONLINE);
-            System.out.println("Player ID " + playerId + " has connected...");
+            logger.info("Player ID " + playerId + " has connected...");
         } else {
-            System.out.println("Session connected event received with no user information.");
+            logger.info("Session connected event received with no user information.");
         }
     }
 
@@ -64,10 +68,10 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (user != null) {
             Long playerId = Long.valueOf(user.getName());
             playerSessionRegistry.updatePlayerStatus(playerId, PlayerStatus.OFFLINE);
-            System.out.println("Player ID " + playerId + " has disconnected...");
+            logger.info("Player ID " + playerId + " has disconnected...");
             sendPublicChatMessage(playerId);
         } else {
-            System.out.println("Session disconnect event received with no user information.");
+            logger.info("Session disconnect event received with no user information.");
         }
     }
 
@@ -78,12 +82,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (user != null) {
             String destination = headers.getDestination();
             Long playerId = Long.valueOf(user.getName());
-            System.out.println("Player ID " + playerId + " has subscribed to " + destination);
+            logger.info("Player ID " + playerId + " has subscribed to " + destination);
             if ("/chat/public".equals(destination)) {
                 sendPublicChatMessage(playerId);
             }
         } else {
-            System.out.println("Session subscribe event received with no user information.");
+            logger.info("Session subscribe event received with no user information.");
         }
     }
 
@@ -93,7 +97,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         try {
             simpMessagingTemplate.convertAndSend("/chat/public", message);
         } catch (MessagingException e) {
-            System.out.println("Error sending public chat message: " + e.getMessage());
+            logger.info("Error sending public chat message: " + e.getMessage());
         }
     }
 }

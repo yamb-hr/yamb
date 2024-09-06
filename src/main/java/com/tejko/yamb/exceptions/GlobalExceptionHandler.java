@@ -97,6 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     protected ResponseEntity<Object> handleInternalServerError(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("Internal server error", ex);
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
@@ -116,7 +117,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         });
 
         String message = messageBuilder.toString().trim();
-        ErrorResponse errorResponse = new ErrorResponse(status.value(), status.getReasonPhrase(), message, Instant.now(), null);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
+        errorResponse.setMessage(message);
+        errorResponse.setTimestamp(Instant.now());
+        errorResponse.setDetail(trimStackTrace(ex.getStackTrace()));
         
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
@@ -135,8 +141,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             customErrorMessage = "error.invalid_request_body";
         }
 
-        ErrorResponse errorResponse = new ErrorResponse(status.value(), status.getReasonPhrase(), customErrorMessage, Instant.now(), ex.getLocalizedMessage());
-
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
+        errorResponse.setMessage(i18nUtil.getMessage(customErrorMessage));
+        errorResponse.setTimestamp(Instant.now());
+        errorResponse.setDetail(trimStackTrace(ex.getStackTrace()));
+        
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 

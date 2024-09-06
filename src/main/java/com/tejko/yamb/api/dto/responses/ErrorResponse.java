@@ -11,15 +11,7 @@ public class ErrorResponse {
     private String detail;
     
     public ErrorResponse() {}
-
-    public ErrorResponse(int status, String error, String message, Instant timestamp, String detail) {
-        this.status = status;
-        this.error = error;
-        this.message = message;
-        this.timestamp = timestamp;
-        this.detail = detail;
-    }
-
+    
     public int getStatus() {
         return status;
     }

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,11 +15,10 @@ import javax.persistence.ManyToOne;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import ch.qos.logback.classic.Level;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.slf4j.event.Level;
 
 @Entity(name = "log")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
@@ -41,9 +42,11 @@ public class Log {
     @Column(name = "data", nullable = true, columnDefinition = "jsonb")
     private Object data;
 
-    @Column(name = "message", nullable = false)
+    // set type to text
+    @Column(name = "message", nullable = false, columnDefinition = "text")
     private String message;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "level", nullable = false)
     private Level level;
     

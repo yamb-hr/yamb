@@ -2,13 +2,13 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 
-import ch.qos.logback.classic.Level;
+import org.slf4j.event.Level;
 
 public class LogResponse  {
 
     private Long id;
     private LocalDateTime createdAt;
-    private PlayerResponse player;
+    private ShortPlayerResponse player;
     private Object data;
     private String message;
     private Level level;
@@ -31,11 +31,11 @@ public class LogResponse  {
         this.createdAt = createdAt;
     }
 
-    public PlayerResponse getPlayer() {
+    public ShortPlayerResponse getPlayer() {
         return player;
     }
 
-    public void setPlayer(PlayerResponse player) {
+    public void setPlayer(ShortPlayerResponse player) {
         this.player = player;
     }
 

@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
+import com.tejko.yamb.api.dto.responses.ShortGameResponse;
 import com.tejko.yamb.domain.services.interfaces.GameService;
 
 @RestController
@@ -43,8 +44,8 @@ public class GameController {
 	}
 
 	@GetMapping("")
-	public ResponseEntity<List<GameResponse>> getAll() {
-		List<GameResponse> gameResponses = gameService.getAll().stream().map(game -> modelMapper.map(game, GameResponse.class)).collect(Collectors.toList());
+	public ResponseEntity<List<ShortGameResponse>> getAll() {
+		List<ShortGameResponse> gameResponses = gameService.getAll().stream().map(game -> modelMapper.map(game, ShortGameResponse.class)).collect(Collectors.toList());
 		return ResponseEntity.ok(gameResponses);
 	}
 

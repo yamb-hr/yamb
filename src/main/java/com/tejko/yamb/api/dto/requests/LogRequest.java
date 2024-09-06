@@ -16,13 +16,7 @@ public class LogRequest {
     private Level level;
     
     public LogRequest() {}
-
-    public LogRequest(String message, Object data, Level level) {
-        this.message = message;
-        this.data = data;
-        this.level = level;
-    }
-
+    
     public String getMessage() {
         return message;
     }
