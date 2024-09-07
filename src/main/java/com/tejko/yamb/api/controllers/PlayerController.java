@@ -80,6 +80,12 @@ public class PlayerController {
         return ResponseEntity.ok(playerPreferencesResponse);
     }
 
+	@PutMapping("{id}/username")
+	public ResponseEntity<PlayerResponse> changeUsername(@PathVariable Long id, @RequestBody String username) {
+		PlayerResponse playerResponse = modelMapper.map(playerService.changeUsername(id, username), PlayerResponse.class);
+		return ResponseEntity.ok(playerResponse);
+	}
+
 	@DeleteMapping("/inactive")
     public ResponseEntity<Void> deleteInactivePlayers() {
 		playerService.deleteInactivePlayers();

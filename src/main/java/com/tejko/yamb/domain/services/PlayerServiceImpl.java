@@ -61,8 +61,15 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerStats getPlayerStats(Long id) {
         PlayerStats stats = new PlayerStats();
 
-        stats.setLastActivity(scoreRepo.findTop1ByPlayerIdOrderByCreatedAtDesc(id).get().getCreatedAt());
-        stats.setAverageScore(scoreRepo.findAverageValueByPlayerId(id));
+        Optional<Score> latestScore = scoreRepo.findTop1ByPlayerIdOrderByCreatedAtDesc(id);
+        if (latestScore.isPresent()) {
+            stats.setLastActivity(latestScore.get().getCreatedAt());
+        }
+        Double averageScore = scoreRepo.findAverageValueByPlayerId(id);
+        if (averageScore == null) {
+            averageScore = 0.0;
+        }
+        stats.setAverageScore(averageScore);
         stats.setHighScore(scoreRepo.findTop1ByPlayerIdOrderByValueDesc(id).orElse(null));
         stats.setScoreCount(scoreRepo.countByPlayerId(id));
 
@@ -131,6 +138,21 @@ public class PlayerServiceImpl implements PlayerService {
 
         playerRepo.save(player);
         return player.getPreferences();
+    }
+
+    public Player changeUsername(Long playerId, String username) {
+        Player player = playerRepo.getById(playerId);
+    
+        validateUsername(username);
+        player.setUsername(username);
+    
+        return playerRepo.save(player);
+    }
+
+    private void validateUsername(String username) {
+        if (playerRepo.existsByUsername(username)) {
+            throw new IllegalArgumentException("error.username_taken");
+        }
     }
 
     private void checkPermission(Long playerId) {

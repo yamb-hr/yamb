@@ -10,5 +10,7 @@ public interface AuthService {
     public RegisteredPlayer register(String username, String password);
 
     public PlayerWithToken createAnonymousPlayer(String username);
+
+    public void changePassword(String oldPassword, String newPassword);
     
 }

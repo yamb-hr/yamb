@@ -27,5 +27,7 @@ public interface PlayerService extends UserDetailsService {
     public PlayerPreferences setPreferencesByPlayerId(Long playerId, PlayerPreferences playerPreferences);
 
     public void deleteInactivePlayers();
+
+    public Player changeUsername(Long playerId, String username);
     
 }

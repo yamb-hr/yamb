@@ -81,6 +81,18 @@ public class AuthServiceImpl implements AuthService {
         return playerWithToken;
     }
 
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+        RegisteredPlayer player = (RegisteredPlayer) AuthContext.getAuthenticatedPlayer().get();
+    
+        if (!encoder.matches(oldPassword, player.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+    
+        player.setPassword(encoder.encode(newPassword));
+        playerRepo.save(player);
+    }    
+
     private void validateUsername(String username) {
         if (playerRepo.existsByUsername(username)) {
             throw new IllegalArgumentException("error.username_taken");

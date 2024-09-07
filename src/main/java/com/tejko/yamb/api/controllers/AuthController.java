@@ -8,13 +8,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.tejko.yamb.api.dto.requests.AnonymousPlayerRequest;
+import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.requests.AuthRequest;
+import com.tejko.yamb.api.dto.requests.PasswordChangeRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.domain.services.interfaces.AuthService;
@@ -50,7 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/anonymous")
-    public ResponseEntity<AuthResponse> createAnonymousPlayer(@Valid @RequestBody AnonymousPlayerRequest anonymousPlayerRequest) {
+    public ResponseEntity<AuthResponse> createAnonymousPlayer(@Valid @RequestBody UsernameRequest anonymousPlayerRequest) {
         AuthResponse authResponse = modelMapper.map(authService.createAnonymousPlayer(anonymousPlayerRequest.getUsername()), AuthResponse.class);
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -59,5 +61,11 @@ public class AuthController {
             .toUri();
         return ResponseEntity.created(location).body(authResponse);
     }
+
+	@PutMapping("/password")
+	public ResponseEntity<Void> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
+		authService.changePassword(passwordChangeRequest.getOldPassword(), passwordChangeRequest.getNewPassword());
+		return ResponseEntity.noContent().build();
+	}
 
 }
