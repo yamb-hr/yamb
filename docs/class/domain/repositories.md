@@ -1,4 +1,4 @@
-# [ 5. Class Documentation ](../documentation)
+# [ 5. Class Documentation ](../documentation.md)
 
 ## 5.1 Domain
 
