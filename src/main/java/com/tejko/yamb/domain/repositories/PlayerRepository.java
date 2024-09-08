@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.PlayerPreferences;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.PlayerPreferences;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 

@@ -21,18 +21,18 @@ import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.api.dto.responses.ShortGameResponse;
 import com.tejko.yamb.api.dto.responses.ShortPlayerResponse;
 import com.tejko.yamb.api.dto.responses.ShortScoreResponse;
-import com.tejko.yamb.domain.models.AnonymousPlayer;
-import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.Log;
-import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
-import com.tejko.yamb.domain.models.Role;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.AnonymousPlayer;
+import com.tejko.yamb.domain.models.entities.Game;
+import com.tejko.yamb.domain.models.entities.Log;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.PlayerPreferences;
+import com.tejko.yamb.domain.models.entities.RegisteredPlayer;
+import com.tejko.yamb.domain.models.entities.Role;
+import com.tejko.yamb.domain.models.entities.Score;
 
 @Configuration
 public class ModelMapperConfig {

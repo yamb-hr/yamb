@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.tejko.yamb.domain.services.interfaces.RecaptchaService;
+import com.tejko.yamb.business.interfaces.RecaptchaService;
 
 @Service
 public class RecaptchaServiceImpl implements RecaptchaService {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.dto.responses.GlobalScoreStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.domain.services.interfaces.ScoreService;
+import com.tejko.yamb.business.interfaces.ScoreService;
 
 @RestController
 @RequestMapping("/api/scores")

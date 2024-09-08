@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
-import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.entities.Game;
 import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;

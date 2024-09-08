@@ -12,8 +12,8 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+import com.tejko.yamb.business.interfaces.WebSocketService;
 import com.tejko.yamb.domain.models.WebSocketMessage;
-import com.tejko.yamb.domain.services.interfaces.WebSocketService;
 
 @RestController
 public class WebSocketController {

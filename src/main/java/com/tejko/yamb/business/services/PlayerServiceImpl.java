@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +10,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
-import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.PlayerPreferences;
+import com.tejko.yamb.domain.models.entities.Score;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
-import com.tejko.yamb.domain.services.interfaces.PlayerService;
 import com.tejko.yamb.security.AuthContext;
 
 @Service

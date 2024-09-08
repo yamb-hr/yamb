@@ -1,8 +1,8 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 
-import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.entities.Log;
 
 public interface LogService {
 

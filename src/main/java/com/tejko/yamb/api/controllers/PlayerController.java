@@ -22,8 +22,8 @@ import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ShortScoreResponse;
-import com.tejko.yamb.domain.models.PlayerPreferences;
-import com.tejko.yamb.domain.services.interfaces.PlayerService;
+import com.tejko.yamb.business.interfaces.PlayerService;
+import com.tejko.yamb.domain.models.entities.PlayerPreferences;
 
 @RestController
 @RequestMapping("/api/players")

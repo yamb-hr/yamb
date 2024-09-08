@@ -2,6 +2,8 @@ package com.tejko.yamb.domain.models;
 
 import java.time.LocalDateTime;
 
+import com.tejko.yamb.domain.models.entities.Score;
+
 public class PlayerStats {
 
     private LocalDateTime lastActivity;

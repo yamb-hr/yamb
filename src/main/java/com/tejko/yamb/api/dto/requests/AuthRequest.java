@@ -6,11 +6,11 @@ import javax.validation.constraints.Size;
 public class AuthRequest {
 
     @NotBlank(message = "error.username_required")
-    @Size(min = 5, max = 15, message = "error.username_length_invalid")
+    @Size(min = 3, max = 15, message = "error.username_length_invalid")
     private String username;
 
     @NotBlank(message = "error.password_required")
-    @Size(min = 5, max = 15, message = "error.password_length_invalid")
+    @Size(min = 6, max = 30, message = "error.password_length_invalid")
     private String password;
 
     public AuthRequest() {}

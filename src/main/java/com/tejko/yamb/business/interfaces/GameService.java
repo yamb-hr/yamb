@@ -1,10 +1,10 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
-import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.entities.Game;
 
 public interface GameService {
 

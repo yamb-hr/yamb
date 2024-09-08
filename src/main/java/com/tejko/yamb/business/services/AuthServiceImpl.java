@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -13,14 +13,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.tejko.yamb.domain.models.AnonymousPlayer;
-import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.business.interfaces.AuthService;
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
-import com.tejko.yamb.domain.models.Role;
+import com.tejko.yamb.domain.models.entities.AnonymousPlayer;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.RegisteredPlayer;
+import com.tejko.yamb.domain.models.entities.Role;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RoleRepository;
-import com.tejko.yamb.domain.services.interfaces.AuthService;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.util.JwtUtil;
 

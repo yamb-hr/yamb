@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.models;
+package com.tejko.yamb.domain.models.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -135,7 +135,7 @@ public class Game {
     }
     
     public void roll(int[] diceToRoll) {
-        validateRollAction();
+        validateRollAction(diceToRoll);
         // always roll all dice for the first roll
         if (rollCount == 0) {
             for (Dice dice : dices) {
@@ -183,13 +183,22 @@ public class Game {
     }
 
 
-    private void validateRollAction() {
+    private void validateRollAction(int[] diceToRoll) {
         if (rollCount == 3) {
             throw new RollLimitExceededException();
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
         } else if (status != GameStatus.IN_PROGRESS) {
             throw new GameLockedException();
+        } else if (diceToRoll.length == 0 || diceToRoll.length > 5) {
+            System.out.println(diceToRoll.length);
+            throw new IllegalArgumentException("Must roll between 1 and 5 dice.");
+        } else {
+            for (int dice : diceToRoll) {
+                if (dice < 0 || dice > 4) {
+                    throw new IllegalArgumentException("Invalid dice value: " + dice + ". Dice must be between 0 and 4.");
+                }
+            }
         }
     }
 

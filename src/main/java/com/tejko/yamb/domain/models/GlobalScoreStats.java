@@ -2,6 +2,8 @@ package com.tejko.yamb.domain.models;
 
 import java.util.List;
 
+import com.tejko.yamb.domain.models.entities.Score;
+
 public class GlobalScoreStats {
 
     private long scoreCount;

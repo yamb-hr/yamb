@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Score;
 
 public interface ScoreRepository extends JpaRepository<Score, Long> {
 

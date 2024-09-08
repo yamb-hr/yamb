@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import java.security.Principal;
 

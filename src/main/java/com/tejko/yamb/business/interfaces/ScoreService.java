@@ -1,9 +1,9 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Score;
 
 public interface ScoreService {
 

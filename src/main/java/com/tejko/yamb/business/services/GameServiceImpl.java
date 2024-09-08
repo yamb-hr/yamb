@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,15 +9,15 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Game;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.Score;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
-import com.tejko.yamb.domain.services.interfaces.GameService;
 import com.tejko.yamb.domain.repositories.GameRepository;
 
 @Service

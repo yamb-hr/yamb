@@ -18,8 +18,8 @@ import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.requests.AuthRequest;
 import com.tejko.yamb.api.dto.requests.PasswordChangeRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
-import com.tejko.yamb.domain.services.interfaces.AuthService;
+import com.tejko.yamb.business.interfaces.AuthService;
+import com.tejko.yamb.domain.models.entities.RegisteredPlayer;
 
 @RestController
 @RequestMapping("/api/auth")

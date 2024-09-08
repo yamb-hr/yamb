@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.tejko.yamb.domain.models.Role;
+import com.tejko.yamb.domain.models.entities.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
 

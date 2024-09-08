@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.dto.responses.LogResponse;
-import com.tejko.yamb.domain.services.interfaces.LogService;
+import com.tejko.yamb.business.interfaces.LogService;
 
 @RestController
 @RequestMapping("/api/logs")

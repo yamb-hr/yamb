@@ -1,7 +1,7 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
+import com.tejko.yamb.domain.models.entities.RegisteredPlayer;
 
 public interface AuthService {
 

@@ -1,14 +1,14 @@
-package com.tejko.yamb.domain.services.interfaces;
+package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
-import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.entities.PlayerPreferences;
+import com.tejko.yamb.domain.models.entities.Score;
 
 public interface PlayerService extends UserDetailsService {
 

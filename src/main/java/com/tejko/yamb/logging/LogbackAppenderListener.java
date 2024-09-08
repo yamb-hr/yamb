@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tejko.yamb.domain.services.interfaces.LogService;
+import com.tejko.yamb.business.interfaces.LogService;
 
 @Component
 public class LogbackAppenderListener implements ApplicationListener<ApplicationReadyEvent> {

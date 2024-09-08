@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.util.List;
 
@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.business.interfaces.LogService;
+import com.tejko.yamb.domain.models.entities.Log;
 import com.tejko.yamb.domain.repositories.LogRepository;
-import com.tejko.yamb.domain.services.interfaces.LogService;
 
 @Service
 public class LogServiceImpl implements LogService {

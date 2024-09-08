@@ -1,8 +1,15 @@
 package com.tejko.yamb.api.dto.requests;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class PasswordChangeRequest {
     
+    @NotBlank(message = "error.password_required")
     private String oldPassword;
+    
+    @NotBlank(message = "error.password_required")
+    @Size(min = 6, max = 30, message = "error.password_length_invalid")
     private String newPassword;
 
     public PasswordChangeRequest() {}

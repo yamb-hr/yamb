@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.services;
+package com.tejko.yamb.business.services;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.tejko.yamb.business.interfaces.ScoreService;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.entities.Score;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
-import com.tejko.yamb.domain.services.interfaces.ScoreService;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {

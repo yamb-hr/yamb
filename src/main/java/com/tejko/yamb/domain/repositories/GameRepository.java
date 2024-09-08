@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.entities.Game;
 
 public interface GameRepository extends MongoRepository<Game, String> {
     

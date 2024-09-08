@@ -22,7 +22,7 @@ import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.ShortGameResponse;
-import com.tejko.yamb.domain.services.interfaces.GameService;
+import com.tejko.yamb.business.interfaces.GameService;
 
 @RestController
 @RequestMapping("/api/games")
