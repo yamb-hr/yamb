@@ -12,7 +12,7 @@ public class GameResponse {
     private String id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private ShortPlayerResponse player;
+    private Long playerId;
     private Sheet sheet;
     private List<Dice> dices;
     private int rollCount;
@@ -46,12 +46,12 @@ public class GameResponse {
         this.updatedAt = updatedAt;
     }
 
-    public ShortPlayerResponse getPlayer() {
-        return player;
+    public Long getPlayerId() {
+        return playerId;
     }
 
-    public void setPlayer(ShortPlayerResponse player) {
-        this.player = player;
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 
     public Sheet getSheet() {

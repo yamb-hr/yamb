@@ -24,6 +24,6 @@ public interface GameService {
 
     public Game completeById(String id);
 
-    public Game finishById(String id);
+    public Game archiveById(String id);
 
 }

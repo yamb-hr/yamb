@@ -24,7 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.tejko.yamb.api.dto.responses.ErrorResponse;
-import com.tejko.yamb.exceptions.custom.GameStateException;
+import com.tejko.yamb.exceptions.custom.IllegalGameStateException;
+import com.tejko.yamb.exceptions.custom.ResourceLockedException;
 import com.tejko.yamb.util.I18nUtil;
 
 @ControllerAdvice
@@ -40,19 +41,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({
         IllegalArgumentException.class,
-        IllegalStateException.class,
         BadCredentialsException.class,
         AccessDeniedException.class,
         ResourceNotFoundException.class,
+        IllegalGameStateException.class,
+        ResourceLockedException.class,
         PersistenceException.class,
         UnsupportedOperationException.class,
         Exception.class
     })
     public final ResponseEntity<Object> handleCustomExceptions(Exception ex, WebRequest request) {
         HttpHeaders headers = new HttpHeaders();
-        if (ex instanceof IllegalArgumentException || ex instanceof IllegalStateException) {
+        if (ex instanceof IllegalArgumentException) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
-            return handleBadRequest(ex, headers, status, request);
+            return handleBadRequest((IllegalArgumentException) ex, headers, status, request);
         } else if (ex instanceof BadCredentialsException) {
             HttpStatus status = HttpStatus.UNAUTHORIZED;
             return handleUnauthorized((BadCredentialsException) ex, headers, status, request);
@@ -62,6 +64,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         } else if (ex instanceof ResourceNotFoundException) {
             HttpStatus status = HttpStatus.NOT_FOUND;
             return handleNotFound((ResourceNotFoundException) ex, headers, status, request);
+        } else if (ex instanceof IllegalGameStateException) {
+            HttpStatus status = HttpStatus.CONFLICT;
+            return handleConflict((IllegalGameStateException) ex, headers, status, request);
+        } else if (ex instanceof ResourceLockedException) {
+            HttpStatus status = HttpStatus.LOCKED;
+            return handleLocked((ResourceLockedException) ex, headers, status, request);
         } else if (ex instanceof UnsupportedOperationException) {
             HttpStatus status = HttpStatus.NOT_IMPLEMENTED;
             return handleUnsupported((UnsupportedOperationException) ex, headers, status, request);
@@ -71,7 +79,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }    
 
-    protected ResponseEntity<Object> handleBadRequest(Exception ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleBadRequest(IllegalArgumentException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
@@ -90,6 +98,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
+
+    protected ResponseEntity<Object> handleConflict(IllegalGameStateException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(ex, status);
+        return handleExceptionInternal(ex, errorResponse, headers, status, request);
+    }
+
+    protected ResponseEntity<Object> handleLocked(ResourceLockedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(ex, status);
+        return handleExceptionInternal(ex, errorResponse, headers, status, request);
+    }    
 
     protected ResponseEntity<Object> handleUnsupported(UnsupportedOperationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ErrorResponse errorResponse = createErrorResponse(ex, status);
@@ -155,8 +173,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatus(status.value());
         
-        if (ex instanceof GameStateException) {
-            GameStateException gameStateException = (GameStateException) ex;
+        if (ex instanceof IllegalGameStateException) {
+            IllegalGameStateException gameStateException = (IllegalGameStateException) ex;
             errorResponse.setMessage(i18nUtil.getMessage(gameStateException.getMessageKey(), gameStateException.getArgs()));
         } else {
             errorResponse.setMessage(i18nUtil.getMessage(ex.getLocalizedMessage()));

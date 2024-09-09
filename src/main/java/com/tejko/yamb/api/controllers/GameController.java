@@ -92,10 +92,10 @@ public class GameController {
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/finish")
+	@PutMapping("/{id}/archive")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> finishById(@PathVariable String id) {
-		GameResponse gameResponse = modelMapper.map(gameService.finishById(id), GameResponse.class);
+	public ResponseEntity<GameResponse> archiveById(@PathVariable String id) {
+		GameResponse gameResponse = modelMapper.map(gameService.archiveById(id), GameResponse.class);
 		return ResponseEntity.ok(gameResponse);
 	}
 	

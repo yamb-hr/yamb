@@ -12,7 +12,7 @@ public class ShortGameResponse {
     private String id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private ShortPlayerResponse player;
+    private Long playerId;
     private GameStatus status;
     private int totalSum;
 
@@ -42,12 +42,12 @@ public class ShortGameResponse {
         this.updatedAt = updatedAt;
     }
 
-    public ShortPlayerResponse getPlayer() {
-        return player;
+    public Long getPlayerId() {
+        return playerId;
     }
 
-    public void setPlayer(ShortPlayerResponse player) {
-        this.player = player;
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 
     public GameStatus getStatus() {

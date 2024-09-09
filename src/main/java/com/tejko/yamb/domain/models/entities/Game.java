@@ -43,9 +43,6 @@ public class Game {
     
     @Field("player_id")
     private Long playerId;
-    
-    @Field("player_name")
-    private String playerName;
 
     @Field("sheet")
     private Sheet sheet;
@@ -64,9 +61,8 @@ public class Game {
 
     protected Game() {}
 
-    protected Game(Long playerId, String playerName, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status) {
+    protected Game(Long playerId, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status, boolean locked) {
         this.playerId = playerId;
-        this.playerName = playerName;
         this.sheet = sheet;
         this.dices = dices;
         this.rollCount = rollCount;
@@ -74,8 +70,8 @@ public class Game {
         this.status = status;
     }
 
-    public static Game getInstance(Long playerId, String playerName) {
-        return new Game(playerId, playerName, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS);
+    public static Game getInstance(Long playerId) {
+        return new Game(playerId, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS, false);
     }
 
     public String getId() {
@@ -92,10 +88,6 @@ public class Game {
 
     public Long getPlayerId() {
         return playerId;
-    }
-
-    public String getPlayerName() {
-        return playerName;
     }
 
     public Sheet getSheet() {
@@ -135,7 +127,7 @@ public class Game {
     }
     
     public void roll(int[] diceToRoll) {
-        validateRollAction(diceToRoll);
+        validateRoll(diceToRoll);
         // always roll all dice for the first roll
         if (rollCount == 0) {
             for (Dice dice : dices) {
@@ -155,7 +147,7 @@ public class Game {
     }
     
     public void fill(ColumnType columnType, BoxType boxType) {
-        validatefillAction(columnType, boxType);
+        validatefill(columnType, boxType);
         sheet.fill(columnType, boxType, ScoreCalculator.calculateScore(getDiceValues(), boxType));
         if (sheet.isCompleted() ) {
             status = GameStatus.COMPLETED;
@@ -165,34 +157,41 @@ public class Game {
     }
     
     public void announce(BoxType boxType) {
-        validateAnnouncementAction(boxType);
+        validateAnnouncement(boxType);
         announcement = boxType;
     }
 
     public void restart() {
-        validateRestartAction();
+        validateRestart();
         rollCount = 0;
         announcement = null;
         sheet = Sheet.getInstance();
         dices = generateDices();
     }
 
-    public void finish() {
-        validateFinishAction();
-        status = GameStatus.FINISHED;
+    public void archive() {
+        validateArchive();
+        status = GameStatus.ARCHIVED;
     }
 
+    public boolean isLocked() {
+        return status == GameStatus.COMPLETED || status == GameStatus.ARCHIVED;
 
-    private void validateRollAction(int[] diceToRoll) {
-        if (rollCount == 3) {
+    }
+
+    private void validateRoll(int[] diceToRoll) {
+        if (isLocked()) {
+            throw new GameLockedException();
+        } else if (rollCount == 3) {
             throw new RollLimitExceededException();
         } else if (isAnnouncementRequired()) {
             throw new AnnouncementRequiredException();
-        } else if (status != GameStatus.IN_PROGRESS) {
-            throw new GameLockedException();
-        } else if (diceToRoll.length == 0 || diceToRoll.length > 5) {
-            System.out.println(diceToRoll.length);
-            throw new IllegalArgumentException("Must roll between 1 and 5 dice.");
+        } else if (diceToRoll == null) {
+            throw new IllegalArgumentException("Dice to roll cannot be null.");
+        } else if (diceToRoll.length == 0) {
+            throw new IllegalArgumentException("Dice to roll cannot be empty.");
+        } else if (diceToRoll.length > 5) {
+            throw new IllegalArgumentException("Dice to roll cannot contain more than 5 elements.");
         } else {
             for (int dice : diceToRoll) {
                 if (dice < 0 || dice > 4) {
@@ -202,35 +201,43 @@ public class Game {
         }
     }
 
-    private void validatefillAction(ColumnType columnType, BoxType boxType) {
-        if (rollCount == 0) {
+    private void validatefill(ColumnType columnType, BoxType boxType) {
+        if (isLocked()) {
+            throw new GameLockedException();
+        } else if (rollCount == 0) {
 			throw new RollRequiredException();
+        } else if (columnType == null) {
+            throw new IllegalArgumentException("Column type cannot be null.");
+        } else if (boxType == null) {
+            throw new IllegalArgumentException("Box type cannot be null.");
         } else if (!isBoxAvailable(columnType, boxType)) {
             throw new BoxUnavailableException();
-        } else if (status != GameStatus.IN_PROGRESS) {
-            throw new GameLockedException();
         }
     }
 
-    private void validateAnnouncementAction(BoxType boxType) {
-        if (announcement != null) {
+    private void validateAnnouncement(BoxType boxType) {
+        if (isLocked()) {
+            throw new GameLockedException();
+        } else if (announcement != null) {
             throw new AnnouncementAlreadyMadeException();
         } else if (rollCount == 0) {
             throw new RollRequiredException();
         } else if (rollCount > 1) {
             throw new AnnouncementNotAllowedException();
-        } else if (status != GameStatus.IN_PROGRESS) {
+        } else if (boxType == null) {
+            throw new IllegalArgumentException("Box type cannot be null.");
+        } else if (this.sheet.getColumns().get(ColumnType.ANNOUNCEMENT.ordinal()).getBoxes().get(boxType.ordinal()).getValue() != null) {
+            throw new BoxUnavailableException();
+        }
+    }
+
+    private void validateRestart() {
+        if (isLocked()) {
             throw new GameLockedException();
         }
     }
 
-    private void validateRestartAction() {
-        if (status != GameStatus.IN_PROGRESS) {
-            throw new GameLockedException();
-        }
-    }
-
-    private void validateFinishAction() {
+    private void validateArchive() {
         if (status != GameStatus.COMPLETED) {
             throw new GameNotCompletedException();
         }
@@ -268,7 +275,7 @@ public class Game {
             roll(diceToRoll);
             fill(ColumnType.FREE, BoxType.values()[i]);
         }
-        for (int i = 0; i < BoxType.values().length-1; i++) {    
+        for (int i = 0; i < BoxType.values().length; i++) {    
             roll(diceToRoll);
             announce(BoxType.values()[i]);
             fill(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);

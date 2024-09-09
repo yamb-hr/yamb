@@ -39,17 +39,16 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<Game> getAll() {
-        List<Game> games = gameRepo.findAllByOrderByUpdatedAt();
+        List<Game> games = gameRepo.findAllByOrderByUpdatedAtDesc();
         return games;
     }
 
     @Override
     public Game getOrCreate(Long playerId) {
-        Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer().get();
         checkPermission(playerId);
 
         Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
-        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerId, authenticatedPlayer.getUsername())));
+        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerId)));
 
         return game;
     }
@@ -104,10 +103,10 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game finishById(String id) {
+    public Game archiveById(String id) {
         Game game = getById(id);
         checkPermission(game.getPlayerId());
-        game.finish();
+        game.archive();
         gameRepo.save(game);
         return game;
     }
