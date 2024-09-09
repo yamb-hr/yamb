@@ -40,7 +40,7 @@ The OpenAPI specification for this project is available [here](src/main/resource
 
 You can view the interactive Swagger UI for detailed API documentation:
 
--   Swagger UI: https://jamb.com.hr/api/swagger-ui
+-   Swagger UI: https://jamb.com.hr/api/swagger-ui.html
 
 ## Installation
 
