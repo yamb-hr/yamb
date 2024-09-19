@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity(name = "role")
@@ -22,7 +23,6 @@ public class Role {
     private Long id;
 
     @Column(name = "external_id", nullable = false, updatable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID externalId;
 
 	@Column(name = "label", nullable = false, unique = true)
@@ -53,8 +53,23 @@ public class Role {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @PrePersist
+    private void ensureExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
     }
     
 }

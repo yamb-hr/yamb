@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,8 +28,7 @@ public class Score {
     @Column(name = "id")
     private Long id;
 
-	@Column(name = "external_id", nullable = false, updatable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "external_id", nullable = false, updatable = false, unique = true)
     private UUID externalId;
 
     @CreationTimestamp
@@ -72,5 +72,12 @@ public class Score {
 	public int getValue() {
 		return value;
 	}
+
+	@PrePersist
+    private void ensureExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
+    }
 
 }

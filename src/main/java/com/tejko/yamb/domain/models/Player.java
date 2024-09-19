@@ -24,6 +24,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -46,7 +47,6 @@ public abstract class Player implements UserDetails {
     private Long id;
 
     @Column(name = "external_id", nullable = false, updatable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID externalId;
 
     @CreationTimestamp
@@ -151,4 +151,12 @@ public abstract class Player implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @PrePersist
+    private void ensureExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
+    }
+    
 }

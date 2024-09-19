@@ -1,5 +1,8 @@
 package com.tejko.yamb.security;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -9,12 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.tejko.yamb.api.controllers.AuthController;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.util.JwtUtil;
@@ -44,12 +49,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isProtectedEndpoint(String requestURI) {
-        return !"/api/auth/login".equals(requestURI) && !"/api/auth/temp-player".equals(requestURI);
+        String loginUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
+        String guestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+        return !requestURI.equals(loginUri) && !requestURI.equals(guestUri);
     }
 
     private Optional<Player> extractPlayerFromRequest(HttpServletRequest request) {
-        return jwtUtil.extractTokenFromAuthHeader(request)
+        Optional<Player> player = jwtUtil.extractTokenFromAuthHeader(request)
             .flatMap(jwtUtil::extractIdFromToken)
             .flatMap(playerRepo::findByExternalId);
+        return player;
     }
 }

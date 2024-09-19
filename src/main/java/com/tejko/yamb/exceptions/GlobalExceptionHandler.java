@@ -51,7 +51,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         BadCredentialsException.class,
         AccessDeniedException.class,
         ResourceNotFoundException.class,
-        IllegalGameStateException.class,
+        IllegalStateException.class,
         ResourceLockedException.class,
         PersistenceException.class,
         UnsupportedOperationException.class,
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     })
     public final ResponseEntity<Object> handleCustomExceptions(Exception ex, WebRequest request) {
         HttpHeaders headers = new HttpHeaders();
-        errorCount.incrementAndGet();  // Increment the error count on every exception
+        errorCount.incrementAndGet();
         if (ex instanceof IllegalArgumentException) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             return handleBadRequest((IllegalArgumentException) ex, headers, status, request);
@@ -72,9 +72,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         } else if (ex instanceof ResourceNotFoundException) {
             HttpStatus status = HttpStatus.NOT_FOUND;
             return handleNotFound((ResourceNotFoundException) ex, headers, status, request);
-        } else if (ex instanceof IllegalGameStateException) {
+        } else if (ex instanceof IllegalStateException) {
             HttpStatus status = HttpStatus.CONFLICT;
-            return handleConflict((IllegalGameStateException) ex, headers, status, request);
+            return handleConflict((IllegalStateException) ex, headers, status, request);
         } else if (ex instanceof ResourceLockedException) {
             HttpStatus status = HttpStatus.LOCKED;
             return handleLocked((ResourceLockedException) ex, headers, status, request);
@@ -107,7 +107,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
 
-    protected ResponseEntity<Object> handleConflict(IllegalGameStateException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleConflict(IllegalStateException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ErrorResponse errorResponse = createErrorResponse(ex, status);
         return handleExceptionInternal(ex, errorResponse, headers, status, request);
     }

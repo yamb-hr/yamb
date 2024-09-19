@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("REGISTERED")
 public class RegisteredPlayer extends Player {
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     protected RegisteredPlayer() {}
@@ -23,6 +23,8 @@ public class RegisteredPlayer extends Player {
     public static RegisteredPlayer getInstance(String username, String password, Set<Role> roles) {
         return new RegisteredPlayer(username, password, roles);
     }
+
+    // public upgradeFromGuest()...
 
     @Override
     public String getPassword() {

@@ -14,12 +14,12 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.slf4j.event.Level;
@@ -36,9 +36,8 @@ public class Log {
     @Column(name = "id")
     private Long id;
 
-	@Column(name = "external_id", nullable = false, updatable = false, unique = true)
-    @GenericGenerator(name = "uuid-hibernate-generator", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID externalId; 
+    @Column(name = "external_id", nullable = false, updatable = false, unique = true)
+    private UUID externalId;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -105,6 +104,13 @@ public class Log {
     @Override
     public String toString() {
         return player.getUsername() + " [" + createdAt + "]: " + message;
+    }
+
+    @PrePersist
+    private void ensureExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
     }
 
 }

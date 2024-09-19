@@ -1,5 +1,8 @@
 package com.tejko.yamb.security;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.tejko.yamb.api.controllers.AuthController;
 import com.tejko.yamb.business.interfaces.RecaptchaService;
 
 public class RecaptchaFilter extends OncePerRequestFilter {
@@ -28,14 +32,18 @@ public class RecaptchaFilter extends OncePerRequestFilter {
             String recaptchaToken = request.getHeader("X-Recaptcha-Token");
 
             if (recaptchaToken == null || !recaptchaService.verifyRecaptcha(recaptchaToken)) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.sendError(403, "Bots not allowed");
                 return;
             }
         }
         filterChain.doFilter(request, response);
     }
-
+    
     private boolean isProtectedEndpoint(String requestURI) {
-        return "/api/auth/register".equals(requestURI) || "/api/auth/temp-player".equals(requestURI);
+        String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
+        String guestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+
+        return /*requestURI.equals(registerUri) || */requestURI.equals(guestUri);
     }
+
 }

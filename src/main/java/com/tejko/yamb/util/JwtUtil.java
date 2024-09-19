@@ -45,7 +45,9 @@ public class JwtUtil {
 
     public Optional<UUID> extractIdFromToken(String token) {
         if (validateToken(token)) {
-            return Optional.ofNullable(parseToken(token).getBody().getSubject()).map(UUID::fromString);
+            String subject = parseToken(token).getBody().getSubject();
+            UUID playerExternalId = UUID.fromString(subject);
+            return Optional.of(playerExternalId);
         } else {
             return Optional.empty();
         }
