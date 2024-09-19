@@ -1,10 +1,12 @@
 package com.tejko.yamb.business.services;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,9 @@ import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.models.entities.Game;
-import com.tejko.yamb.domain.models.entities.Player;
-import com.tejko.yamb.domain.models.entities.Score;
+import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
@@ -38,17 +40,16 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> getAll() {
-        List<Game> games = gameRepo.findAllByOrderByUpdatedAtDesc();
-        return games;
+    public Page<Game> getAll(Pageable pageable) {
+        return gameRepo.findAll(pageable);
     }
 
     @Override
-    public Game getOrCreate(Long playerId) {
-        checkPermission(playerId);
+    public Game getOrCreate() {
+        UUID playerExternalId = AuthContext.getAuthenticatedPlayer().get().getExternalId();
 
-        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
-        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerId)));
+        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerExternalId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
+        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId)));
 
         return game;
     }
@@ -111,9 +112,9 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
-    private void checkPermission(Long playerId) {
-        Optional<Player> authenticatedPlayerId = AuthContext.getAuthenticatedPlayer();  
-        if (playerId == null || !authenticatedPlayerId.isPresent() || !authenticatedPlayerId.get().getId().equals(playerId)) {
+    private void checkPermission(UUID playerExternalId) {
+        Optional<Player> authenticatedPlayer = AuthContext.getAuthenticatedPlayer();  
+        if (playerExternalId == null || !authenticatedPlayer.isPresent() || !authenticatedPlayer.get().getExternalId().equals(playerExternalId)) {
             throw new AccessDeniedException("error.access_denied");
         }
     }

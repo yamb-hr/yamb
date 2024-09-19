@@ -1,10 +1,15 @@
 package com.tejko.yamb.api.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import org.modelmapper.ModelMapper;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.business.interfaces.LogService;
 
@@ -21,40 +27,43 @@ import com.tejko.yamb.business.interfaces.LogService;
 public class LogController {
 
 	private final LogService logService;
-	private final ModelMapper modelMapper;
+	private final LogModelAssembler logModelAssembler;
 
 	@Autowired
-	public LogController(LogService logService, ModelMapper modelMapper) {
+	public LogController(LogService logService, LogModelAssembler logModelAssembler) {
 		this.logService = logService;
-		this.modelMapper = modelMapper;
+		this.logModelAssembler = logModelAssembler;
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<LogResponse> getById(@PathVariable Long id) {
-		LogResponse logResponse = modelMapper.map(logService.getById(id), LogResponse.class);
+	public ResponseEntity<LogResponse> getByExternalId(@PathVariable UUID externalId) {
+		LogResponse logResponse = logModelAssembler.toModel(logService.getByExternalId(externalId));
 		return ResponseEntity.ok(logResponse);
 	}
 
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<List<LogResponse>> getAll() {
-		List<LogResponse> logResponses = logService.getAll().stream().map(log -> modelMapper.map(log, LogResponse.class)).collect(Collectors.toList());
-		return ResponseEntity.ok(logResponses);
+	public ResponseEntity<PagedModel<LogResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		PagedModel<LogResponse> pagedLogs = logModelAssembler.toPagedModel(logService.getAll(pageable));
+		return ResponseEntity.ok(pagedLogs);
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-		logService.deleteById(id);
-    	return ResponseEntity.noContent().build();
+	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
+		logService.deleteByExternalId(externalId);
+		return ResponseEntity.noContent()
+			.location(linkTo(methodOn(LogController.class).getAll(null)).toUri())
+			.build();
 	}
 
 	@DeleteMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Void> deleteAll() {
 		logService.deleteAll();
-    	return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent()
+			.location(linkTo(methodOn(LogController.class).getAll(null)).toUri())
+			.build();
 	}
-
 }

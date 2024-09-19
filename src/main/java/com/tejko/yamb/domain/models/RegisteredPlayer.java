@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.models.entities;
+package com.tejko.yamb.domain.models;
 
 import java.util.Set;
 

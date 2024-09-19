@@ -1,18 +1,17 @@
 package com.tejko.yamb.api.dto.responses;
 
-public class AuthResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class AuthResponse extends RepresentationModel<AuthResponse> {
 
     private PlayerResponse player;
     private String token;
 
     public AuthResponse() {}
-    
-    public PlayerResponse getPlayer() {
-        return player;
-    }
 
-    public void setPlayer(PlayerResponse player) {
+    public AuthResponse(PlayerResponse player, String token) {
         this.player = player;
+        this.token = token;
     }
 
     public String getToken() {
@@ -21,6 +20,14 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public PlayerResponse getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(PlayerResponse player) {
+        this.player = player;
     }
     
 }

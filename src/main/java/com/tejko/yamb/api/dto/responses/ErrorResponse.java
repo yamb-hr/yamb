@@ -2,7 +2,9 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.Instant;
 
-public class ErrorResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class ErrorResponse extends RepresentationModel<ErrorResponse> {
 
     private int status;
     private String error;

@@ -1,6 +1,8 @@
 package com.tejko.yamb.api.dto.responses;
 
-public class PlayerPreferencesResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class PlayerPreferencesResponse extends RepresentationModel<PlayerPreferencesResponse> {
 
     private String language;
     private String theme;

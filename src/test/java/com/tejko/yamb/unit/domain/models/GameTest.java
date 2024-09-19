@@ -2,13 +2,15 @@ package com.tejko.yamb.unit.domain.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.models.entities.Game;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;
@@ -25,7 +27,7 @@ public class GameTest {
 
     @BeforeEach
     public void setUp() {
-        game = Game.getInstance(1L);
+        game = Game.getInstance(UUID.randomUUID());
     }
 
     @Test

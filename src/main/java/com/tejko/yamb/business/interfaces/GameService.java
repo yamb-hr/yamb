@@ -1,18 +1,19 @@
 package com.tejko.yamb.business.interfaces;
 
-import java.util.List;
-
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
-import com.tejko.yamb.domain.models.entities.Game;
+import com.tejko.yamb.domain.models.Game;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface GameService {
 
     public Game getById(String id);
 
-    public List<Game> getAll();
+    public Page<Game> getAll(Pageable pageable);
 
-    public Game getOrCreate(Long playerId);
+    public Game getOrCreate();
 
     public Game rollById(String id, int[] diceToRoll);
 

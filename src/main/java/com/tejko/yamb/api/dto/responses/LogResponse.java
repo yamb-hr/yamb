@@ -1,25 +1,30 @@
 package com.tejko.yamb.api.dto.responses;
 
+import java.util.UUID;
+
 import java.time.LocalDateTime;
 
 import org.slf4j.event.Level;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
-public class LogResponse  {
+@Relation(collectionRelation = "logs")
+public class LogResponse extends RepresentationModel<LogResponse> {
 
-    private Long id;
+    private UUID id;
     private LocalDateTime createdAt;
-    private ShortPlayerResponse player;
+    private PlayerResponse player;
     private Object data;
     private String message;
     private Level level;
 
     public LogResponse() {}
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -31,11 +36,11 @@ public class LogResponse  {
         this.createdAt = createdAt;
     }
 
-    public ShortPlayerResponse getPlayer() {
+    public PlayerResponse getPlayer() {
         return player;
     }
 
-    public void setPlayer(ShortPlayerResponse player) {
+    public void setPlayer(PlayerResponse player) {
         this.player = player;
     }
 

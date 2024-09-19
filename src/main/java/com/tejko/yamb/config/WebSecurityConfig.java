@@ -36,7 +36,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final PlayerRepository playerRepository;
 	private final RecaptchaService recaptchaService;
 
-
 	@Autowired
 	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaService recaptchaService) {
 		this.playerService = playerService;

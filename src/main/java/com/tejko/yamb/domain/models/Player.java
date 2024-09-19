@@ -1,10 +1,11 @@
-package com.tejko.yamb.domain.models.entities;
+package com.tejko.yamb.domain.models;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,6 +16,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -22,6 +24,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -32,12 +35,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity(name = "player")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@Table(name = "player", indexes = {
+    @Index(name = "idx_player_external_id", columnList = "external_id")
+})
 public abstract class Player implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "external_id", nullable = false, updatable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID externalId;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -72,6 +82,10 @@ public abstract class Player implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public LocalDateTime getCreatedAt() {

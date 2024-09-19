@@ -2,6 +2,7 @@ package com.tejko.yamb.exceptions;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.PersistenceException;
 
@@ -34,9 +35,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final I18nUtil i18nUtil;
 
+    private AtomicLong errorCount = new AtomicLong();
+
     @Autowired
     public GlobalExceptionHandler(I18nUtil i18nUtil) {
         this.i18nUtil = i18nUtil;
+    }
+
+    public long getErrorCount() {
+        return errorCount.get();
     }
 
     @ExceptionHandler({
@@ -52,6 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     })
     public final ResponseEntity<Object> handleCustomExceptions(Exception ex, WebRequest request) {
         HttpHeaders headers = new HttpHeaders();
+        errorCount.incrementAndGet();  // Increment the error count on every exception
         if (ex instanceof IllegalArgumentException) {
             HttpStatus status = HttpStatus.BAD_REQUEST;
             return handleBadRequest((IllegalArgumentException) ex, headers, status, request);

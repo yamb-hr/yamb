@@ -1,12 +1,19 @@
 package com.tejko.yamb.api.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.UUID;
 
 import javax.validation.Valid;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,73 +23,81 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
+import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
-import com.tejko.yamb.api.dto.responses.ShortScoreResponse;
+import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
-import com.tejko.yamb.domain.models.entities.PlayerPreferences;
 
 @RestController
 @RequestMapping("/api/players")
 public class PlayerController {
 
 	private final PlayerService playerService;
-	private final ModelMapper modelMapper;
+	private final PlayerModelAssembler playerModelAssembler;
+	private final ScoreModelAssembler scoreModelAssembler;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, ModelMapper modelMapper) {
+	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler) {
 		this.playerService = playerService;
-		this.modelMapper = modelMapper;
+		this.playerModelAssembler = playerModelAssembler;
+		this.scoreModelAssembler = scoreModelAssembler;
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<PlayerResponse> getById(@PathVariable Long id) {
-		PlayerResponse playerResponse = modelMapper.map(playerService.getById(id), PlayerResponse.class);
-		return ResponseEntity.ok(playerResponse);
-	}
+	@GetMapping("/{externalId}")
+    public ResponseEntity<PlayerResponse> getByExternalId(@PathVariable UUID externalId) {
+        PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.getByExternalId(externalId));
+        return ResponseEntity.ok(playerResponse);
+    }
 
 	@GetMapping("")
-	public ResponseEntity<List<PlayerResponse>> getAll() {
-		List<PlayerResponse> playerResponses = playerService.getAll().stream().map(player -> modelMapper.map(player, PlayerResponse.class)).collect(Collectors.toList());
-		return ResponseEntity.ok(playerResponses);
+	public ResponseEntity<PagedModel<PlayerResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		PagedModel<PlayerResponse> pagedPlayers = playerModelAssembler.toPagedModel(playerService.getAll(pageable));
+		return ResponseEntity.ok(pagedPlayers);
 	}
 
 	@GetMapping("/stats")
     public ResponseEntity<GlobalPlayerStatsResponse> getGlobalStats() {
-		GlobalPlayerStatsResponse globalPlayerStatsResponse = modelMapper.map(playerService.getGlobalStats(), GlobalPlayerStatsResponse.class);
+		GlobalPlayerStatsResponse globalPlayerStatsResponse = playerModelAssembler.toModel(playerService.getGlobalStats());
         return ResponseEntity.ok(globalPlayerStatsResponse);
     }
 
-	@GetMapping("/{id}/scores")
-	public ResponseEntity<List<ShortScoreResponse>> getScoresByPlayerId(@PathVariable Long id) {
-		List<ShortScoreResponse> scoreResponses = playerService.getScoresByPlayerId(id).stream().map(score -> modelMapper.map(score, ShortScoreResponse.class)).collect(Collectors.toList());
+	@GetMapping("/{externalId}/scores")
+	public ResponseEntity<CollectionModel<ScoreResponse>> getScoresByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<ScoreResponse> scoreResponses = scoreModelAssembler.toCollectionModel(playerService.getScoresByPlayerExternalId(externalId));
 		return ResponseEntity.ok(scoreResponses);
 	}
 
-	@GetMapping("/{id}/stats")
-    public ResponseEntity<PlayerStatsResponse> getPlayerStats(@PathVariable Long id) {
-		PlayerStatsResponse playerStatsResponse = modelMapper.map(playerService.getPlayerStats(id), PlayerStatsResponse.class);
+	@GetMapping("/{externalId}/stats")
+    public ResponseEntity<PlayerStatsResponse> getPlayerStatsByExternalId(@PathVariable UUID externalId) {
+		PlayerStatsResponse playerStatsResponse = playerModelAssembler.toModel(playerService.getPlayerStatsByExternalId(externalId));
         return ResponseEntity.ok(playerStatsResponse);
     }
 
-	@GetMapping("{id}/preferences")
-    public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerId(@PathVariable Long id) {
-		PlayerPreferencesResponse playerPreferencesResponse = modelMapper.map(playerService.getPreferencesByPlayerId(id), PlayerPreferencesResponse.class);
+	@GetMapping("{externalId}/preferences")
+    public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerExternalId(@PathVariable UUID externalId) {
+		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.getPreferencesByPlayerExternalId(externalId));
         return ResponseEntity.ok(playerPreferencesResponse);
     }
 
-	@PutMapping("{id}/preferences")
-    public ResponseEntity<PlayerPreferencesResponse> setPreferencesByPlayerId(@PathVariable Long id, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
-		PlayerPreferencesResponse playerPreferencesResponse = modelMapper.map(playerService.setPreferencesByPlayerId(id, modelMapper.map(playerPreferencesRequest, PlayerPreferences.class)), PlayerPreferencesResponse.class);
-        return ResponseEntity.ok(playerPreferencesResponse);
+	@PutMapping("{externalId}/preferences")
+    public ResponseEntity<EntityModel<PlayerPreferencesResponse>> setPreferencesByPlayerExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
+		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.setPreferencesByPlayerExternalId(externalId, playerModelAssembler.fromModel(playerPreferencesRequest)));
+
+		EntityModel<PlayerPreferencesResponse> preferencesModel = EntityModel.of(playerPreferencesResponse);
+        preferencesModel.add(linkTo(methodOn(PlayerController.class).setPreferencesByPlayerExternalId(externalId, playerPreferencesRequest)).withSelfRel());
+        preferencesModel.add(linkTo(methodOn(PlayerController.class).getByExternalId(externalId)).withRel("player"));
+
+        return ResponseEntity.ok(preferencesModel);
     }
 
-	@PutMapping("{id}/username")
-	public ResponseEntity<PlayerResponse> changeUsername(@PathVariable Long id, @RequestBody String username) {
-		PlayerResponse playerResponse = modelMapper.map(playerService.changeUsername(id, username), PlayerResponse.class);
+	@PutMapping("{externalId}/username")
+	public ResponseEntity<PlayerResponse> changeUsername(@PathVariable UUID externalId, @RequestBody String username) {
+		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.changeUsernameByExternalId(externalId, username));
 		return ResponseEntity.ok(playerResponse);
 	}
 
@@ -90,5 +105,11 @@ public class PlayerController {
     public ResponseEntity<Void> deleteInactivePlayers() {
 		playerService.deleteInactivePlayers();
     	return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/me")
+    public ResponseEntity<PlayerResponse> getCurrentPlayer() {
+		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.getCurrentPlayer());
+		return ResponseEntity.ok(playerResponse);
 	}
 }

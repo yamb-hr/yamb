@@ -1,9 +1,10 @@
-package com.tejko.yamb.domain.models.entities;
+package com.tejko.yamb.domain.models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.persistence.Id;
@@ -17,14 +18,14 @@ import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.exceptions.custom.GameNotCompletedException;
 import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
-import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;
+import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
 import com.tejko.yamb.exceptions.custom.BoxUnavailableException;
-import com.tejko.yamb.exceptions.custom.RollRequiredException;
 import com.tejko.yamb.exceptions.custom.GameLockedException;
+import com.tejko.yamb.exceptions.custom.GameNotCompletedException;
 import com.tejko.yamb.exceptions.custom.RollLimitExceededException;
+import com.tejko.yamb.exceptions.custom.RollRequiredException;
 import com.tejko.yamb.util.ScoreCalculator;
 
 @Document(collection = "games")
@@ -42,7 +43,7 @@ public class Game {
     private LocalDateTime updatedAt;
     
     @Field("player_id")
-    private Long playerId;
+    private UUID playerId;
 
     @Field("sheet")
     private Sheet sheet;
@@ -61,7 +62,7 @@ public class Game {
 
     protected Game() {}
 
-    protected Game(Long playerId, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status, boolean locked) {
+    protected Game(UUID playerId, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status, boolean locked) {
         this.playerId = playerId;
         this.sheet = sheet;
         this.dices = dices;
@@ -70,7 +71,7 @@ public class Game {
         this.status = status;
     }
 
-    public static Game getInstance(Long playerId) {
+    public static Game getInstance(UUID playerId) {
         return new Game(playerId, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS, false);
     }
 
@@ -86,7 +87,7 @@ public class Game {
         return updatedAt;
     }
 
-    public Long getPlayerId() {
+    public UUID getPlayerId() {
         return playerId;
     }
 
@@ -447,7 +448,7 @@ public class Game {
             if (ones.getValue() != null && max.getValue() != null && min.getValue() != null) {
                 middleSectionSum = ones.getValue() * (max.getValue() - min.getValue());
             }
-            return middleSectionSum;
+            return Math.min(middleSectionSum, 0);
         }
 
         public int getBottomSectionSum() {

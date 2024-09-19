@@ -1,8 +1,5 @@
 package com.tejko.yamb.domain.models;
 
-import com.tejko.yamb.domain.models.entities.Player;
-import com.tejko.yamb.domain.models.entities.Score;
-
 public class GlobalPlayerStats {
 
     private long playerCount;

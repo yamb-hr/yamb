@@ -2,17 +2,22 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
 
-public class GameResponse {
+@Relation(collectionRelation = "games")
+public class GameResponse extends RepresentationModel<GameResponse> {
  
     private String id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long playerId;
+    private UUID playerId;
     private Sheet sheet;
     private List<Dice> dices;
     private int rollCount;
@@ -46,11 +51,11 @@ public class GameResponse {
         this.updatedAt = updatedAt;
     }
 
-    public Long getPlayerId() {
+    public UUID getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(Long playerId) {
+    public void setPlayerId(UUID playerId) {
         this.playerId = playerId;
     }
 

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.event.Level;
 
 import com.tejko.yamb.business.interfaces.LogService;
-import com.tejko.yamb.domain.models.entities.Log;
+import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.security.AuthContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

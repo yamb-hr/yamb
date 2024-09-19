@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.tejko.yamb.domain.models.entities.Player;
+import com.tejko.yamb.domain.models.Player;
 
 public class AuthContext {
 

@@ -2,16 +2,19 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.tejko.yamb.domain.models.entities.Player;
-import com.tejko.yamb.domain.models.entities.PlayerPreferences;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.PlayerPreferences;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
+
+    Optional<Player> findByExternalId(UUID externalId);
 
     Optional<Player> findByUsername(String username);
 

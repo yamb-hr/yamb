@@ -23,9 +23,7 @@ public class RecaptchaFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
-
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (isProtectedEndpoint(request.getRequestURI())) {
             String recaptchaToken = request.getHeader("X-Recaptcha-Token");
 
@@ -34,7 +32,6 @@ public class RecaptchaFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
         filterChain.doFilter(request, response);
     }
 

@@ -1,13 +1,15 @@
 package com.tejko.yamb.business.services;
 
-import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.LogService;
-import com.tejko.yamb.domain.models.entities.Log;
+import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.repositories.LogRepository;
 
 @Service
@@ -21,15 +23,14 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Log getById(Long id) {
-        Log log = logRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
+    public Log getByExternalId(UUID externalId) {
+        Log log = logRepo.findByExternalId(externalId).orElseThrow(() -> new ResourceNotFoundException());
         return log;
     }
 
     @Override
-    public List<Log> getAll() {
-        List<Log> logs = logRepo.findAllByOrderByCreatedAtDesc();
-        return logs;
+    public Page<Log> getAll(Pageable pageable) {
+        return logRepo.findAll(pageable);
     }
 
     @Override
@@ -44,8 +45,8 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        logRepo.deleteById(id);
+    public void deleteByExternalId(UUID externalId) {
+        logRepo.deleteByExternalId(externalId);
     }
 
 }

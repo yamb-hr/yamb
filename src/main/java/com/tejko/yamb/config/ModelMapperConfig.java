@@ -18,21 +18,18 @@ import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.RoleResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.api.dto.responses.ShortGameResponse;
-import com.tejko.yamb.api.dto.responses.ShortPlayerResponse;
-import com.tejko.yamb.api.dto.responses.ShortScoreResponse;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
+import com.tejko.yamb.domain.models.GuestPlayer;
+import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.entities.AnonymousPlayer;
-import com.tejko.yamb.domain.models.entities.Game;
-import com.tejko.yamb.domain.models.entities.Log;
-import com.tejko.yamb.domain.models.entities.Player;
-import com.tejko.yamb.domain.models.entities.PlayerPreferences;
-import com.tejko.yamb.domain.models.entities.RegisteredPlayer;
-import com.tejko.yamb.domain.models.entities.Role;
-import com.tejko.yamb.domain.models.entities.Score;
+import com.tejko.yamb.domain.models.RegisteredPlayer;
+import com.tejko.yamb.domain.models.Role;
+import com.tejko.yamb.domain.models.Score;
 
 @Configuration
 public class ModelMapperConfig {
@@ -42,8 +39,8 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
-            .setFieldMatchingEnabled(true)
-            .setFieldAccessLevel(AccessLevel.PRIVATE);
+            .setFieldMatchingEnabled(false)
+            .setFieldAccessLevel(AccessLevel.PUBLIC);
         configureMappings(modelMapper);
         return modelMapper;
     }
@@ -61,63 +58,45 @@ public class ModelMapperConfig {
         // player
 
         modelMapper.createTypeMap(Player.class, PlayerResponse.class)
-            .addMapping(Player::getId, PlayerResponse::setId)
+            .addMapping(Player::getExternalId, PlayerResponse::setId)
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
             .addMapping(Player::getUpdatedAt, PlayerResponse::setUpdatedAt)
             .addMapping(Player::getUsername, PlayerResponse::setName)
             .addMappings(mapper -> mapper.using(isRegisteredConverter).map(src -> src, PlayerResponse::setRegistered));
 
         modelMapper.createTypeMap(RegisteredPlayer.class, PlayerResponse.class)
-            .addMapping(Player::getId, PlayerResponse::setId)
+            .addMapping(Player::getExternalId, PlayerResponse::setId)
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
             .addMapping(Player::getUpdatedAt, PlayerResponse::setUpdatedAt)
             .addMapping(Player::getUsername, PlayerResponse::setName)
             .addMappings(mapper -> mapper.map(src -> true, PlayerResponse::setRegistered));
 
-        modelMapper.createTypeMap(AnonymousPlayer.class, PlayerResponse.class)
-            .addMapping(AnonymousPlayer::getId, PlayerResponse::setId)
-            .addMapping(AnonymousPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
-            .addMapping(AnonymousPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
-            .addMapping(AnonymousPlayer::getUsername, PlayerResponse::setName)
+        modelMapper.createTypeMap(GuestPlayer.class, PlayerResponse.class)
+            .addMapping(GuestPlayer::getExternalId, PlayerResponse::setId)
+            .addMapping(GuestPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
+            .addMapping(GuestPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
+            .addMapping(GuestPlayer::getUsername, PlayerResponse::setName)
             .addMappings(mapper -> mapper.map(src -> false, PlayerResponse::setRegistered));
-
-        // short player
-
-        modelMapper.createTypeMap(Player.class, ShortPlayerResponse.class)
-            .addMapping(Player::getId, ShortPlayerResponse::setId)
-            .addMapping(Player::getUsername, ShortPlayerResponse::setName);
-
-        modelMapper.createTypeMap(RegisteredPlayer.class, ShortPlayerResponse.class)
-            .addMapping(Player::getId, ShortPlayerResponse::setId)
-            .addMapping(Player::getUsername, ShortPlayerResponse::setName);
-
-        modelMapper.createTypeMap(AnonymousPlayer.class, ShortPlayerResponse.class)
-            .addMapping(AnonymousPlayer::getId, ShortPlayerResponse::setId)
-            .addMapping(AnonymousPlayer::getUsername, ShortPlayerResponse::setName);
 
         // role
 
         modelMapper.createTypeMap(Role.class, RoleResponse.class)
+            .addMapping(Role::getExternalId, RoleResponse::setId)
             .addMapping(Role::getLabel, RoleResponse::setName)
             .addMapping(Role::getDescription, RoleResponse::setDescription);
 
         // score
 
         modelMapper.createTypeMap(Score.class, ScoreResponse.class)
-            .addMapping(Score::getId, ScoreResponse::setId)
+            .addMapping(Score::getExternalId, ScoreResponse::setId)
             .addMapping(Score::getCreatedAt, ScoreResponse::setCreatedAt)
             .addMapping(Score::getValue, ScoreResponse::setValue)
             .addMapping(Score::getPlayer, ScoreResponse::setPlayer);
 
-        modelMapper.createTypeMap(Score.class, ShortScoreResponse.class)
-            .addMapping(Score::getId, ShortScoreResponse::setId)
-            .addMapping(Score::getCreatedAt, ShortScoreResponse::setCreatedAt)
-            .addMapping(Score::getValue, ShortScoreResponse::setValue);
-
         // log
 
         modelMapper.createTypeMap(Log.class, LogResponse.class)
-            .addMapping(Log::getId, LogResponse::setId)
+            .addMapping(Log::getExternalId, LogResponse::setId)
             .addMapping(Log::getCreatedAt, LogResponse::setCreatedAt)
             .addMapping(Log::getData, LogResponse::setData)
             .addMapping(Log::getMessage, LogResponse::setMessage)
@@ -136,13 +115,6 @@ public class ModelMapperConfig {
             .addMapping(Game::getAnnouncement, GameResponse::setAnnouncement)
             .addMapping(Game::getStatus, GameResponse::setStatus)
             .addMapping(Game::getTotalSum, GameResponse::setTotalSum);
-
-        modelMapper.createTypeMap(Game.class, ShortGameResponse.class)
-            .addMapping(Game::getId, ShortGameResponse::setId)
-            .addMapping(Game::getCreatedAt, ShortGameResponse::setCreatedAt)
-            .addMapping(Game::getUpdatedAt, ShortGameResponse::setUpdatedAt)
-            .addMapping(Game::getTotalSum, ShortGameResponse::setTotalSum)
-            .addMapping(Game::getStatus, ShortGameResponse::setStatus);
 
         // stats
 
@@ -175,6 +147,8 @@ public class ModelMapperConfig {
             .addMapping(PlayerStats::getAverageScore, PlayerStatsResponse::setAverageScore)
             .addMapping(PlayerStats::getHighScore, PlayerStatsResponse::setHighScore)
             .addMapping(PlayerStats::getScoreCount, PlayerStatsResponse::setScoreCount);
+
+        // auth
 
         modelMapper.createTypeMap(PlayerWithToken.class, AuthResponse.class)
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
