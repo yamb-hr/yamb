@@ -13,6 +13,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import com.tejko.yamb.api.controllers.LogController;
+import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.domain.models.Log;
 
@@ -30,6 +31,7 @@ public class LogModelAssembler implements RepresentationModelAssembler<Log, LogR
         
         LogResponse logResponse = modelMapper.map(log, LogResponse.class);
 		logResponse.add(linkTo(methodOn(LogController.class).getByExternalId(logResponse.getId())).withSelfRel());
+		if (logResponse.getPlayer() != null) logResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(logResponse.getPlayer().getId())).withSelfRel());
         
         return logResponse;
     }

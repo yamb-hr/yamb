@@ -4,27 +4,31 @@ import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.models.Game;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GameService {
 
-    public Game getById(String id);
+    public Game getByExternalId(UUID externalId);
 
     public Page<Game> getAll(Pageable pageable);
 
     public Game getOrCreate();
 
-    public Game rollById(String id, int[] diceToRoll);
+    public Game rollByExternalId(UUID externalId, int[] diceToRoll);
 
-    public Game announceById(String id, BoxType boxType);
+    public Game announceByExternalId(UUID externalId, BoxType boxType);
 
-    public Game fillById(String id, ColumnType columnType, BoxType boxType);
+    public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType);
 
-    public Game restartById(String id);
+    public Game restartByExternalId(UUID externalId);
 
-    public Game completeById(String id);
+    public Game completeByExternalId(UUID externalId);
 
-    public Game archiveById(String id);
+    public Game archiveByExternalId(UUID externalId);
+
+    public void deleteByExternalId(UUID externalId);
 
 }

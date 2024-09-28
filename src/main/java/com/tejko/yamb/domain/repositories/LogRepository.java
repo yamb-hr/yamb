@@ -14,6 +14,6 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 
     List<Log> findAllByOrderByCreatedAtDesc();
 
-    void deleteByExternalId(UUID externalId);
+    List<Log> findAllByPlayerId(Long playerId);
     
 }

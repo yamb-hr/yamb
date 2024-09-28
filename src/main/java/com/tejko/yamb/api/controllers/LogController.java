@@ -49,15 +49,6 @@ public class LogController {
 		return ResponseEntity.ok(pagedLogs);
 	}
 
-	@DeleteMapping("/{externalId}")
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
-		logService.deleteByExternalId(externalId);
-		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(LogController.class).getAll(null)).toUri())
-			.build();
-	}
-
 	@DeleteMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Void> deleteAll() {
@@ -66,4 +57,5 @@ public class LogController {
 			.location(linkTo(methodOn(LogController.class).getAll(null)).toUri())
 			.build();
 	}
+	
 }

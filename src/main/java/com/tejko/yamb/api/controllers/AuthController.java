@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,12 +62,10 @@ public class AuthController {
         return ResponseEntity.created(location).body(playerResponse);
     }
 
-    @PostMapping("/guest")
-    public ResponseEntity<AuthResponse> registerGuest(@Valid @RequestBody UsernameRequest anonymousPlayerRequest) {
+    @PostMapping("/register-guest")
+    public ResponseEntity<AuthResponse> registerGuest(@Valid @RequestBody UsernameRequest usernameRequest) {
         
-        AuthResponse authResponse = authModelAssembler.toModel(authService.registerGuest(anonymousPlayerRequest.getUsername()));
-        authResponse.add(linkTo(methodOn(AuthController.class).register(null)).withRel("register"));
-
+        AuthResponse authResponse = authModelAssembler.toModel(authService.registerGuest(usernameRequest.getUsername()));
         
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -77,7 +76,8 @@ public class AuthController {
         return ResponseEntity.created(location).body(authResponse);
     }
 
-    @PutMapping("/password")
+    @PutMapping("/password-reset")
+	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> resetPassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
         authService.changePassword(passwordChangeRequest.getOldPassword(), passwordChangeRequest.getNewPassword());
         

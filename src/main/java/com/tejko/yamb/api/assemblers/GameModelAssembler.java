@@ -31,14 +31,14 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
     public GameResponse toModel(Game game) {
         
         GameResponse gameResponse = modelMapper.map(game, GameResponse.class);
-        gameResponse.add(linkTo(methodOn(GameController.class).getById(gameResponse.getId())).withSelfRel());
-        gameResponse.add(linkTo(methodOn(GameController.class).rollById(gameResponse.getId(), null)).withRel("roll"));
-        gameResponse.add(linkTo(methodOn(GameController.class).announceById(gameResponse.getId(), null)).withRel("announce"));
-        gameResponse.add(linkTo(methodOn(GameController.class).fillById(gameResponse.getId(), null)).withRel("fill"));
-        gameResponse.add(linkTo(methodOn(GameController.class).restartById(gameResponse.getId())).withRel("restart"));
-        gameResponse.add(linkTo(methodOn(GameController.class).archiveById(gameResponse.getId())).withRel("archive"));
-        gameResponse.add(linkTo(methodOn(GameController.class).completeById(gameResponse.getId())).withRel("complete"));
-        gameResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(gameResponse.getPlayerId())).withRel("player"));
+        gameResponse.add(linkTo(methodOn(GameController.class).getByExternalId(gameResponse.getId())).withSelfRel());
+        gameResponse.add(linkTo(methodOn(GameController.class).rollByExternalId(gameResponse.getId(), null)).withRel("roll"));
+        gameResponse.add(linkTo(methodOn(GameController.class).announceByExternalId(gameResponse.getId(), null)).withRel("announce"));
+        gameResponse.add(linkTo(methodOn(GameController.class).fillByExternalId(gameResponse.getId(), null)).withRel("fill"));
+        gameResponse.add(linkTo(methodOn(GameController.class).restartByExternalId(gameResponse.getId())).withRel("restart"));
+        gameResponse.add(linkTo(methodOn(GameController.class).archiveByExternalId(gameResponse.getId())).withRel("archive"));
+        gameResponse.add(linkTo(methodOn(GameController.class).completeByExternalId(gameResponse.getId())).withRel("complete"));
+        gameResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(gameResponse.getPlayer().getId())).withSelfRel());
 
         return gameResponse;
     }

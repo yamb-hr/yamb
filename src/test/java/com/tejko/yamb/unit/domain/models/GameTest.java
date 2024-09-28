@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.exceptions.AnnouncementAlreadyMadeException;
+import com.tejko.yamb.domain.exceptions.AnnouncementNotAllowedException;
+import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
+import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
+import com.tejko.yamb.domain.exceptions.GameLockedException;
+import com.tejko.yamb.domain.exceptions.GameNotCompletedException;
+import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
+import com.tejko.yamb.domain.exceptions.RollRequiredException;
 import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.exceptions.custom.AnnouncementAlreadyMadeException;
-import com.tejko.yamb.exceptions.custom.AnnouncementRequiredException;
-import com.tejko.yamb.exceptions.custom.AnnouncementNotAllowedException;
-import com.tejko.yamb.exceptions.custom.BoxUnavailableException;
-import com.tejko.yamb.exceptions.custom.RollRequiredException;
-import com.tejko.yamb.exceptions.custom.GameLockedException;
-import com.tejko.yamb.exceptions.custom.GameNotCompletedException;
-import com.tejko.yamb.exceptions.custom.RollLimitExceededException;
 
 public class GameTest {
 

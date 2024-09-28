@@ -23,10 +23,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tejko.yamb.api.assemblers.ClashModelAssembler;
+import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
+import com.tejko.yamb.api.dto.requests.UsernameRequest;
+import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
@@ -40,12 +45,16 @@ public class PlayerController {
 	private final PlayerService playerService;
 	private final PlayerModelAssembler playerModelAssembler;
 	private final ScoreModelAssembler scoreModelAssembler;
+	private final ClashModelAssembler clashModelAssembler;
+	private final LogModelAssembler logModelAssembler;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler) {
+	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler, ClashModelAssembler clashModelAssembler, LogModelAssembler logModelAssembler) {
 		this.playerService = playerService;
 		this.playerModelAssembler = playerModelAssembler;
 		this.scoreModelAssembler = scoreModelAssembler;
+		this.clashModelAssembler = clashModelAssembler;
+		this.logModelAssembler = logModelAssembler;
 	}
 
 	@GetMapping("/{externalId}")
@@ -72,6 +81,18 @@ public class PlayerController {
 		return ResponseEntity.ok(scoreResponses);
 	}
 
+	@GetMapping("/{externalId}/clashes")
+	public ResponseEntity<CollectionModel<ClashResponse>> getClashesByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<ClashResponse> clashResponses = clashModelAssembler.toCollectionModel(playerService.getClashesByPlayerExternalId(externalId));
+		return ResponseEntity.ok(clashResponses);
+	}
+
+	@GetMapping("/{externalId}/logs")
+	public ResponseEntity<CollectionModel<LogResponse>> getLogsByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<LogResponse> logResponses = logModelAssembler.toCollectionModel(playerService.getLogsByPlayerExternalId(externalId));
+		return ResponseEntity.ok(logResponses);
+	}
+
 	@GetMapping("/{externalId}/stats")
     public ResponseEntity<PlayerStatsResponse> getPlayerStatsByExternalId(@PathVariable UUID externalId) {
 		PlayerStatsResponse playerStatsResponse = playerModelAssembler.toModel(playerService.getPlayerStatsByExternalId(externalId));
@@ -96,8 +117,8 @@ public class PlayerController {
     }
 
 	@PutMapping("{externalId}/username")
-	public ResponseEntity<PlayerResponse> changeUsername(@PathVariable UUID externalId, @RequestBody String username) {
-		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.changeUsernameByExternalId(externalId, username));
+	public ResponseEntity<PlayerResponse> changeUsernameByExternalId(@PathVariable UUID externalId, @RequestBody UsernameRequest usernameRequest) {
+		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.changeUsernameByExternalId(externalId, usernameRequest.getUsername()));
 		return ResponseEntity.ok(playerResponse);
 	}
 

@@ -1,19 +1,21 @@
 package com.tejko.yamb.security;
 
-import java.util.Optional;
-
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.tejko.yamb.domain.models.Player;
 
 public class AuthContext {
 
-    public static Optional<Player> getAuthenticatedPlayer() {
-        try {
-            return Optional.of((Player) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        } catch (Exception e) {
-            return Optional.empty();
+    public static Player getAuthenticatedPlayer() {
+        if (isAuthenticated()) {
+            return (Player) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }
+        throw new BadCredentialsException("test");
+    }
+
+    private static boolean isAuthenticated() {
+        return !SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser");
     }
 
 }

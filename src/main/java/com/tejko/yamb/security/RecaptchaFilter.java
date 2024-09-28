@@ -28,22 +28,23 @@ public class RecaptchaFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+
         if (isProtectedEndpoint(request.getRequestURI())) {
             String recaptchaToken = request.getHeader("X-Recaptcha-Token");
-
             if (recaptchaToken == null || !recaptchaService.verifyRecaptcha(recaptchaToken)) {
                 response.sendError(403, "Bots not allowed");
                 return;
             }
         }
+
         filterChain.doFilter(request, response);
     }
     
+    // recaptcha is only required for (guest) registration
     private boolean isProtectedEndpoint(String requestURI) {
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
-        String guestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
-
-        return /*requestURI.equals(registerUri) || */requestURI.equals(guestUri);
+        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+        return requestURI.equals(registerUri) || requestURI.equals(registerGuestUri);
     }
 
 }

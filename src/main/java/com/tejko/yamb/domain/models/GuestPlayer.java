@@ -18,10 +18,5 @@ public class GuestPlayer extends Player {
     public static GuestPlayer getInstance(String username, Set<Role> roles) {
         return new GuestPlayer(username, roles);
     }
-    
-    @Override
-    public String getPassword() {
-        return null;
-    }
-   
+
 }

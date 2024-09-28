@@ -1,4 +1,4 @@
-package com.tejko.yamb.exceptions;
+package com.tejko.yamb.api;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -25,8 +25,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.tejko.yamb.api.dto.responses.ErrorResponse;
-import com.tejko.yamb.exceptions.custom.IllegalGameStateException;
-import com.tejko.yamb.exceptions.custom.ResourceLockedException;
+import com.tejko.yamb.domain.exceptions.IllegalGameStateException;
+import com.tejko.yamb.domain.exceptions.ResourceLockedException;
 import com.tejko.yamb.util.I18nUtil;
 
 @ControllerAdvice

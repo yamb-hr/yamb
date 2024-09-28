@@ -40,7 +40,10 @@ public class PlayerModelAssembler implements RepresentationModelAssembler<Player
         PlayerResponse playerResponse = modelMapper.map(player, PlayerResponse.class);
         playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
         playerResponse.add(linkTo(methodOn(PlayerController.class).getScoresByPlayerExternalId(playerResponse.getId())).withRel("scores"));
+        playerResponse.add(linkTo(methodOn(PlayerController.class).getClashesByPlayerExternalId(playerResponse.getId())).withRel("clashes"));
+        playerResponse.add(linkTo(methodOn(PlayerController.class).getLogsByPlayerExternalId(playerResponse.getId())).withRel("logs"));
         playerResponse.add(linkTo(methodOn(PlayerController.class).getPreferencesByPlayerExternalId(playerResponse.getId())).withRel("preferences"));
+        playerResponse.add(linkTo(methodOn(PlayerController.class).changeUsernameByExternalId(playerResponse.getId(), null)).withRel("username"));
         playerResponse.add(linkTo(methodOn(PlayerController.class).getPlayerStatsByExternalId(playerResponse.getId())).withRel("stats"));
         
         return playerResponse;

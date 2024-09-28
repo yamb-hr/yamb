@@ -11,10 +11,16 @@ import com.tejko.yamb.domain.models.Game;
 
 public interface GameRepository extends MongoRepository<Game, String> {
     
+    Optional<Game> findByExternalId(UUID externalId);
+    
     Optional<Game> findByPlayerIdAndStatusIn(UUID playerId, List<GameStatus> statuses);
+
+    Optional<Game> findByPlayerIdAndStatus(UUID playerId, GameStatus status);
 
     boolean existsByPlayerIdAndStatusIn(UUID playerId, List<GameStatus> statuses);
 
-    List<Game> findAllByOrderByUpdatedAtDesc();    
+    List<Game> findAllByOrderByUpdatedAtDesc();
+    
+    void deleteByExternalId(UUID externalId);
 
 }

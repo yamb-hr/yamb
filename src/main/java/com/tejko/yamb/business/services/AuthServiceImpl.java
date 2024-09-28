@@ -1,7 +1,6 @@
 package com.tejko.yamb.business.services;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,22 +50,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public RegisteredPlayer register(String username, String password) {
-
-        Optional<Player> authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
-        RegisteredPlayer player;
-        if (authenticatedPlayer.isPresent() && authenticatedPlayer.get() instanceof GuestPlayer) {
-            if (!authenticatedPlayer.get().getUsername().equals(username)) {
-                validateUsername(username);
-            }
-            GuestPlayer anonymousPlayer = (GuestPlayer) authenticatedPlayer.get();
-            player = RegisteredPlayer.getInstance(username, encoder.encode(password), anonymousPlayer.getRoles());
-        } else {
-            validateUsername(username);
-            player = RegisteredPlayer.getInstance(username, encoder.encode(password), getDefaultRoles());
-        }
-        player = playerRepo.save(player);
-
-        return player;
+        validateUsername(username);
+        RegisteredPlayer registeredPlayer = RegisteredPlayer.getInstance(username, encoder.encode(password), getDefaultRoles());
+        registeredPlayer = playerRepo.save(registeredPlayer);
+        return registeredPlayer;
     }
 
     @Override
@@ -80,9 +67,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        RegisteredPlayer player = (RegisteredPlayer) AuthContext.getAuthenticatedPlayer().get();
+        Player player = AuthContext.getAuthenticatedPlayer();
     
-        if (!encoder.matches(oldPassword, player.getPassword())) {
+        if (player instanceof RegisteredPlayer && !encoder.matches(oldPassword, player.getPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
     

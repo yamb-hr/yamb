@@ -1,16 +1,15 @@
 package com.tejko.yamb.domain.models;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,6 +27,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DiscriminatorFormula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,11 +35,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "player")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "player", indexes = {
     @Index(name = "idx_player_external_id", columnList = "external_id")
 })
-public abstract class Player implements UserDetails {
+@DiscriminatorFormula("CASE WHEN password IS NULL THEN 'GUEST' ELSE 'REGISTERED' END")
+public abstract class Player implements UserDetails, Principal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,6 +59,9 @@ public abstract class Player implements UserDetails {
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
+
+    @Column(name = "password", nullable = true) // password is null for guest users
+    private String password;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Score> scores;
@@ -104,11 +107,20 @@ public abstract class Player implements UserDetails {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
     
     public List<Score> getScores() {
         return scores;
     }
-    
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -157,6 +169,11 @@ public abstract class Player implements UserDetails {
         if (this.externalId == null) {
             this.externalId = UUID.randomUUID();
         }
+    }
+
+    @Override 
+    public String getName() {
+        return String.valueOf(externalId);
     }
     
 }

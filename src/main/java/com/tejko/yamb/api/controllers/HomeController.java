@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.LongAdder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +17,14 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 
 import com.sun.management.OperatingSystemMXBean;
-import com.tejko.yamb.exceptions.GlobalExceptionHandler;
+import com.tejko.yamb.api.GlobalExceptionHandler;
 import com.tejko.yamb.util.ResponseTimeAspect;
 
 @Controller
@@ -46,8 +46,6 @@ public class HomeController {
     @Value("${app.version}")
     private String appVersion;
 
-    private LongAdder requestsProcessed = new LongAdder();
-
     @Autowired
     public HomeController(Environment environment, JdbcTemplate jdbcTemplate, MongoTemplate mongoTemplate, RestTemplate restTemplate, ResponseTimeAspect responseTimeAspect, GlobalExceptionHandler globalExceptionHandler) {
         this.environment = environment;
@@ -67,7 +65,9 @@ public class HomeController {
     public ResponseEntity<RepresentationModel<?>> getApiRoot() {
         RepresentationModel<?> rootResource = new RepresentationModel<>();
 
-        rootResource.add(linkTo(methodOn(AuthController.class).registerGuest(null)).withRel("guest"));
+        rootResource.add(linkTo(methodOn(HomeController.class).getHealthCheck()).withRel("health"));
+        rootResource.add(linkTo(methodOn(HomeController.class).getMetrics()).withRel("metrics"));
+        rootResource.add(linkTo(methodOn(AuthController.class).registerGuest(null)).withRel("register-guest"));
         rootResource.add(linkTo(methodOn(AuthController.class).register(null)).withRel("register"));
         rootResource.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
         rootResource.add(linkTo(methodOn(GameController.class).getOrCreate()).withRel("get-or-create-game"));
@@ -78,59 +78,43 @@ public class HomeController {
         return ResponseEntity.ok(rootResource);
     }
 
-    @GetMapping("/api/version")
-    public ResponseEntity<Map<String, String>> getVersionInfo() {
-        Map<String, String> versionInfo = new HashMap<>();
-        versionInfo.put("version", appVersion);
-        return ResponseEntity.ok(versionInfo);
-    }
-
     @GetMapping("/api/health")
-    public ResponseEntity<Map<String, String>> healthCheck() {
+    public ResponseEntity<Map<String, String>> getHealthCheck() {        
+        
         Map<String, String> response = new HashMap<>();
-        response.put("status", "healthy");
         response.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime() + "ms");
         response.put("version", appVersion);
+        response.put("postgres", checkPostgreSQLConnection() ? "connected" : "disconnected");
+        response.put("mongo", checkMongoDBConnection() ? "connected" : "disconnected");
+        response.put("recaptchaAPI", checkRecaptchaAPI() ? "reachable" : "unreachable");
+
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/status")
-    public ResponseEntity<Map<String, String>> statusCheck() {
-        Map<String, String> status = new HashMap<>();
-        status.put("postgres", checkPostgreSQLConnection() ? "connected" : "disconnected");
-        status.put("mongo", checkMongoDBConnection() ? "connected" : "disconnected");
-        status.put("recaptchaAPI", checkRecaptchaAPI() ? "reachable" : "unreachable");
-        status.put("version", appVersion);
-        return ResponseEntity.ok(status);
-    }
-
-    @GetMapping("/api/system-info")
-    public ResponseEntity<Map<String, String>> getSystemInfo() {
-        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-        Map<String, String> systemInfo = new HashMap<>();
-        systemInfo.put("memoryUsage", osBean.getFreePhysicalMemorySize() + " bytes free");
-        systemInfo.put("cpuUsage", osBean.getSystemCpuLoad() * 100 + "%");
-        systemInfo.put("diskSpace", osBean.getFreeSwapSpaceSize() + " bytes free");
-        return ResponseEntity.ok(systemInfo);
-    }
-
     @GetMapping("/api/metrics")
-    public ResponseEntity<Map<String, Object>> getMetrics() {
-        requestsProcessed.increment();
+	@PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Map<String, String>> getMetrics() {
 
-        long totalRequests = requestsProcessed.sum();
+        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+        
+        long totalRequests = responseTimeAspect.getRequestCount();
         long errorCount = globalExceptionHandler.getErrorCount();
         double averageResponseTime = responseTimeAspect.getAverageResponseTime();
         double errorRate = (totalRequests == 0) ? 0 : ((double) errorCount / totalRequests) * 100;
 
-        Map<String, Object> metrics = new HashMap<>();
-        metrics.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime() + "ms");
-        metrics.put("requestsProcessed", totalRequests);
-        metrics.put("averageResponseTime", averageResponseTime + "ms");
-        metrics.put("errorRate", errorRate + "%");
+        Map<String, String> response = new HashMap<>();
+        response.put("memoryUsage", osBean.getFreePhysicalMemorySize() + " bytes free");
+        response.put("cpuUsage", osBean.getSystemCpuLoad() * 100 + "%");
+        response.put("diskSpace", osBean.getFreeSwapSpaceSize() + " bytes free");
+        response.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime() + "ms");
+        response.put("averageResponseTime", averageResponseTime + "ms");
+        response.put("requestsProcessed", String.valueOf(totalRequests));
+        response.put("errorCount", String.valueOf(errorCount));
+        response.put("errorRate", errorRate + "%");
 
-        return ResponseEntity.ok(metrics);
+        return ResponseEntity.ok(response);
     }
+
 
     private boolean checkPostgreSQLConnection() {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {

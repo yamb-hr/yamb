@@ -1,4 +1,4 @@
-package com.tejko.yamb.exceptions.custom;
+package com.tejko.yamb.domain.exceptions;
 
 public class RollRequiredException extends IllegalGameStateException {
 

@@ -1,6 +1,10 @@
 package com.tejko.yamb.api.controllers;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.net.URI;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -10,7 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,10 +25,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.api.assemblers.GameModelAssembler;
 import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.business.interfaces.GameService;
+import com.tejko.yamb.domain.enums.MessageType;
+import com.tejko.yamb.domain.models.WebSocketMessage;
+
+
 
 @RestController
 @RequestMapping("/api/games")
@@ -30,16 +41,20 @@ public class GameController {
 
 	private final GameService gameService;
 	private final GameModelAssembler gameModelAssembler;
+	private final SimpMessagingTemplate simpMessagingTemplate;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public GameController(GameService gameService, GameModelAssembler gameModelAssembler) {
+	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper) {
 		this.gameService = gameService;
 		this.gameModelAssembler = gameModelAssembler;
+		this.simpMessagingTemplate = simpMessagingTemplate;
+		this.objectMapper = objectMapper;
 	}
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<GameResponse> getById(@PathVariable String id) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.getById(id));
+	@GetMapping("/{externalId}")
+	public ResponseEntity<GameResponse> getByExternalId(@PathVariable UUID externalId) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.getByExternalId(externalId));
 		return ResponseEntity.ok(gameResponse);
 	}
 
@@ -52,13 +67,12 @@ public class GameController {
 	@PutMapping("")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> getOrCreate() {
-
+		
 		GameResponse gameResponse = gameModelAssembler.toModel(gameService.getOrCreate());
-
 		if (gameResponse.getCreatedAt().equals(gameResponse.getUpdatedAt())) {
 			URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()
-				.path("/{id}")
+				.path("/{externalId}")
 				.buildAndExpand(gameResponse.getId())
 				.toUri();
 			return ResponseEntity.created(location).body(gameResponse);
@@ -67,46 +81,63 @@ public class GameController {
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/roll")
+	@PutMapping("/{externalId}/roll")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> rollById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.rollById(id, actionRequest.getDiceToRoll()));
+	public ResponseEntity<GameResponse> rollByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.rollByExternalId(externalId,actionRequest.getDiceToRoll()));
+		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ROLL, gameResponse);
+		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/announce")
+	@PutMapping("/{externalId}/announce")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> announceById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.announceById(id, actionRequest.getBoxType()));
+	public ResponseEntity<GameResponse> announceByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.announceByExternalId(externalId,actionRequest.getBoxType()));
+		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
+		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/fill")
+	@PutMapping("/{externalId}/fill")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> fillById(@PathVariable String id, @Valid @RequestBody ActionRequest actionRequest) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.fillById(id, actionRequest.getColumnType(), actionRequest.getBoxType()));
+	public ResponseEntity<GameResponse> fillByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.fillByExternalId(externalId,actionRequest.getColumnType(), actionRequest.getBoxType()));
+		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
+		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/restart")
+	@PutMapping("/{externalId}/restart")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> restartById(@PathVariable String id) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.restartById(id));
+	public ResponseEntity<GameResponse> restartByExternalId(@PathVariable UUID externalId) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.restartByExternalId(externalId));
+		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
+		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(gameResponse);
 	}
 
-	@PutMapping("/{id}/archive")
+	@PutMapping("/{externalId}/archive")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> archiveById(@PathVariable String id) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.archiveById(id));
+	public ResponseEntity<GameResponse> archiveByExternalId(@PathVariable UUID externalId) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.archiveByExternalId(externalId));
 		return ResponseEntity.ok(gameResponse);
 	}
 	
-	@PutMapping("/{id}/complete")
+	@PutMapping("/{externalId}/complete")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<GameResponse> completeById(@PathVariable String id) {
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.completeById(id));
+	public ResponseEntity<GameResponse> completeByExternalId(@PathVariable UUID externalId) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.completeByExternalId(externalId));
 		return ResponseEntity.ok(gameResponse);
+	}
+	
+	@DeleteMapping("/{externalId}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
+		gameService.deleteByExternalId(externalId);
+		return ResponseEntity.noContent()
+			.location(linkTo(methodOn(GameController.class).getAll(null)).toUri())
+			.build();
 	}
 
 }

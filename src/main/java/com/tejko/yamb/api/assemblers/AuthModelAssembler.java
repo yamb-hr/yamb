@@ -25,9 +25,17 @@ public class AuthModelAssembler implements RepresentationModelAssembler<PlayerWi
 
     @Override
     public AuthResponse toModel(PlayerWithToken playerWithToken) {
+
         AuthResponse authResponse = modelMapper.map(playerWithToken, AuthResponse.class);
         authResponse.add(linkTo(methodOn(AuthController.class).resetPassword(null)).withRel("reset-password"));
-        authResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(authResponse.getPlayer().getId())).withRel("player"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(authResponse.getPlayer().getId())).withSelfRel());
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getScoresByPlayerExternalId(authResponse.getPlayer().getId())).withRel("scores"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getClashesByPlayerExternalId(authResponse.getPlayer().getId())).withRel("clashes"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getLogsByPlayerExternalId(authResponse.getPlayer().getId())).withRel("logs"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getPreferencesByPlayerExternalId(authResponse.getPlayer().getId())).withRel("preferences"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).changeUsernameByExternalId(authResponse.getPlayer().getId(), null)).withRel("username"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getPlayerStatsByExternalId(authResponse.getPlayer().getId())).withRel("stats"));
+        
         return authResponse;
     }
 

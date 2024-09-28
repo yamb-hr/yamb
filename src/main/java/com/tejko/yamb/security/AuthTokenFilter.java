@@ -4,7 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,6 +17,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.tejko.yamb.api.controllers.AuthController;
@@ -37,27 +38,44 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
-        if (isProtectedEndpoint(requestURI)) {
-            extractPlayerFromRequest(request).ifPresent(player -> {
+        if (isProtectedEndpoint(request.getRequestURI())) {
+            System.out.println(request.getRequestURI());
+            String authToken = parseToken(request);
+            if (authToken != null && jwtUtil.validateToken(authToken)) {
+                UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
+                Player player = playerRepo.findByExternalId(playerExternalId).get();
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(player, null, player.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            } else {
+                response.sendError(401, "Unauthorized");
+                return;
+            }
         }
         filterChain.doFilter(request, response);
     }
 
+    // every endpoint except token fetching and (guest) registration may expect authorization
     private boolean isProtectedEndpoint(String requestURI) {
-        String loginUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
-        String guestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
-        return !requestURI.equals(loginUri) && !requestURI.equals(guestUri);
+        String tokenUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
+        String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
+        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+        return !requestURI.equals(tokenUri) && !requestURI.equals(registerGuestUri) && !requestURI.equals(registerUri);
     }
 
-    private Optional<Player> extractPlayerFromRequest(HttpServletRequest request) {
-        Optional<Player> player = jwtUtil.extractTokenFromAuthHeader(request)
-            .flatMap(jwtUtil::extractIdFromToken)
-            .flatMap(playerRepo::findByExternalId);
-        return player;
+    private String parseToken(HttpServletRequest request) {
+        
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+    
+        String tokenParam = request.getParameter("token");
+        if (StringUtils.hasText(tokenParam)) {
+            return tokenParam;
+        }
+        return null;
     }
+    
+
 }

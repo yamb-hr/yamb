@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
+import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
@@ -22,6 +24,10 @@ public interface PlayerService extends UserDetailsService {
     public Page<Player> getAll(Pageable pageable);
     
     public List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
+
+    public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId);
+
+    public List<Log> getLogsByPlayerExternalId(UUID playerExternalId);
 
     public PlayerStats getPlayerStatsByExternalId(UUID externalId);
 

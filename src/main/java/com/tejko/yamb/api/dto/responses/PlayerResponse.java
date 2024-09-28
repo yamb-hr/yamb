@@ -14,7 +14,7 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private Set<RoleResponse> roles;
+    private Set<String> roles;
     private boolean isRegistered;
 
     public PlayerResponse() {}
@@ -51,11 +51,11 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
         this.name = name;
     }
 
-    public Set<RoleResponse> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<RoleResponse> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 

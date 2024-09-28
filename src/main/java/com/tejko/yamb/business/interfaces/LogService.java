@@ -15,8 +15,6 @@ public interface LogService {
     
     public Log create(Log log);
 
-    public void deleteByExternalId(UUID externalId);
-
     public void deleteAll();
     
 }

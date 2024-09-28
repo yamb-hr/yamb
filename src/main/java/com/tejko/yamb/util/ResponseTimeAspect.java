@@ -35,4 +35,8 @@ public class ResponseTimeAspect {
         }
         return totalTime.doubleValue() / count;
     }
+
+    public long getRequestCount() {
+        return requestCount.get();
+    }
 }

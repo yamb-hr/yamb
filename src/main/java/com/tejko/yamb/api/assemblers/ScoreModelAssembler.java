@@ -32,7 +32,7 @@ public class ScoreModelAssembler implements RepresentationModelAssembler<Score, 
         
         ScoreResponse scoreResponse = modelMapper.map(score, ScoreResponse.class);
 		scoreResponse.add(linkTo(methodOn(ScoreController.class).getByExternalId(scoreResponse.getId())).withSelfRel());
-		scoreResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(scoreResponse.getPlayer().getId())).withRel("player"));
+		scoreResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(scoreResponse.getPlayer().getId())).withSelfRel());
 
         return scoreResponse;
     }

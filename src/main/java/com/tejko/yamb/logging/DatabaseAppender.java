@@ -48,7 +48,7 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
                                 .collect(Collectors.toList())
                 );
             }
-            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer().orElse(null), message, stackTraceData, Level.ERROR));
+            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), message, stackTraceData, Level.ERROR));
         } catch (Exception e) {
             System.err.println("Failed to log to database: " + e.getLocalizedMessage());
         }

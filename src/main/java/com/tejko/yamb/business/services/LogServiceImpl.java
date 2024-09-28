@@ -44,9 +44,4 @@ public class LogServiceImpl implements LogService {
         logRepo.deleteAll();
     }
 
-    @Override
-    public void deleteByExternalId(UUID externalId) {
-        logRepo.deleteByExternalId(externalId);
-    }
-
 }

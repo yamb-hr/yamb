@@ -7,31 +7,34 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.tejko.yamb.websocket.WebSocketAuthInterceptor;
+import com.tejko.yamb.security.WebSocketAuthHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
+    private WebSocketAuthHandler webSocketAuthHandler;
 
     @Autowired
-    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor) {
-        this.webSocketAuthInterceptor = webSocketAuthInterceptor;
+    public WebSocketConfig(WebSocketAuthHandler webSocketAuthHandler) {
+        this.webSocketAuthHandler = webSocketAuthHandler;
     }
+
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
         registry.setUserDestinationPrefix("/player");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/ws")        
-            .setAllowedOrigins("*")
-            .addInterceptors(webSocketAuthInterceptor);
+        registry.addEndpoint("/api/ws")
+            .setAllowedOrigins("http://localhost:3000", "https://jamb.com.hr")
+            // .addInterceptors(webSocketAuthInterceptor)
+            .setHandshakeHandler(webSocketAuthHandler)
+            .withSockJS();
     }
 
 }

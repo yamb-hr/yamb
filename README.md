@@ -57,7 +57,7 @@ To run this project locally, follow these steps:
 
 1.  Clone the repository:
 
-    `git clone https://github.com/MatejDanic/yamb.git
+    `git clone https://github.com/yamb-hr/yamb.git
     cd yamb`
 
 2.  Install dependencies:
