@@ -28,13 +28,16 @@ import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
+import com.tejko.yamb.api.dto.requests.RelationshipRequest;
 import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
+import com.tejko.yamb.api.dto.responses.FriendRequestResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.RelationshipResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
 
@@ -120,6 +123,18 @@ public class PlayerController {
 	public ResponseEntity<PlayerResponse> changeUsernameByExternalId(@PathVariable UUID externalId, @RequestBody UsernameRequest usernameRequest) {
 		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.changeUsernameByExternalId(externalId, usernameRequest.getUsername()));
 		return ResponseEntity.ok(playerResponse);
+	}
+
+	@GetMapping("{externalId}/relationships")
+	public ResponseEntity<CollectionModel<RelationshipResponse>> getRelationshipsByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<RelationshipResponse> relationshipResponses = playerModelAssembler.toCollectionModel(playerService.getRelationshipsByPlayerExternalId(externalId));
+		return ResponseEntity.ok(relationshipResponses);
+	}
+
+	@GetMapping("{externalId}/friend-requests")
+	public ResponseEntity<CollectionModel<RelationshipResponse>> getRelationshipsByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<RelationshipResponse> relationshipResponses = playerModelAssembler.toCollectionModel(playerService.getRelationshipsByPlayerExternalId(externalId));
+		return ResponseEntity.ok(relationshipResponses);
 	}
 
 	@DeleteMapping("/inactive")

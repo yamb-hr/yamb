@@ -66,7 +66,6 @@ public class GameServiceImpl implements GameService {
         checkPermission(game.getPlayerId());
         game.roll(diceToRoll);
         gameRepo.save(game);
-        advanceTurnIfWithinClash(game);
         return game;
     }
 
@@ -100,7 +99,6 @@ public class GameServiceImpl implements GameService {
         Game game = getByExternalId(externalId);
         game.complete();
         gameRepo.save(game);
-        advanceTurnIfWithinClash(game);
         return game;
     }
 
@@ -123,10 +121,13 @@ public class GameServiceImpl implements GameService {
     }
 
     private void advanceTurnIfWithinClash(Game game) {
-        Optional<Clash> existingClash = clashRepo.findByPlayerIdsContainsAndStatusAndType(game.getPlayerId(), ClashStatus.IN_PROGRESS, ClashType.LIVE);
+        Optional<Clash> existingClash = clashRepo.findByCurrentPlayerIdAndStatusAndType(game.getPlayerId(), ClashStatus.IN_PROGRESS, ClashType.LIVE);
         if (existingClash.isPresent()) {
             Clash clash = existingClash.get();
             clash.advanceTurn();
+            if (clash.getOwnerId().equals(clash.getCurrentPlayerId()) && gameRepo.existsByPlayerIdAndStatus(clash.getCurrentPlayerId(), GameStatus.COMPLETED)) {
+                clash.complete();
+            }
             clashRepo.save(clash);
         }
     }

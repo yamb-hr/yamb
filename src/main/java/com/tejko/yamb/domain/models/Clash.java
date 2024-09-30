@@ -152,5 +152,9 @@ public class Clash {
         int nextIndex = (currentIndex + 1) % playerIds.size();
         currentPlayerId = playerIds.get(nextIndex);
     }
+
+    public void complete() {
+        status = ClashStatus.COMPLETED;
+    }
     
 }

@@ -14,16 +14,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
+import com.tejko.yamb.domain.enums.RelationshipStatus;
+import com.tejko.yamb.domain.enums.RelationshipType;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
+import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.LogRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
+import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.security.AuthContext;
 
@@ -33,13 +37,15 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepo;
     private final ScoreRepository scoreRepo;
     private final ClashRepository clashRepo;
+    private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
 
     @Autowired
-    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, ClashRepository clashRepo, LogRepository logRepo) {
+    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, ClashRepository clashRepo, RelationshipRepository relationshipRepo, LogRepository logRepo) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
         this.clashRepo = clashRepo;
+        this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
     }
 
@@ -197,6 +203,77 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Player getCurrentPlayer() {
         return AuthContext.getAuthenticatedPlayer();
+    }
+
+    @Override
+    public List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        return relationshipRepo.getRelationshipsByPlayerId(player.getId());
+    }
+
+    @Override
+    public PlayerRelationship blockByPlayerExternalId(UUID playerExternalId) {
+
+    }
+
+    @Override
+    public RelationshipRequest requestFriendshipByPlayerExternalId(UUID playerExternalId) {
+
+    }
+
+    @Override
+    public PlayerRelationship requestRelationshipByPlayerExternalId(UUID playerExternalId, RelationshipType type) {
+        Player currentPlayer = AuthContext.getAuthenticatedPlayer();
+        Player player = getByExternalId(playerExternalId);
+        validateCreateRelationship(currentPlayer, player, type);
+        PlayerRelationship playerRelationship = PlayerRelationship.getInstance(currentPlayer, player, type);
+        if (RelationshipType.BLOCK.equals(type)) {
+            playerRelationship.setStatus(RelationshipStatus.ACCEPTED);
+        }
+        relationshipRepo.save(playerRelationship);
+        return playerRelationship;
+    }
+
+    @Override
+    public PlayerRelationship acceptRelationshipRequestByPlayerExternalId(UUID playerExternalId) {
+        Player currentPlayer = AuthContext.getAuthenticatedPlayer();
+        Player player = getByExternalId(playerExternalId);
+        validateAcceptRelationship(currentPlayer, player);
+        Optional<PlayerRelationship> existingPlayerRelationship = relationshipRepo.findByPlayerIds(currentPlayer.getId(), player.getId());
+        if (existingPlayerRelationship.isPresent()) {
+            PlayerRelationship playerRelationship = existingPlayerRelationship.get();
+            playerRelationship.setStatus(null);
+        }
+        playerRelationship.setStatus(RelationshipStatus.ACCEPTED);
+    }
+
+    @Override
+    public PlayerRelationship declineRelationshipRequestByPlayerExternalId(UUID playerExternalId) {
+        Player currentPlayer = AuthContext.getAuthenticatedPlayer();
+        Player player = getByExternalId(playerExternalId);
+        validateAcceptRelationship(currentPlayer, player);
+        Optional<PlayerRelationship> existingPlayerRelationship = relationshipRepo.findByPlayerIds(currentPlayer.getId(), player.getId());
+        if (existingPlayerRelationship.isPresent()) {
+            PlayerRelationship playerRelationship = existingPlayerRelationship.get();
+            playerRelationship.setStatus(null);
+        }
+        playerRelationship.setStatus(RelationshipStatus.ACCEPTED);
+    }
+
+    @Override
+    public void removeRelationshipByPlayerExternalId(UUID playerExternalId) {
+        Player currentPlayer = AuthContext.getAuthenticatedPlayer();
+        Player player = getByExternalId(playerExternalId);
+        PlayerRelationship playerRelationship = relationshipRepo.findByPlayerIds(currentPlayer.getId(), player.getId());
+        relationshipRepo.delete(playerRelationship);
+    }
+
+    private void validateCreateRelationship(Player currentPlayer, Player player, RelationshipType type) {
+        
+    }
+
+    private void validateAcceptRelationship(Player currentPlayer, Player player) {
+        
     }
 
 }

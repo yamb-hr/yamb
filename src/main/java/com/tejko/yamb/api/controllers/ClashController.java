@@ -27,7 +27,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.api.assemblers.ClashModelAssembler;
-import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.ClashRequest;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.business.interfaces.ClashService;
@@ -83,19 +82,19 @@ public class ClashController {
 
 	@PutMapping("/{externalId}/accept")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ClashResponse> rollByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
+	public ResponseEntity<ClashResponse> acceptInvitationByExternalId(@PathVariable UUID externalId) {
 		ClashResponse clashResponse = clashModelAssembler.toModel(clashService.acceptInvitationByExternalId(externalId));
 		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ACCEPT, clashResponse);
-		simpMessagingTemplate.convertAndSend("/topic/clashs/" + clashResponse.getId(), message, message.getHeaders());
+		simpMessagingTemplate.convertAndSend("/topic/clashes/" + clashResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(clashResponse);
 	}
 
 	@PutMapping("/{externalId}/decline")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<ClashResponse> announceByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
+	public ResponseEntity<ClashResponse> declineInvitationByExternalId(@PathVariable UUID externalId) {
 		ClashResponse clashResponse = clashModelAssembler.toModel(clashService.declineInvitationByExternalId(externalId));
 		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.DECLINE, clashResponse);
-		simpMessagingTemplate.convertAndSend("/topic/clashs/" + clashResponse.getId(), message, message.getHeaders());
+		simpMessagingTemplate.convertAndSend("/topic/clashes/" + clashResponse.getId(), message, message.getHeaders());
 		return ResponseEntity.ok(clashResponse);
 	}
 	

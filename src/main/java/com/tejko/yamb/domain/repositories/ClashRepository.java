@@ -26,6 +26,8 @@ public interface ClashRepository extends MongoRepository<Clash, String> {
     
     int countByPlayerIdsContainsAndStatusAndType(UUID playerId, ClashStatus status, ClashType type);
 
+    Optional<Clash> findByCurrentPlayerIdAndStatusAndType(UUID playerId, ClashStatus status, ClashType type);
+
     List<Clash> findAllByOrderByUpdatedAtDesc();
     
     void deleteByExternalId(UUID externalId);
