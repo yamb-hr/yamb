@@ -1,103 +1,119 @@
 package com.tejko.yamb.business.services;
 
 import java.security.Principal;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.business.interfaces.WebSocketService;
 import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.enums.PlayerStatus;
+import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.WebSocketMessage;
-import com.tejko.yamb.websocket.PlayerSessionRegistry;
 
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketServiceImpl.class);
-
-    private final PlayerSessionRegistry playerSessionRegistry;
+    private final ObjectMapper objectMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final Map<UUID, PlayerStatus> playerStatusMap = new ConcurrentHashMap<>();
+    private final Map<String, String> subscriptionDestinations = new ConcurrentHashMap<>();
 
     @Autowired
-    public WebSocketServiceImpl(PlayerSessionRegistry playerSessionRegistry, SimpMessagingTemplate simpMessagingTemplate) {
-        this.playerSessionRegistry = playerSessionRegistry;
+    public WebSocketServiceImpl(ObjectMapper objectMapper, SimpMessagingTemplate simpMessagingTemplate) {
+        this.objectMapper = objectMapper;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Override
     public void publicMessage(WebSocketMessage message, Principal principal) {
-        Long senderId = Long.valueOf(principal.getName());
-        message.setSenderId(senderId);
-        simpMessagingTemplate.convertAndSend("/chat/public", message);
+        UUID senderExternalId = UUID.fromString(principal.getName());
+        message.setSenderId(senderExternalId);
+        simpMessagingTemplate.send("/topic/public", message);
     }
 
     @Override
     public void privateMessage(WebSocketMessage message, Principal principal) {
-        Long senderId = Long.valueOf(principal.getName());
-        message.setSenderId(senderId);
-        Long receiverId = message.getReceiverId();
-        simpMessagingTemplate.convertAndSendToUser(receiverId.toString(), "/private", message);
+        UUID senderExternalId = UUID.fromString(principal.getName());
+        message.setSenderId(senderExternalId);
+        simpMessagingTemplate.convertAndSendToUser(String.valueOf(message.getReceiverId()), "/player/private", message, message.getHeaders());
     }
 
     @Override
     public void handleSessionConnected(SessionConnectEvent event) {
-        StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
-        Principal user = headers.getUser();
-        if (user != null) {
-            Long playerId = Long.valueOf(user.getName());
-            playerSessionRegistry.updatePlayerStatus(playerId, PlayerStatus.ONLINE);
-            logger.info("Player ID " + playerId + " has connected...");
-        } else {
-            logger.info("Session connected event received with no user information.");
-        }
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Player player = (Player) accessor.getUser();
+        updatePlayerStatus(UUID.fromString(player.getName()), PlayerStatus.ONLINE);
+        broadcastPlayerStatuses();
+        System.out.println(player.getUsername() + " connected.");
     }
 
     @Override
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
-        StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
-        Principal user = headers.getUser();
-        if (user != null) {
-            Long playerId = Long.valueOf(user.getName());
-            playerSessionRegistry.updatePlayerStatus(playerId, PlayerStatus.OFFLINE);
-            logger.info("Player ID " + playerId + " has disconnected...");
-            sendPublicChatMessage(playerId);
-        } else {
-            logger.info("Session disconnect event received with no user information.");
-        }
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Player player = (Player) accessor.getUser();
+        updatePlayerStatus(UUID.fromString(player.getName()), PlayerStatus.OFFLINE);
+        System.out.println(player.getUsername() + " disconnected.");
     }
 
     @Override
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
-        StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
-        Principal user = headers.getUser();
-        if (user != null) {
-            String destination = headers.getDestination();
-            Long playerId = Long.valueOf(user.getName());
-            logger.info("Player ID " + playerId + " has subscribed to " + destination);
-            if ("/chat/public".equals(destination)) {
-                sendPublicChatMessage(playerId);
-            }
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Player player = (Player) accessor.getUser();
+        String destination = accessor.getDestination();
+        String subscriptionId = accessor.getSubscriptionId();
+    
+        if (subscriptionId != null && destination != null) {
+            subscriptionDestinations.put(subscriptionId, destination);
+        }
+    
+        System.out.println(player.getUsername() + " has subscribed to " + destination);
+    }
+    
+    @Override
+    public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Player player = (Player) accessor.getUser();
+        String subscriptionId = accessor.getSubscriptionId();
+    
+        String destination = subscriptionDestinations.get(subscriptionId);
+        if (destination != null) {
+            subscriptionDestinations.remove(subscriptionId);
+            System.out.println(player.getUsername() + " has unsubscribed from " + destination);
         } else {
-            logger.info("Session subscribe event received with no user information.");
+            System.out.println(player.getUsername() + " has unsubscribed, but the destination is unknown.");
         }
     }
 
-    
-    private void sendPublicChatMessage(Long playerId) {
-        WebSocketMessage message = new WebSocketMessage(playerId, null, MessageType.PLAYERS, playerSessionRegistry.getPlayerStatusMap());
-        try {
-            simpMessagingTemplate.convertAndSend("/chat/public", message);
-        } catch (MessagingException e) {
-            logger.info("Error sending public chat message: " + e.getMessage());
-        }
+    private void broadcastPlayerStatuses() {
+        WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.PLAYERS, getAllPlayerStatuses());
+        simpMessagingTemplate.send("/topic/players", message);
+
     }
+
+    private void updatePlayerStatus(UUID playerExternalId, PlayerStatus status) {
+        playerStatusMap.put(playerExternalId, status);
+    }
+
+    public Map<UUID, PlayerStatus> getAllPlayerStatuses() {
+        return playerStatusMap;
+    }
+
+    // private PlayerStatus getPlayerStatus(UUID playerId) {
+    //     return hashOps.get(PLAYER_STATUS_KEY, playerId);
+    // }
+
+    // private void removePlayerStatus(UUID playerId) {
+    //     hashOps.delete(PLAYER_STATUS_KEY, playerId);
+    // }
 }

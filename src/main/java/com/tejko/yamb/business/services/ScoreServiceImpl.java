@@ -4,15 +4,17 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.ScoreService;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.entities.Score;
+import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 
 @Service
@@ -26,19 +28,19 @@ public class ScoreServiceImpl implements ScoreService {
 	}
 
 	@Override
-	public Score getById(Long id) {
-		return scoreRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("error.not_found.score"));
+	public Score getByExternalId(UUID externalId) {
+		return scoreRepo.findByExternalId(externalId)
+			.orElseThrow(() -> new ResourceNotFoundException("error.not_found.score"));
 	}
 
     @Override
-	public List<Score> getAll() {
-		List<Score> scores = scoreRepo.findAllByOrderByCreatedAtDesc();
-        return scores;
+	public Page<Score> getAll(Pageable pageable) {
+		return scoreRepo.findAll(pageable);
 	}
 
     @Override
-	public void deleteById(Long id) {
-		scoreRepo.deleteById(id);
+	public void deleteByExternalId(UUID externalId) {
+		scoreRepo.deleteByExternalId(externalId);
 	}
 
     @Override

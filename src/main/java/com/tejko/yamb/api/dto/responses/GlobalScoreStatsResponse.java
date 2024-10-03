@@ -2,7 +2,9 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.util.List;
 
-public class GlobalScoreStatsResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class GlobalScoreStatsResponse extends RepresentationModel<GlobalScoreStatsResponse> {
 
     private long scoreCount;
     private double averageScore;

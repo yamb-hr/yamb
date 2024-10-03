@@ -2,23 +2,28 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
-public class PlayerResponse {
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
-    private Long id;
+@Relation(collectionRelation = "players")
+public class PlayerResponse extends RepresentationModel<PlayerResponse> {
+
+    private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private Set<RoleResponse> roles;
+    private Set<String> roles;
     private boolean isRegistered;
 
     public PlayerResponse() {}
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -46,11 +51,11 @@ public class PlayerResponse {
         this.name = name;
     }
 
-    public Set<RoleResponse> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<RoleResponse> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 

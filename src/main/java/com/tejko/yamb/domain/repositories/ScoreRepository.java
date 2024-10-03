@@ -3,13 +3,16 @@ package com.tejko.yamb.domain.repositories;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.tejko.yamb.domain.models.entities.Score;
+import com.tejko.yamb.domain.models.Score;
 
 public interface ScoreRepository extends JpaRepository<Score, Long> {
+    
+    Optional<Score> findByExternalId(UUID externalId);
 
     List<Score> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
 
@@ -32,5 +35,7 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     Double findAverageValueByPlayerId(Long playerId);
 
     List<Score> findAllByOrderByCreatedAtDesc();
+
+    void deleteByExternalId(UUID externalId);
 
 }

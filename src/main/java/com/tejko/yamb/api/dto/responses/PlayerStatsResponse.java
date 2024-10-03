@@ -2,7 +2,9 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 
-public class PlayerStatsResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class PlayerStatsResponse extends RepresentationModel<PlayerStatsResponse> {
 
     private LocalDateTime lastActivity;
     private double averageScore;

@@ -1,7 +1,5 @@
 package com.tejko.yamb.domain.models;
 
-import com.tejko.yamb.domain.models.entities.Player;
-
 public class PlayerWithToken {
 
     private Player player;

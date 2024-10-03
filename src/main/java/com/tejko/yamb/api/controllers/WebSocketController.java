@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import com.tejko.yamb.business.interfaces.WebSocketService;
 import com.tejko.yamb.domain.models.WebSocketMessage;
@@ -25,14 +26,14 @@ public class WebSocketController {
         this.webSocketService = webSocketService;
     }
 
-    @MessageMapping("/message")
-    @SendTo("/chat/public")
+    @MessageMapping("/public")
+    @SendTo("/topic/public")
     public void publicMessage(WebSocketMessage messageRequest, Principal principal) throws Exception {
         webSocketService.publicMessage(messageRequest, principal);
     }
 
-    @MessageMapping("/private-message")
-    @SendToUser("/private")
+    @MessageMapping("/private")
+    @SendToUser("/player/private")
     public void privateMessage(WebSocketMessage messageRequest, Principal principal) throws Exception {
         webSocketService.privateMessage(messageRequest, principal);
     }
@@ -51,5 +52,9 @@ public class WebSocketController {
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
         webSocketService.handleSessionSubscribeEvent(event);
     }
-
+    
+    @EventListener
+    public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
+        webSocketService.handleSessionUnsubscribeEvent(event);
+    }
 }

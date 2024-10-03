@@ -1,23 +1,29 @@
 package com.tejko.yamb.business.services;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.BoxType;
+import com.tejko.yamb.domain.enums.ClashStatus;
+import com.tejko.yamb.domain.enums.ClashType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
-import com.tejko.yamb.domain.models.entities.Game;
-import com.tejko.yamb.domain.models.entities.Player;
-import com.tejko.yamb.domain.models.entities.Score;
+import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Game;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.security.AuthContext;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
+import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
 
 @Service
@@ -25,37 +31,35 @@ public class GameServiceImpl implements GameService {
 
     private final GameRepository gameRepo;
     private final ScoreRepository scoreRepo;
+    private final ClashRepository clashRepo;
 
     @Autowired
-    public GameServiceImpl(GameRepository gameRepo, ScoreRepository scoreRepo) {
+    public GameServiceImpl(GameRepository gameRepo, ScoreRepository scoreRepo, ClashRepository clashRepo) {
         this.gameRepo = gameRepo;
         this.scoreRepo = scoreRepo;
+        this.clashRepo = clashRepo;
     }
 
     @Override
-    public Game getById(String id) {
-        return gameRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException());
+    public Game getByExternalId(UUID externalId) {
+        return gameRepo.findByExternalId(externalId).orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
-    public List<Game> getAll() {
-        List<Game> games = gameRepo.findAllByOrderByUpdatedAtDesc();
-        return games;
+    public Page<Game> getAll(Pageable pageable) {
+        return gameRepo.findAll(pageable);
     }
 
     @Override
-    public Game getOrCreate(Long playerId) {
-        checkPermission(playerId);
-
-        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
-        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerId)));
-
+    public Game getOrCreate(UUID playerExternalId) {
+        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerExternalId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
+        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId)));
         return game;
     }
 
     @Override
-    public Game rollById(String id, int[] diceToRoll) {
-        Game game = getById(id);
+    public Game rollByExternalId(UUID externalId, int[] diceToRoll) {
+        Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         game.roll(diceToRoll);
         gameRepo.save(game);
@@ -63,39 +67,41 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game announceById(String id, BoxType boxType) {
-        Game game = getById(id);
+    public Game announceByExternalId(UUID externalId, BoxType boxType) {
+        Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         game.announce(boxType);
         gameRepo.save(game);
+        advanceTurnIfWithinClash(game);
         return game;
     }
 
     @Override
-    public Game fillById(String id, ColumnType columnType, BoxType boxType) {    
-        Game game = getById(id);
+    public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType) {    
+        Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         game.fill(columnType, boxType);
         if (game.getStatus() == GameStatus.COMPLETED) {
-            Player player = AuthContext.getAuthenticatedPlayer().get();
+            Player player = AuthContext.getAuthenticatedPlayer();
             Score score = Score.getInstance(player, game.getTotalSum());
             scoreRepo.save(score);
         }
         gameRepo.save(game);
+        advanceTurnIfWithinClash(game);
         return game;
     }
 
     @Override
-    public Game completeById(String id) {
-        Game game = getById(id);
+    public Game completeByExternalId(UUID externalId) {
+        Game game = getByExternalId(externalId);
         game.complete();
         gameRepo.save(game);
         return game;
     }
 
     @Override
-    public Game restartById(String id) {      
-        Game game = getById(id);
+    public Game restartByExternalId(UUID externalId) {      
+        Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         game.restart();
         gameRepo.save(game);
@@ -103,19 +109,36 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game archiveById(String id) {
-        Game game = getById(id);
+    public Game archiveByExternalId(UUID externalId) {
+        Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         game.archive();
         gameRepo.save(game);
         return game;
     }
 
-    private void checkPermission(Long playerId) {
-        Optional<Player> authenticatedPlayerId = AuthContext.getAuthenticatedPlayer();  
-        if (playerId == null || !authenticatedPlayerId.isPresent() || !authenticatedPlayerId.get().getId().equals(playerId)) {
+    private void advanceTurnIfWithinClash(Game game) {
+        Optional<Clash> existingClash = clashRepo.findByCurrentPlayerIdAndStatusAndType(game.getPlayerId(), ClashStatus.IN_PROGRESS, ClashType.LIVE);
+        if (existingClash.isPresent()) {
+            Clash clash = existingClash.get();
+            clash.advanceTurn();
+            if (clash.getOwnerId().equals(clash.getCurrentPlayerId()) && gameRepo.existsByPlayerIdAndStatus(clash.getCurrentPlayerId(), GameStatus.COMPLETED)) {
+                clash.complete();
+            }
+            clashRepo.save(clash);
+        }
+    }
+
+    private void checkPermission(UUID playerExternalId) {
+        Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();  
+        if (playerExternalId == null || authenticatedPlayer != null && !authenticatedPlayer.getExternalId().equals(playerExternalId)) {
             throw new AccessDeniedException("error.access_denied");
         }
+    }
+
+    @Override
+    public void deleteByExternalId(UUID externalId) {
+        gameRepo.deleteByExternalId(externalId);
     }
 
 

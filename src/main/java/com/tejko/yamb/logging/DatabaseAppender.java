@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.event.Level;
 
 import com.tejko.yamb.business.interfaces.LogService;
-import com.tejko.yamb.domain.models.entities.Log;
+import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.security.AuthContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,7 +48,7 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
                                 .collect(Collectors.toList())
                 );
             }
-            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer().orElse(null), message, stackTraceData, Level.ERROR));
+            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), message, stackTraceData, Level.ERROR));
         } catch (Exception e) {
             System.err.println("Failed to log to database: " + e.getLocalizedMessage());
         }

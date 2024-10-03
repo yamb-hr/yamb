@@ -2,31 +2,36 @@ package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
 
-public class GameResponse {
+@Relation(collectionRelation = "games")
+public class GameResponse extends RepresentationModel<GameResponse> {
  
-    private String id;
+    private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long playerId;
     private Sheet sheet;
     private List<Dice> dices;
     private int rollCount;
     private BoxType announcement;
     private GameStatus status;
+    private PlayerResponse player;
     private int totalSum;
 
     public GameResponse() {}
     
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -44,14 +49,6 @@ public class GameResponse {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public Long getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(Long playerId) {
-        this.playerId = playerId;
     }
 
     public Sheet getSheet() {
@@ -100,6 +97,14 @@ public class GameResponse {
 
     public void setTotalSum(int totalSum) {
         this.totalSum = totalSum;
+    }
+
+    public PlayerResponse getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(PlayerResponse player) {
+        this.player = player;
     }
 
     public static class Dice {

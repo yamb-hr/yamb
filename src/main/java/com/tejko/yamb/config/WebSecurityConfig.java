@@ -36,7 +36,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final PlayerRepository playerRepository;
 	private final RecaptchaService recaptchaService;
 
-
 	@Autowired
 	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaService recaptchaService) {
 		this.playerService = playerService;
@@ -79,9 +78,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers("/**").permitAll()
 			.antMatchers("/**").permitAll();
-			http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-    		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
-		}
+		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
@@ -89,8 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
-					.allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+					.allowedOrigins("http://localhost:3000", "https://jamb.com.hr")
+					.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 					.allowCredentials(true);
 			}
 		};

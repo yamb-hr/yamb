@@ -1,6 +1,8 @@
 package com.tejko.yamb.api.dto.responses;
 
-public class GlobalPlayerStatsResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+public class GlobalPlayerStatsResponse extends RepresentationModel<GlobalPlayerStatsResponse> {
 
     private long playerCount;
     private long mostScoresByAnyPlayer;

@@ -1,21 +1,28 @@
 package com.tejko.yamb.api.dto.responses;
 
+import java.util.UUID;
+
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
+
 import java.time.LocalDateTime;
 
-public class ScoreResponse {
 
-    private Long id;
+@Relation(collectionRelation = "scores")
+public class ScoreResponse extends RepresentationModel<ScoreResponse> {
+
+    private UUID id;
     private LocalDateTime createdAt;
-    private ShortPlayerResponse player;
+    private PlayerResponse player;
     private int value;
 
     public ScoreResponse() {}
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -27,11 +34,11 @@ public class ScoreResponse {
         this.createdAt = createdAt;
     }
 
-    public ShortPlayerResponse getPlayer() {
+    public PlayerResponse getPlayer() {
         return player;
     }
 
-    public void setPlayer(ShortPlayerResponse player) {
+    public void setPlayer(PlayerResponse player) {
         this.player = player;
     }
 
