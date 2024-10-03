@@ -51,12 +51,9 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game getOrCreate() {
-        UUID playerExternalId = AuthContext.getAuthenticatedPlayer().getExternalId();
-
+    public Game getOrCreate(UUID playerExternalId) {
         Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerExternalId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
         Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId)));
-
         return game;
     }
 

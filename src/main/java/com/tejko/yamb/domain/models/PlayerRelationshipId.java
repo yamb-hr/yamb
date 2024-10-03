@@ -11,34 +11,34 @@ import javax.persistence.ManyToOne;
 public class PlayerRelationshipId implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name = "first_player_id")
-    private Player firstPlayer;
+    @JoinColumn(name = "player_id")
+    private Player player;
 
     @ManyToOne
-    @JoinColumn(name = "second_player_id")
-    private Player secondPlayer;
+    @JoinColumn(name = "related_player_id")
+    private Player relatedPlayer;
 
     public PlayerRelationshipId() {}
 
-    public PlayerRelationshipId(Player firstPlayer, Player secondPlayer) {
-        this.firstPlayer = firstPlayer;
-        this.secondPlayer = secondPlayer;
+    public PlayerRelationshipId(Player player, Player relatedPlayer) {
+        this.player = player;
+        this.player = relatedPlayer;
     }
 
-    public Player getFirstPlayer() {
-        return firstPlayer;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void setFirstPlayer(Player firstPlayer) {
-        this.firstPlayer = firstPlayer;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
-    public Player getSecondPlayer() {
-        return secondPlayer;
+    public Player getRelatedPlayer() {
+        return relatedPlayer;
     }
 
-    public void setSecondPlayer(Player secondPlayer) {
-        this.secondPlayer = secondPlayer;
+    public void setRelatedPlayer(Player relatedPlayer) {
+        this.relatedPlayer = relatedPlayer;
     }
 
     @Override
@@ -46,13 +46,13 @@ public class PlayerRelationshipId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlayerRelationshipId that = (PlayerRelationshipId) o;
-        return Objects.equals(firstPlayer, that.firstPlayer) &&
-               Objects.equals(secondPlayer, that.secondPlayer);
+        return Objects.equals(player, that.player) &&
+               Objects.equals(relatedPlayer, that.relatedPlayer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstPlayer, secondPlayer);
+        return Objects.hash(player, relatedPlayer);
     }
     
 }

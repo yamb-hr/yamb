@@ -28,6 +28,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.api.assemblers.GameModelAssembler;
 import com.tejko.yamb.api.dto.requests.ActionRequest;
+import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.MessageType;
@@ -65,10 +66,10 @@ public class GameController {
 	}
 
 	@PutMapping("")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<GameResponse> getOrCreate() {
+	@PreAuthorize("isAuthenticated() and (#gameRequest.playerId == principal.externalId or hasAuthority('ADMIN'))")
+	public ResponseEntity<GameResponse> getOrCreate(@Valid @RequestBody GameRequest gameRequest) {
 		
-		GameResponse gameResponse = gameModelAssembler.toModel(gameService.getOrCreate());
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.getOrCreate(gameRequest.getPlayerId()));
 		if (gameResponse.getCreatedAt().equals(gameResponse.getUpdatedAt())) {
 			URI location = ServletUriComponentsBuilder
 				.fromCurrentRequest()

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.tejko.yamb.domain.enums.RelationshipType;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Log;
@@ -45,6 +44,6 @@ public interface PlayerService extends UserDetailsService {
 
     public List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
 
-    public PlayerRelationship requestRelationshipByPlayerExternalId(UUID playerExternalId, RelationshipType type);
+    public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
     
 }

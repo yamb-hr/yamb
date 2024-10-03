@@ -70,7 +70,7 @@ public class HomeController {
         rootResource.add(linkTo(methodOn(AuthController.class).registerGuest(null)).withRel("register-guest"));
         rootResource.add(linkTo(methodOn(AuthController.class).register(null)).withRel("register"));
         rootResource.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
-        rootResource.add(linkTo(methodOn(GameController.class).getOrCreate()).withRel("get-or-create-game"));
+        rootResource.add(linkTo(methodOn(GameController.class).getOrCreate(null)).withRel("get-or-create-game"));
         rootResource.add(linkTo(methodOn(GameController.class).getAll(null)).withRel("games"));
         rootResource.add(linkTo(methodOn(PlayerController.class).getAll(null)).withRel("players"));
         rootResource.add(linkTo(methodOn(ScoreController.class).getAll(null)).withRel("scores"));
@@ -93,24 +93,24 @@ public class HomeController {
 
     @GetMapping("/api/metrics")
 	@PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, String>> getMetrics() {
+    public ResponseEntity<Map<String, Number>> getMetrics() {
 
         OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
         
         long totalRequests = responseTimeAspect.getRequestCount();
         long errorCount = globalExceptionHandler.getErrorCount();
         double averageResponseTime = responseTimeAspect.getAverageResponseTime();
-        double errorRate = (totalRequests == 0) ? 0 : ((double) errorCount / totalRequests) * 100;
+        double errorRate = (totalRequests == 0) ? 0 : ((double) errorCount / totalRequests);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("memoryUsage", osBean.getFreePhysicalMemorySize() + " bytes free");
-        response.put("cpuUsage", osBean.getSystemCpuLoad() * 100 + "%");
-        response.put("diskSpace", osBean.getFreeSwapSpaceSize() + " bytes free");
-        response.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime() + "ms");
-        response.put("averageResponseTime", averageResponseTime + "ms");
-        response.put("requestsProcessed", String.valueOf(totalRequests));
-        response.put("errorCount", String.valueOf(errorCount));
-        response.put("errorRate", errorRate + "%");
+        Map<String, Number> response = new HashMap<>();
+        response.put("memoryUsage", osBean.getFreePhysicalMemorySize());
+        response.put("cpuUsage", osBean.getSystemCpuLoad());
+        response.put("diskSpace", osBean.getFreeSwapSpaceSize());
+        response.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
+        response.put("averageResponseTime", averageResponseTime);
+        response.put("requestsProcessed", totalRequests);
+        response.put("errorCount", errorCount);
+        response.put("errorRate", errorRate);
 
         return ResponseEntity.ok(response);
     }

@@ -15,7 +15,7 @@ public interface GameService {
 
     public Page<Game> getAll(Pageable pageable);
 
-    public Game getOrCreate();
+    public Game getOrCreate(UUID playerExternalId);
 
     public Game rollByExternalId(UUID externalId, int[] diceToRoll);
 

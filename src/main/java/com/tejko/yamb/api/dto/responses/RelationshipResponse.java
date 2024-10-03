@@ -1,15 +1,29 @@
 package com.tejko.yamb.api.dto.responses;
 
+import java.util.UUID;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import com.tejko.yamb.domain.enums.RelationshipType;
 import com.tejko.yamb.domain.models.Player;
 
-public class RelationshipResponse {
+public class RelationshipResponse extends RepresentationModel<RelationshipResponse> {
 
+    private UUID id;
     private Player player;
-    
+    private Player relatedPlayer;
     private RelationshipType type;
+    private boolean active;
 
     public RelationshipResponse() {}
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public Player getPlayer() {
         return player;
@@ -19,6 +33,14 @@ public class RelationshipResponse {
         this.player = player;
     }
 
+    public Player getRelatedPlayer() {
+        return relatedPlayer;
+    }
+
+    public void setRelatedPlayer(Player relatedPlayer) {
+        this.relatedPlayer = relatedPlayer;
+    }
+
     public RelationshipType getType() {
         return type;
     }
@@ -26,5 +48,13 @@ public class RelationshipResponse {
     public void setType(RelationshipType type) {
         this.type = type;
     }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }    
     
 }

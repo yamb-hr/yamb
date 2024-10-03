@@ -153,6 +153,19 @@ public class Clash {
         currentPlayerId = playerIds.get(nextIndex);
     }
 
+    public void replacePlayer(UUID oldPlayerExternalId, UUID newPlayerExternalId) {
+        playerIds.set(playerIds.indexOf(oldPlayerExternalId), newPlayerExternalId);
+        if (ownerId == oldPlayerExternalId) {
+            ownerId = newPlayerExternalId;
+        }
+        if (currentPlayerId == oldPlayerExternalId) {
+            currentPlayerId = newPlayerExternalId;
+        }
+        if (winnerId == oldPlayerExternalId) {
+            winnerId = newPlayerExternalId;
+        }
+    }
+
     public void complete() {
         status = ClashStatus.COMPLETED;
     }

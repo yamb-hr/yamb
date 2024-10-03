@@ -89,6 +89,10 @@ public class Log {
         return player;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Object getData() {
         return data;
     }

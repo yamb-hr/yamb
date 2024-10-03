@@ -69,6 +69,10 @@ public class Score {
 		return player;
 	}
 
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+
 	public int getValue() {
 		return value;
 	}
