@@ -76,8 +76,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/**").permitAll()
-			.antMatchers("/**").permitAll();
+			.authorizeRequests()
+				.antMatchers("/**").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.anyRequest().permitAll();
+		
 		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
@@ -88,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
+					.allowedOrigins("https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
 					.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 					.allowCredentials(true);
 			}
