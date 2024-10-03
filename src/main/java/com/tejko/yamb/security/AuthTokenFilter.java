@@ -60,7 +60,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String tokenUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
         String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
-        return !requestURI.equals(tokenUri) && !requestURI.equals(registerGuestUri) && !requestURI.equals(registerUri);
+    
+        if (!requestURI.startsWith("/api")) {
+            return false;
+        }
+    
+        return !requestURI.equals(tokenUri) && 
+               !requestURI.equals(registerGuestUri) && 
+               !requestURI.equals(registerUri);
     }
 
     private String parseToken(HttpServletRequest request) {
