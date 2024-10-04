@@ -455,7 +455,7 @@ public class Game {
             if (ones.getValue() != null && max.getValue() != null && min.getValue() != null) {
                 middleSectionSum = ones.getValue() * (max.getValue() - min.getValue());
             }
-            return Math.min(middleSectionSum, 0);
+            return Math.max(middleSectionSum, 0);
         }
 
         public int getBottomSectionSum() {
