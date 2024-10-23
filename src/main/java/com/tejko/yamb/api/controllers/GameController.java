@@ -32,7 +32,9 @@ import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.MessageType;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.WebSocketMessage;
+import com.tejko.yamb.util.SortFieldTranslator;
 
 
 
@@ -44,13 +46,15 @@ public class GameController {
 	private final GameModelAssembler gameModelAssembler;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final ObjectMapper objectMapper;
+	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper) {
+	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper, SortFieldTranslator sortFieldTranslator) {
 		this.gameService = gameService;
 		this.gameModelAssembler = gameModelAssembler;
 		this.simpMessagingTemplate = simpMessagingTemplate;
 		this.objectMapper = objectMapper;
+		this.sortFieldTranslator = sortFieldTranslator;
 	}
 	
 	@GetMapping("/{externalId}")
@@ -61,7 +65,8 @@ public class GameController {
 
 	@GetMapping("")
 	public ResponseEntity<PagedModel<GameResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		PagedModel<GameResponse> pagedGames = gameModelAssembler.toPagedModel(gameService.getAll(pageable));
+		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Game.class, GameResponse.class);
+		PagedModel<GameResponse> pagedGames = gameModelAssembler.toPagedModel(gameService.getAll(modifiedPageable));
 		return ResponseEntity.ok(pagedGames);
 	}
 

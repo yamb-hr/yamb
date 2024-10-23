@@ -91,11 +91,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedOrigins("https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
+					.allowedOrigins("http://localhost:3000", "https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
 					.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 					.allowCredentials(true);
 			}
 		};
-	}
+	} 
 
 }

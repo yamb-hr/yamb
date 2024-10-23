@@ -221,4 +221,5 @@ public class ModelMapperConfig {
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
             .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
     }
+
 }
