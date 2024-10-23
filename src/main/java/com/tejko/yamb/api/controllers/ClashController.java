@@ -31,7 +31,9 @@ import com.tejko.yamb.api.dto.requests.ClashRequest;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.business.interfaces.ClashService;
 import com.tejko.yamb.domain.enums.MessageType;
+import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.WebSocketMessage;
+import com.tejko.yamb.util.SortFieldTranslator;
 
 
 
@@ -43,13 +45,15 @@ public class ClashController {
 	private final ClashModelAssembler clashModelAssembler;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final ObjectMapper objectMapper;
+	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public ClashController(ClashService clashService, ClashModelAssembler clashModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper) {
+	public ClashController(ClashService clashService, ClashModelAssembler clashModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper, SortFieldTranslator sortFieldTranslator) {
 		this.clashService = clashService;
 		this.clashModelAssembler = clashModelAssembler;
 		this.simpMessagingTemplate = simpMessagingTemplate;
 		this.objectMapper = objectMapper;
+		this.sortFieldTranslator = sortFieldTranslator;
 	}
 	
 	@GetMapping("/{externalId}")
@@ -60,7 +64,8 @@ public class ClashController {
 
 	@GetMapping("")
 	public ResponseEntity<PagedModel<ClashResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		PagedModel<ClashResponse> pagedClashs = clashModelAssembler.toPagedModel(clashService.getAll(pageable));
+		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Clash.class, ClashResponse.class);
+		PagedModel<ClashResponse> pagedClashs = clashModelAssembler.toPagedModel(clashService.getAll(modifiedPageable));
 		return ResponseEntity.ok(pagedClashs);
 	}
 

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.business.interfaces.LogService;
+import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.util.SortFieldTranslator;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -28,11 +30,13 @@ public class LogController {
 
 	private final LogService logService;
 	private final LogModelAssembler logModelAssembler;
+	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public LogController(LogService logService, LogModelAssembler logModelAssembler) {
+	public LogController(LogService logService, LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator) {
 		this.logService = logService;
 		this.logModelAssembler = logModelAssembler;
+		this.sortFieldTranslator = sortFieldTranslator;
 	}
 
 	@GetMapping("/{externalId}")
@@ -45,7 +49,8 @@ public class LogController {
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PagedModel<LogResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		PagedModel<LogResponse> pagedLogs = logModelAssembler.toPagedModel(logService.getAll(pageable));
+		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Log.class, LogResponse.class);
+		PagedModel<LogResponse> pagedLogs = logModelAssembler.toPagedModel(logService.getAll(modifiedPageable));
 		return ResponseEntity.ok(pagedLogs);
 	}
 

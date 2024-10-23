@@ -40,6 +40,8 @@ import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.RelationshipResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
+import com.tejko.yamb.domain.models.Player;
+import com.tejko.yamb.util.SortFieldTranslator;
 
 @RestController
 @RequestMapping("/api/players")
@@ -51,15 +53,17 @@ public class PlayerController {
 	private final ClashModelAssembler clashModelAssembler;
 	private final RelationshipModelAssembler relationshipModelAssembler;
 	private final LogModelAssembler logModelAssembler;
+	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler, ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, LogModelAssembler logModelAssembler) {
+	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler, ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator) {
 		this.playerService = playerService;
 		this.playerModelAssembler = playerModelAssembler;
 		this.scoreModelAssembler = scoreModelAssembler;
 		this.clashModelAssembler = clashModelAssembler;
 		this.relationshipModelAssembler = relationshipModelAssembler;
 		this.logModelAssembler = logModelAssembler;
+		this.sortFieldTranslator = sortFieldTranslator;
 	}
 
 	@GetMapping("/{externalId}")
@@ -70,7 +74,8 @@ public class PlayerController {
 
 	@GetMapping("")
 	public ResponseEntity<PagedModel<PlayerResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		PagedModel<PlayerResponse> pagedPlayers = playerModelAssembler.toPagedModel(playerService.getAll(pageable));
+        Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Player.class, PlayerResponse.class);
+        PagedModel<PlayerResponse> pagedPlayers = playerModelAssembler.toPagedModel(playerService.getAll(modifiedPageable));
 		return ResponseEntity.ok(pagedPlayers);
 	}
 

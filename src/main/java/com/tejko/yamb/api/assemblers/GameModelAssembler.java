@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -23,6 +24,7 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
 
     private final ModelMapper modelMapper;
 
+    @Autowired
     public GameModelAssembler(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }

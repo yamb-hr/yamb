@@ -203,4 +203,5 @@ public ModelMapper modelMapper() {
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
             .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
     }
+
 }
