@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tejko.yamb.api.assemblers.ClashModelAssembler;
+import com.tejko.yamb.api.assemblers.GameModelAssembler;
 import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
 import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
@@ -32,6 +33,7 @@ import com.tejko.yamb.api.dto.requests.PlayerMergeRequest;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
+import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
@@ -50,16 +52,21 @@ public class PlayerController {
 	private final PlayerService playerService;
 	private final PlayerModelAssembler playerModelAssembler;
 	private final ScoreModelAssembler scoreModelAssembler;
+	private final GameModelAssembler gameModelAssembler;
 	private final ClashModelAssembler clashModelAssembler;
 	private final RelationshipModelAssembler relationshipModelAssembler;
 	private final LogModelAssembler logModelAssembler;
 	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, ScoreModelAssembler scoreModelAssembler, ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator) {
+	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, 
+							ScoreModelAssembler scoreModelAssembler, GameModelAssembler gameModelAssembler,
+							ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, 
+							LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator) {
 		this.playerService = playerService;
 		this.playerModelAssembler = playerModelAssembler;
 		this.scoreModelAssembler = scoreModelAssembler;
+		this.gameModelAssembler = gameModelAssembler;
 		this.clashModelAssembler = clashModelAssembler;
 		this.relationshipModelAssembler = relationshipModelAssembler;
 		this.logModelAssembler = logModelAssembler;
@@ -89,6 +96,12 @@ public class PlayerController {
 	public ResponseEntity<CollectionModel<ScoreResponse>> getScoresByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<ScoreResponse> scoreResponses = scoreModelAssembler.toCollectionModel(playerService.getScoresByPlayerExternalId(externalId));
 		return ResponseEntity.ok(scoreResponses);
+	}
+
+	@GetMapping("/{externalId}/games")
+	public ResponseEntity<CollectionModel<GameResponse>> getGamesByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<GameResponse> gameResponses = gameModelAssembler.toCollectionModel(playerService.getGamesByPlayerExternalId(externalId));
+		return ResponseEntity.ok(gameResponses);
 	}
 
 	@GetMapping("/{externalId}/clashes")

@@ -22,6 +22,8 @@ public interface GameRepository extends MongoRepository<Game, String> {
     boolean existsByPlayerIdAndStatusIn(UUID playerId, List<GameStatus> statuses);
 
     List<Game> findAllByOrderByUpdatedAtDesc();
+
+    List<Game> findAllByPlayerIdOrderByUpdatedAtDesc(UUID playerId);
     
     void deleteByExternalId(UUID externalId);
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
@@ -23,6 +24,7 @@ import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.repositories.ClashRepository;
+import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.LogRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RelationshipRepository;
@@ -34,14 +36,16 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepo;
     private final ScoreRepository scoreRepo;
+    private final GameRepository gameRepo;
     private final ClashRepository clashRepo;
     private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
 
     @Autowired
-    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, ClashRepository clashRepo, RelationshipRepository relationshipRepo, LogRepository logRepo) {
+    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, GameRepository gameRepo, ClashRepository clashRepo, RelationshipRepository relationshipRepo, LogRepository logRepo) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
+        this.gameRepo = gameRepo;
         this.clashRepo = clashRepo;
         this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
@@ -66,9 +70,14 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public List<Game> getGamesByPlayerExternalId(UUID playerExternalId) {
+        List<Game> games = gameRepo.findAllByPlayerIdOrderByUpdatedAtDesc(playerExternalId);
+        return games;
+    }
+
+    @Override
     public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId) {
-        Player player = getByExternalId(playerExternalId);
-        List<Clash> clashes = clashRepo.findAllByPlayerIdsContains(player.getExternalId());
+        List<Clash> clashes = clashRepo.findAllByPlayerIdsContains(playerExternalId);
         return clashes;
     }
 
