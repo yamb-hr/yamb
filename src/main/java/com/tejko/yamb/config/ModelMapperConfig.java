@@ -49,30 +49,24 @@ public class ModelMapperConfig {
     }
 
     @Bean
-    @Primary
-    public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-            .setFieldMatchingEnabled(false)
-            .setFieldAccessLevel(AccessLevel.PUBLIC)
-            .setAmbiguityIgnored(true);
+@Primary
+public ModelMapper modelMapper() {
+    ModelMapper modelMapper = new ModelMapper();
+    modelMapper.getConfiguration()
+        .setFieldMatchingEnabled(true)
+        .setFieldAccessLevel(AccessLevel.PRIVATE)
+        .setAmbiguityIgnored(true)
+        .setSkipNullEnabled(true)
+        .setImplicitMappingEnabled(false);
 
-        configureMappings(modelMapper);
-        return modelMapper;
-    }
+    configureMappings(modelMapper);
+    return modelMapper;
+}
 
     private void configureMappings(ModelMapper modelMapper) {
-
-        Converter<Player, Boolean> isRegisteredConverter = new Converter<Player, Boolean>() {
-            @Override
-            public Boolean convert(MappingContext<Player, Boolean> context) {
-                Player source = context.getSource();
-                return source instanceof RegisteredPlayer;
-            }
-        };
+        Converter<Player, Boolean> isRegisteredConverter = context -> context.getSource() instanceof RegisteredPlayer;
 
         // player
-
         modelMapper.createTypeMap(Player.class, PlayerResponse.class)
             .addMapping(Player::getExternalId, PlayerResponse::setId)
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
@@ -98,12 +92,10 @@ public class ModelMapperConfig {
             .addMappings(mapper -> mapper.map(src -> false, PlayerResponse::setRegistered));
 
         // role
-
         modelMapper.createTypeMap(Role.class, String.class)
-            .setConverter(ctx -> String.valueOf(ctx.getSource().getLabel()));
+            .setConverter(ctx -> ctx.getSource().getLabel());
 
         // score
-
         modelMapper.createTypeMap(Score.class, ScoreResponse.class)
             .addMapping(Score::getExternalId, ScoreResponse::setId)
             .addMapping(Score::getCreatedAt, ScoreResponse::setCreatedAt)
@@ -111,7 +103,6 @@ public class ModelMapperConfig {
             .addMapping(Score::getPlayer, ScoreResponse::setPlayer);
 
         // log
-
         modelMapper.createTypeMap(Log.class, LogResponse.class)
             .addMapping(Log::getExternalId, LogResponse::setId)
             .addMapping(Log::getCreatedAt, LogResponse::setCreatedAt)
@@ -121,42 +112,10 @@ public class ModelMapperConfig {
             .addMapping(Log::getPlayer, LogResponse::setPlayer);
 
         // game
-
-        Converter<UUID, PlayerResponse> playerConverter = new Converter<UUID, PlayerResponse>() {
-            @Override
-            public PlayerResponse convert(MappingContext<UUID, PlayerResponse> context) {
-                UUID playerExternalId = context.getSource();
-                if (playerExternalId == null) {
-                    return null;
-                }
-
-                Player player = playerService.getByExternalId(playerExternalId);
-                if (player == null) {
-                    return null;
-                }
-
-                return modelMapper.map(player, PlayerResponse.class);
-            }
-        };
-
-        Converter<List<UUID>, List<PlayerResponse>> playerListConverter = new Converter<List<UUID>, List<PlayerResponse>>() {
-            @Override
-            public List<PlayerResponse> convert(MappingContext<List<UUID>, List<PlayerResponse>> context) {
-                List<UUID> playerIds = context.getSource();
-                if (playerIds == null || playerIds.isEmpty()) {
-                    return null;
-                }
-                
-                return playerIds.stream()
-                    .map(playerId -> {
-                        Player player = playerService.getByExternalId(playerId);
-                        if (player != null) {
-                            return modelMapper.map(player, PlayerResponse.class);
-                        }
-                        return null;
-                    })
-                    .collect(Collectors.toList());
-            }
+        Converter<UUID, PlayerResponse> playerConverter = context -> {
+            UUID playerExternalId = context.getSource();
+            Player player = playerService.getByExternalId(playerExternalId);
+            return player == null ? null : modelMapper.map(player, PlayerResponse.class);
         };
 
         modelMapper.createTypeMap(Game.class, GameResponse.class)
@@ -171,13 +130,37 @@ public class ModelMapperConfig {
             .addMapping(Game::getTotalSum, GameResponse::setTotalSum)
             .addMappings(mapper -> mapper.using(playerConverter).map(Game::getPlayerId, GameResponse::setPlayer));
 
+        modelMapper.createTypeMap(Game.Sheet.class, GameResponse.Sheet.class)
+            .addMapping(Game.Sheet::getColumns, GameResponse.Sheet::setColumns);
+
+        modelMapper.createTypeMap(Game.Column.class, GameResponse.Column.class)
+            .addMapping(Game.Column::getType, GameResponse.Column::setType)
+            .addMapping(Game.Column::getBoxes, GameResponse.Column::setBoxes);
+
+        modelMapper.createTypeMap(Game.Box.class, GameResponse.Box.class)
+            .addMapping(Game.Box::getType, GameResponse.Box::setType)
+            .addMapping(Game.Box::getValue, GameResponse.Box::setValue);
+
+        modelMapper.createTypeMap(Game.Dice.class, GameResponse.Dice.class)
+            .addMapping(Game.Dice::getIndex, GameResponse.Dice::setIndex)   
+            .addMapping(Game.Dice::getValue, GameResponse.Dice::setValue);
+
+        // clash
+        Converter<List<UUID>, List<PlayerResponse>> playerListConverter = context ->
+            context.getSource().stream()
+                .map(playerId -> {
+                    Player player = playerService.getByExternalId(playerId);
+                    return player == null ? null : modelMapper.map(player, PlayerResponse.class);
+                })
+                .collect(Collectors.toList());
+                
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
             .addMapping(Clash::getCreatedAt, ClashResponse::setCreatedAt)
             .addMapping(Clash::getUpdatedAt, ClashResponse::setUpdatedAt)
-            .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
             .addMapping(Clash::getType, ClashResponse::setType)
             .addMapping(Clash::getStatus, ClashResponse::setStatus)
+            // .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getCurrentPlayerId, ClashResponse::setCurrentPlayer))

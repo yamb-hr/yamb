@@ -33,24 +33,26 @@ public class ClashModelAssembler implements RepresentationModelAssembler<Clash, 
         
         ClashResponse clashResponse = modelMapper.map(clash, ClashResponse.class);
         clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
-        clashResponse.getOwner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getOwner().getId())).withSelfRel());
+        if (clashResponse.getOwner() != null) clashResponse.getOwner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getOwner().getId())).withSelfRel());
         if (clashResponse.getWinner() != null) clashResponse.getWinner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getWinner().getId())).withSelfRel());
-        clashResponse.getCurrentPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getCurrentPlayer().getId())).withSelfRel());
-        for (PlayerResponse playerResponse : clashResponse.getPlayers()) {
-            playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
+        if (clashResponse.getCurrentPlayer() != null) clashResponse.getCurrentPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getCurrentPlayer().getId())).withSelfRel());
+        if (clashResponse.getPlayers() != null) {
+            for (PlayerResponse playerResponse : clashResponse.getPlayers()) {
+                playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
+            }
         }
 
         return clashResponse;
     }
 
-    public PagedModel<ClashResponse> toPagedModel(Page<Clash> clashs) {
+    public PagedModel<ClashResponse> toPagedModel(Page<Clash> clashes) {
 
-        List<ClashResponse> clashResponses = clashs.stream()
+        List<ClashResponse> clashResponses = clashes.stream()
             .map(this::toModel)
             .collect(Collectors.toList());
 
         PagedModel<ClashResponse> pagedClashs = PagedModel.of(clashResponses, new PagedModel.PageMetadata(
-            clashs.getSize(), clashs.getNumber(), clashs.getTotalElements(), clashs.getTotalPages()
+            clashes.getSize(), clashes.getNumber(), clashes.getTotalElements(), clashes.getTotalPages()
         ));
 
         return pagedClashs;
