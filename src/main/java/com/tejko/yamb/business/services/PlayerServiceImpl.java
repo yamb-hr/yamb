@@ -48,8 +48,13 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Optional<Player> findByExternalId(UUID externalId) {
+        return playerRepo.findByExternalId(externalId);
+    }
+
+    @Override
     public Player getByExternalId(UUID externalId) {
-        return playerRepo.findByExternalId(externalId)
+        return findByExternalId(externalId)
             .orElseThrow(() -> new ResourceNotFoundException());
     }
 

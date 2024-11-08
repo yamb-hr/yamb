@@ -1,6 +1,7 @@
 package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +18,8 @@ import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
 
 public interface PlayerService extends UserDetailsService {
+
+    public Optional<Player> findByExternalId(UUID externalId);
 
     public Player getByExternalId(UUID externalId);
 

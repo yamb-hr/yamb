@@ -1,13 +1,15 @@
 package com.tejko.yamb.config;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,7 @@ import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
+import com.tejko.yamb.domain.enums.InvitationStatus;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
@@ -64,6 +67,7 @@ public ModelMapper modelMapper() {
 }
 
     private void configureMappings(ModelMapper modelMapper) {
+
         Converter<Player, Boolean> isRegisteredConverter = context -> context.getSource() instanceof RegisteredPlayer;
 
         // player
@@ -114,8 +118,8 @@ public ModelMapper modelMapper() {
         // game
         Converter<UUID, PlayerResponse> playerConverter = context -> {
             UUID playerExternalId = context.getSource();
-            Player player = playerService.getByExternalId(playerExternalId);
-            return player == null ? null : modelMapper.map(player, PlayerResponse.class);
+            Optional<Player> player = playerService.findByExternalId(playerExternalId);
+            return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
         };
 
         modelMapper.createTypeMap(Game.class, GameResponse.class)
@@ -149,10 +153,17 @@ public ModelMapper modelMapper() {
         Converter<List<UUID>, List<PlayerResponse>> playerListConverter = context ->
             context.getSource().stream()
                 .map(playerId -> {
-                    Player player = playerService.getByExternalId(playerId);
-                    return player == null ? null : modelMapper.map(player, PlayerResponse.class);
+                    Optional<Player> player = playerService.findByExternalId(playerId);
+                    return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
                 })
                 .collect(Collectors.toList());
+
+        Converter<Map<UUID, InvitationStatus>, Map<UUID, InvitationStatus>> invitationStatusMapConverter = context ->
+            context.getSource().entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue
+                ));
                 
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
@@ -160,14 +171,13 @@ public ModelMapper modelMapper() {
             .addMapping(Clash::getUpdatedAt, ClashResponse::setUpdatedAt)
             .addMapping(Clash::getType, ClashResponse::setType)
             .addMapping(Clash::getStatus, ClashResponse::setStatus)
-            // .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
+            .addMappings(mapper -> mapper.using(invitationStatusMapConverter).map(Clash::getInvitations, ClashResponse::setInvitations))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getCurrentPlayerId, ClashResponse::setCurrentPlayer))
             .addMappings(mapper -> mapper.using(playerListConverter).map(Clash::getPlayerIds, ClashResponse::setPlayers));
 
         // stats
-
         modelMapper.createTypeMap(GlobalPlayerStats.class, GlobalPlayerStatsResponse.class)
             .addMapping(GlobalPlayerStats::getPlayerCount, GlobalPlayerStatsResponse::setPlayerCount)
             .addMapping(GlobalPlayerStats::getMostScoresByAnyPlayer, GlobalPlayerStatsResponse::setMostScoresByAnyPlayer)
@@ -199,7 +209,6 @@ public ModelMapper modelMapper() {
             .addMapping(PlayerStats::getScoreCount, PlayerStatsResponse::setScoreCount);
 
         // auth
-
         modelMapper.createTypeMap(PlayerWithToken.class, AuthResponse.class)
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
             .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
