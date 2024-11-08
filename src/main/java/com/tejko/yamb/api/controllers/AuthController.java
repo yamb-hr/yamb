@@ -4,6 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 
 import javax.validation.Valid;
 
@@ -25,18 +26,21 @@ import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.business.interfaces.AuthService;
+import com.tejko.yamb.business.interfaces.EmailService;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
     private final AuthModelAssembler authModelAssembler;
     private final PlayerModelAssembler playerModelAssembler;
 
     @Autowired
-    public AuthController(AuthService authService, AuthModelAssembler authModelAssembler, PlayerModelAssembler playerModelAssembler) {
+    public AuthController(AuthService authService, EmailService emailService, AuthModelAssembler authModelAssembler, PlayerModelAssembler playerModelAssembler) {
         this.authService = authService;
+        this.emailService = emailService;
         this.authModelAssembler = authModelAssembler;
         this.playerModelAssembler = playerModelAssembler;
     }
@@ -59,6 +63,8 @@ public class AuthController {
             .buildAndExpand(playerResponse.getId())
             .toUri();
 
+            emailService.sendSimpleMessage("matej@jamb.com.hr", "New User: " + authRequest.getUsername(), "User " + authRequest.getUsername() + " registered on " + LocalDateTime.now());
+
         return ResponseEntity.created(location).body(playerResponse);
     }
 
@@ -72,6 +78,8 @@ public class AuthController {
             .path("/{id}")
             .buildAndExpand(authResponse.getPlayer().getId())
             .toUri();
+
+            emailService.sendSimpleMessage("matej@jamb.com.hr", "New User: " + usernameRequest.getUsername(), "User " + usernameRequest.getUsername() + " registered on " + LocalDateTime.now());
 
         return ResponseEntity.created(location).body(authResponse);
     }
