@@ -1,7 +1,6 @@
 package com.tejko.yamb.config;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,7 +24,6 @@ import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
-import com.tejko.yamb.domain.enums.InvitationStatus;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
@@ -156,13 +154,6 @@ public ModelMapper modelMapper() {
                     return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
                 })
                 .collect(Collectors.toList());
-
-        Converter<Map<UUID, InvitationStatus>, Map<UUID, InvitationStatus>> invitationStatusMapConverter = context ->
-            context.getSource().entrySet().stream()
-                .collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    Map.Entry::getValue
-                ));
                 
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
@@ -170,7 +161,7 @@ public ModelMapper modelMapper() {
             .addMapping(Clash::getUpdatedAt, ClashResponse::setUpdatedAt)
             .addMapping(Clash::getType, ClashResponse::setType)
             .addMapping(Clash::getStatus, ClashResponse::setStatus)
-            .addMappings(mapper -> mapper.using(invitationStatusMapConverter).map(Clash::getInvitations, ClashResponse::setInvitations))
+            .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getCurrentPlayerId, ClashResponse::setCurrentPlayer))
