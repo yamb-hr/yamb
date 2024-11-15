@@ -24,6 +24,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
+
         MimeMessagePreparator mailMessage = mimeMessage -> {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             message.setFrom(fromEmail, fromName);
@@ -31,6 +32,11 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject(subject);
             message.setText(text);
         };
-        mailSender.send(mailMessage);
+        
+        try {
+            mailSender.send(mailMessage);
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
     }
 }
