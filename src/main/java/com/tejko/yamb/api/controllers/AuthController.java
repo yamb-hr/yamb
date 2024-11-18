@@ -97,7 +97,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/email-verification-token")
+    @PostMapping("/email-verification-token")
     public ResponseEntity<Void> sendVerificationEmail(@Valid @RequestBody EmailRequest emailRequest) {
         authService.sendVerificationEmail(emailRequest.getEmail());
         return ResponseEntity.ok().build();

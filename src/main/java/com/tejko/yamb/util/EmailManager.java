@@ -91,7 +91,7 @@ public class EmailManager {
             };
             mailSender.send(mailMessage);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getLocalizedMessage());
         }
     }
 
