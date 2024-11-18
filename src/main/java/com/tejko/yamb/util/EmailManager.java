@@ -7,10 +7,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component
@@ -97,8 +97,14 @@ public class EmailManager {
 
     private String loadTemplate(String templateName) throws IOException {
         ClassPathResource resource = new ClassPathResource("templates/en/" + templateName);
-        Path path = Paths.get(resource.getURI());
-        return Files.readString(path);
+
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Template not found: " + templateName);
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     private String buildContent(String templateName, Map<String, String> placeholders) {
