@@ -14,7 +14,7 @@ public interface ClashRepository extends MongoRepository<Clash, String> {
     
     Optional<Clash> findByExternalId(UUID externalId);
     
-    List<Clash> findAllByPlayerIdsContains(UUID playerId);
+    List<Clash> findAllByPlayerIdsContainsOrderByUpdatedAtDesc(UUID playerId);
     
     boolean existsByPlayerIdsContainsAndStatusAndType(UUID playerId, ClashStatus status, ClashType type);
 

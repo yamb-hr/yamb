@@ -62,7 +62,7 @@ public class ClashServiceImpl implements ClashService {
 
     @Override
     public List<Clash> getByPlayerExternalId(UUID playerExternalId) {
-        return clashRepo.findAllByPlayerIdsContains(playerExternalId);
+        return clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(playerExternalId);
     }
 
     @Override

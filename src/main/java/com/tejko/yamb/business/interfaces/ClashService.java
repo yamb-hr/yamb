@@ -11,18 +11,18 @@ import com.tejko.yamb.domain.models.Clash;
 
 public interface ClashService {
 
-    public Clash getByExternalId(UUID externalId);
+    Clash getByExternalId(UUID externalId);
 
-    public Page<Clash> getAll(Pageable pageable);
+    Page<Clash> getAll(Pageable pageable);
 
-    public Clash getOrCreate(List<UUID> playerExternalIds, ClashType type);
+    Clash getOrCreate(List<UUID> playerExternalIds, ClashType type);
     
-    public List<Clash> getByPlayerExternalId(UUID playerExternalId);
+    List<Clash> getByPlayerExternalId(UUID playerExternalId);
 
-    public Clash acceptInvitationByExternalId(UUID externalId);
+    Clash acceptInvitationByExternalId(UUID externalId);
 
-    public Clash declineInvitationByExternalId(UUID externalId);
+    Clash declineInvitationByExternalId(UUID externalId);
 
-    public void deleteByExternalId(UUID externalId);
+    void deleteByExternalId(UUID externalId);
 
 }

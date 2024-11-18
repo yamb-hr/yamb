@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
@@ -28,13 +29,11 @@ import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.GuestPlayer;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
 
@@ -65,33 +64,22 @@ public ModelMapper modelMapper() {
 
     private void configureMappings(ModelMapper modelMapper) {
 
-        Converter<Player, Boolean> isRegisteredConverter = context -> context.getSource() instanceof RegisteredPlayer;
-
+        Converter<Player, Boolean> isAdminConverter = ctx -> {
+            Player player = ctx.getSource();
+            if (player.getRoles() == null) {
+                return false;
+            }
+            return player.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getLabel()));
+        };
+        
         // player
         modelMapper.createTypeMap(Player.class, PlayerResponse.class)
             .addMapping(Player::getExternalId, PlayerResponse::setId)
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
             .addMapping(Player::getUpdatedAt, PlayerResponse::setUpdatedAt)
             .addMapping(Player::getUsername, PlayerResponse::setName)
-            .addMapping(Player::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.using(isRegisteredConverter).map(src -> src, PlayerResponse::setRegistered));
-
-        modelMapper.createTypeMap(RegisteredPlayer.class, PlayerResponse.class)
-            .addMapping(RegisteredPlayer::getExternalId, PlayerResponse::setId)
-            .addMapping(RegisteredPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
-            .addMapping(RegisteredPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
-            .addMapping(RegisteredPlayer::getUsername, PlayerResponse::setName)
-            .addMapping(RegisteredPlayer::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.map(src -> true, PlayerResponse::setRegistered));
-
-        modelMapper.createTypeMap(GuestPlayer.class, PlayerResponse.class)
-            .addMapping(GuestPlayer::getExternalId, PlayerResponse::setId)
-            .addMapping(GuestPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
-            .addMapping(GuestPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
-            .addMapping(GuestPlayer::getUsername, PlayerResponse::setName)
-            .addMapping(GuestPlayer::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.map(src -> false, PlayerResponse::setRegistered));
-
+            .addMappings(mapper -> mapper.using(isAdminConverter).map(src -> src, PlayerResponse::setAdmin));
+        
         // role
         modelMapper.createTypeMap(Role.class, String.class)
             .setConverter(ctx -> ctx.getSource().getLabel());
@@ -191,6 +179,10 @@ public ModelMapper modelMapper() {
         modelMapper.createTypeMap(PlayerPreferences.class, PlayerPreferencesResponse.class)
             .addMapping(PlayerPreferences::getLanguage, PlayerPreferencesResponse::setLanguage)
             .addMapping(PlayerPreferences::getTheme, PlayerPreferencesResponse::setTheme);
+
+        modelMapper.createTypeMap(PlayerPreferencesRequest.class, PlayerPreferences.class)
+            .addMapping(PlayerPreferencesRequest::getLanguage, PlayerPreferences::setLanguage)
+            .addMapping(PlayerPreferencesRequest::getTheme, PlayerPreferences::setTheme);
 
         modelMapper.createTypeMap(PlayerStats.class, PlayerStatsResponse.class)
             .addMapping(PlayerStats::getLastActivity, PlayerStatsResponse::setLastActivity)

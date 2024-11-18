@@ -23,13 +23,16 @@ import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.LogRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
+import com.tejko.yamb.domain.repositories.TicketRepository;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.EmailManager;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -40,15 +43,20 @@ public class PlayerServiceImpl implements PlayerService {
     private final ClashRepository clashRepo;
     private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
+    private final TicketRepository ticketRepo;
 
     @Autowired
-    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, GameRepository gameRepo, ClashRepository clashRepo, RelationshipRepository relationshipRepo, LogRepository logRepo) {
+    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, 
+                            GameRepository gameRepo, ClashRepository clashRepo, 
+                            RelationshipRepository relationshipRepo, LogRepository logRepo, 
+                            TicketRepository ticketRepo) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
         this.gameRepo = gameRepo;
         this.clashRepo = clashRepo;
         this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
+        this.ticketRepo = ticketRepo;
     }
 
     @Override
@@ -82,15 +90,22 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId) {
-        List<Clash> clashes = clashRepo.findAllByPlayerIdsContains(playerExternalId);
+        List<Clash> clashes = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(playerExternalId);
         return clashes;
     }
 
     @Override
     public List<Log> getLogsByPlayerExternalId(UUID playerExternalId) {
         Player player = getByExternalId(playerExternalId);
-        List<Log> logs = logRepo.findAllByPlayerId(player.getId());
+        List<Log> logs = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
         return logs;
+    }
+
+    @Override
+    public List<Ticket> getTicketsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        List<Ticket> tickets = ticketRepo.findAllByPlayerIdOrderByUpdatedAtDesc(player.getId());
+        return tickets;
     }
 
     @Override
@@ -165,7 +180,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences) {
         checkPermission(playerExternalId);
-
+        
         Player player = getByExternalId(playerExternalId);
         PlayerPreferences preferences = player.getPreferences();
 
@@ -185,7 +200,7 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getPreferences();
     }
 
-    public Player changeUsernameByExternalId(UUID externalId, String username) {
+    public Player updateUsernameByExternalId(UUID externalId, String username) {
         Player player = getByExternalId(externalId);
     
         validateUsername(username);
@@ -194,8 +209,22 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepo.save(player);
     }
 
+    public Player updateEmailByExternalId(UUID externalId, String email) {
+        Player player = getByExternalId(externalId);
+        String normalizedEmail = EmailManager.normalizeEmail(email);
+        validateEmail(normalizedEmail);
+        player.setEmail(normalizedEmail);
+        return playerRepo.save(player);
+    }
+
+    private void validateEmail(String email) {
+        if (playerRepo.existsByEmailIgnoreCaseAndEmailVerified(email, true)) {
+            throw new IllegalArgumentException("error.email_taken");
+        }
+    }
+
     private void validateUsername(String username) {
-        if (playerRepo.existsByUsername(username)) {
+        if (playerRepo.existsByUsernameIgnoreCase(username)) {
             throw new IllegalArgumentException("error.username_taken");
         }
     }
@@ -227,18 +256,18 @@ public class PlayerServiceImpl implements PlayerService {
     public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds) {
         
         Player parentPlayer = getByExternalId(parentExternalId);
-        List<Player> players = playerRepo.findAllByExternalIdIn(playerExternalIds);
+        List<Player> players = playerRepo.findAllByExternalIdInOrderByUpdatedAtDesc(playerExternalIds);
 
         for (Player player : players) {
             List<Score> scoresToMerge = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
             scoresToMerge.forEach(score -> score.setPlayer(parentPlayer));
             scoreRepo.saveAll(scoresToMerge);
 
-            List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContains(player.getExternalId());
+            List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(player.getExternalId());
             clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
             clashRepo.saveAll(clashesToMerge);
 
-            List<Log> logsToMerge = logRepo.findAllByPlayerId(player.getId());
+            List<Log> logsToMerge = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
             logsToMerge.forEach(log -> log.setPlayer(parentPlayer));
             logRepo.saveAll(logsToMerge);
 

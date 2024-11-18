@@ -108,7 +108,7 @@ public class ClashController {
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		clashService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(ClashController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(ClashController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
 

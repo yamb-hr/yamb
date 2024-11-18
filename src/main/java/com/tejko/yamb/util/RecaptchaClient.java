@@ -1,4 +1,4 @@
-package com.tejko.yamb.business.services;
+package com.tejko.yamb.util;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,17 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.tejko.yamb.business.interfaces.RecaptchaService;
-
 @Service
-public class RecaptchaServiceImpl implements RecaptchaService {
+public class RecaptchaClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(RecaptchaServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecaptchaClient.class);
 
-    @Value("${RECAPTCHA_SECRET_KEY}")
+    @Value("${recaptcha.secret.key}")
     private String recaptchaSecretKey;
 
-    @Override
     public boolean verifyRecaptcha(String recaptchaToken) {
         String url = buildRecaptchaVerificationUrl(recaptchaToken);
 
@@ -36,9 +33,7 @@ public class RecaptchaServiceImpl implements RecaptchaService {
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Map<String, Object>>() {}
             );
-
             return extractSuccessFromResponse(responseEntity);
-
         } catch (Exception e) {
             logger.info("Failed to verify recaptcha: " + e.getMessage());
             return false;

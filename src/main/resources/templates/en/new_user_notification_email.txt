@@ -1,0 +1,7 @@
+New User Registration
+
+A new user has registered on Jamb.
+
+Username: {username}
+
+© 2024 Jamb. All rights reserved.

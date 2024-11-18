@@ -10,12 +10,12 @@ import org.springframework.data.domain.Pageable;
 
 public interface ScoreService {
 
-	public Score getByExternalId(UUID externalId);
+	Score getByExternalId(UUID externalId);
 
-	public Page<Score> getAll(Pageable pageable);
+	Page<Score> getAll(Pageable pageable);
 
-	public void deleteByExternalId(UUID externalId);
+	void deleteByExternalId(UUID externalId);
 
-	public GlobalScoreStats getGlobalStats();
+	GlobalScoreStats getGlobalStats();
     
 }

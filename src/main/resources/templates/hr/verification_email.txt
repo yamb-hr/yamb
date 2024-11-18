@@ -1,0 +1,12 @@
+Potvrdite svoj email
+
+Pozdrav {username},
+
+Hvala što ste se registrirali na Jamb! Potvrdite svoju email adresu koristeći donju poveznicu:
+
+{verificationLink}
+
+Ako niste napravili račun, možete ignorirati ovaj email.
+
+Srdačan pozdrav,
+Jamb tim

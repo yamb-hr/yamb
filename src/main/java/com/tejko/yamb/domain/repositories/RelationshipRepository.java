@@ -14,12 +14,12 @@ public interface RelationshipRepository extends JpaRepository<PlayerRelationship
 
    Optional<PlayerRelationship> findByExternalId(UUID externalId);
 
-   @Query("SELECT pr FROM PlayerRelationship pr WHERE pr.id.player.id = :playerId OR pr.id.relatedPlayer.id = :playerId ")
+   @Query("SELECT pr FROM PlayerRelationship pr WHERE pr.id.player.id = :playerId OR pr.id.relatedPlayer.id = :playerId ORDER BY updatedAt")
    List<PlayerRelationship> getRelationshipsByPlayerId(Long playerId);
 
    @Query("SELECT pr FROM PlayerRelationship pr " +
       "WHERE (pr.id.player.id = :playerId AND pr.id.relatedPlayer.id = :relatedPlayerId)" +
-      "OR (pr.id.player.id = :relatedPlayerId AND pr.id.relatedPlayer.id = :playerId)")
+      "OR (pr.id.player.id = :relatedPlayerId AND pr.id.relatedPlayer.id = :playerId) ORDER BY updatedAt")
    Optional<PlayerRelationship> findByPlayerIds(Long playerId, Long relatedPlayerId);
 
    void deleteByExternalId(UUID externalId);

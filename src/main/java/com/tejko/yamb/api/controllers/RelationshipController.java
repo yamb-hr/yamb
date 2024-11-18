@@ -79,7 +79,7 @@ public class RelationshipController {
 	public ResponseEntity<Void> declineByExternalId(@PathVariable UUID externalId) {
 		relationshipService.declineByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(RelationshipController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
 
@@ -88,7 +88,7 @@ public class RelationshipController {
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		relationshipService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(RelationshipController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
     

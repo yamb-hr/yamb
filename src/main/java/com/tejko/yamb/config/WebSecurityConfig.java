@@ -18,12 +18,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
-import com.tejko.yamb.business.interfaces.RecaptchaService;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.security.AuthEntryPoint;
 import com.tejko.yamb.security.AuthTokenFilter;
 import com.tejko.yamb.security.RecaptchaFilter;
 import com.tejko.yamb.util.JwtUtil;
+import com.tejko.yamb.util.RecaptchaClient;
 
 @Configuration
 @EnableWebSecurity
@@ -34,15 +34,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final AuthEntryPoint unauthorizedHandler;
 	private final JwtUtil jwtUtil;
 	private final PlayerRepository playerRepository;
-	private final RecaptchaService recaptchaService;
+	private final RecaptchaClient recaptchaClient;
 
 	@Autowired
-	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaService recaptchaService) {
+	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaClient recaptchaClient) {
 		this.playerService = playerService;
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.jwtUtil = jwtUtil;
 		this.playerRepository = playerRepository;
-		this.recaptchaService = recaptchaService;
+		this.recaptchaClient = recaptchaClient;
 	}
 
 	@Bean
@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public RecaptchaFilter recaptchaFilter() {
-		return new RecaptchaFilter(recaptchaService);
+		return new RecaptchaFilter(recaptchaClient);
 	}
 
 	@Override

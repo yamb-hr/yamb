@@ -5,7 +5,6 @@ import javax.validation.constraints.Size;
 
 public class PasswordChangeRequest {
     
-    @NotBlank(message = "error.password_required")
     private String oldPassword;
     
     @NotBlank(message = "error.password_required")

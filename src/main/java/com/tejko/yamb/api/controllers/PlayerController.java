@@ -15,6 +15,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
 import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
+import com.tejko.yamb.api.dto.requests.EmailRequest;
 import com.tejko.yamb.api.dto.requests.PlayerMergeRequest;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.requests.UsernameRequest;
@@ -87,85 +89,105 @@ public class PlayerController {
 	}
 
 	@GetMapping("/stats")
+	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<GlobalPlayerStatsResponse> getGlobalStats() {
 		GlobalPlayerStatsResponse globalPlayerStatsResponse = playerModelAssembler.toModel(playerService.getGlobalStats());
         return ResponseEntity.ok(globalPlayerStatsResponse);
     }
 
 	@GetMapping("/{externalId}/scores")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<CollectionModel<ScoreResponse>> getScoresByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<ScoreResponse> scoreResponses = scoreModelAssembler.toCollectionModel(playerService.getScoresByPlayerExternalId(externalId));
 		return ResponseEntity.ok(scoreResponses);
 	}
 
 	@GetMapping("/{externalId}/games")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<CollectionModel<GameResponse>> getGamesByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<GameResponse> gameResponses = gameModelAssembler.toCollectionModel(playerService.getGamesByPlayerExternalId(externalId));
 		return ResponseEntity.ok(gameResponses);
 	}
 
 	@GetMapping("/{externalId}/clashes")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
 	public ResponseEntity<CollectionModel<ClashResponse>> getClashesByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<ClashResponse> clashResponses = clashModelAssembler.toCollectionModel(playerService.getClashesByPlayerExternalId(externalId));
 		return ResponseEntity.ok(clashResponses);
 	}
 
 	@GetMapping("/{externalId}/logs")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
 	public ResponseEntity<CollectionModel<LogResponse>> getLogsByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<LogResponse> logResponses = logModelAssembler.toCollectionModel(playerService.getLogsByPlayerExternalId(externalId));
 		return ResponseEntity.ok(logResponses);
 	}
 
 	@GetMapping("/{externalId}/stats")
+	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<PlayerStatsResponse> getPlayerStatsByExternalId(@PathVariable UUID externalId) {
 		PlayerStatsResponse playerStatsResponse = playerModelAssembler.toModel(playerService.getPlayerStatsByExternalId(externalId));
         return ResponseEntity.ok(playerStatsResponse);
     }
 
 	@GetMapping("/{externalId}/preferences")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
     public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerExternalId(@PathVariable UUID externalId) {
 		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.getPreferencesByPlayerExternalId(externalId));
         return ResponseEntity.ok(playerPreferencesResponse);
     }
 
 	@PutMapping("/{externalId}/preferences")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
     public ResponseEntity<EntityModel<PlayerPreferencesResponse>> setPreferencesByPlayerExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
 		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.setPreferencesByPlayerExternalId(externalId, playerModelAssembler.fromModel(playerPreferencesRequest)));
-
 		EntityModel<PlayerPreferencesResponse> preferencesModel = EntityModel.of(playerPreferencesResponse);
         preferencesModel.add(linkTo(methodOn(PlayerController.class).setPreferencesByPlayerExternalId(externalId, playerPreferencesRequest)).withSelfRel());
         preferencesModel.add(linkTo(methodOn(PlayerController.class).getByExternalId(externalId)).withRel("player"));
-
         return ResponseEntity.ok(preferencesModel);
     }
 
-	@PutMapping("/{externalId}/username")
-	public ResponseEntity<PlayerResponse> changeUsernameByExternalId(@PathVariable UUID externalId, @Valid @RequestBody UsernameRequest usernameRequest) {
-		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.changeUsernameByExternalId(externalId, usernameRequest.getUsername()));
-		return ResponseEntity.ok(playerResponse);
-	}
-
 	@GetMapping("/{externalId}/relationships")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
 	public ResponseEntity<CollectionModel<RelationshipResponse>> getRelationshipsByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<RelationshipResponse> relationshipResponses = relationshipModelAssembler.toCollectionModel(playerService.getRelationshipsByPlayerExternalId(externalId));
 		return ResponseEntity.ok(relationshipResponses);
 	}
 
 	@PostMapping("/merge")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Void> mergePlayers(@Valid @RequestBody PlayerMergeRequest playerMergeRequest) {
 		playerService.mergePlayers(playerMergeRequest.getParentId(), playerMergeRequest.getPlayerIds());
 		return ResponseEntity.accepted().build();
 	}
 
-	// @DeleteMapping("/inactive")
-    // public ResponseEntity<Void> deleteInactivePlayers() {
-	// 	playerService.deleteInactivePlayers();
-    // 	return ResponseEntity.noContent().build();
-	// }
-
 	@GetMapping("/me")
+	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<PlayerResponse> getCurrentPlayer() {
-		PlayerResponse playerResponse = playerModelAssembler.toModel(playerService.getCurrentPlayer());
+		Player player = playerService.getCurrentPlayer();
+		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
+		playerResponse.setEmail(player.getEmail());
+		playerResponse.setEmailVerified(player.isEmailVerified());
 		return ResponseEntity.ok(playerResponse);
 	}
+
+	@PutMapping("/{externalId}/username")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+	public ResponseEntity<PlayerResponse> updateUsernameByExternalId(@PathVariable UUID externalId, @Valid @RequestBody UsernameRequest usernameRequest) {
+		Player player = playerService.updateUsernameByExternalId(externalId, usernameRequest.getUsername());
+		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
+		playerResponse.setEmail(player.getEmail());
+		playerResponse.setEmailVerified(player.isEmailVerified());
+		return ResponseEntity.ok(playerResponse);
+	}
+
+	@PutMapping("/{externalId}/email")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+    public ResponseEntity<PlayerResponse> updateEmailByExternalId(@PathVariable UUID externalId, @Valid @RequestBody EmailRequest emailRequest) {
+		Player player = playerService.updateEmailByExternalId(externalId, emailRequest.getEmail());
+		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
+		playerResponse.setEmail(player.getEmail());
+		playerResponse.setEmailVerified(player.isEmailVerified());
+		return ResponseEntity.ok(playerResponse);
+    }
 }

@@ -17,39 +17,44 @@ import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 
 public interface PlayerService extends UserDetailsService {
 
-    public Optional<Player> findByExternalId(UUID externalId);
+    Optional<Player> findByExternalId(UUID externalId);
 
-    public Player getByExternalId(UUID externalId);
+    Player getByExternalId(UUID externalId);
 
-    public Player getCurrentPlayer();
+    Player getCurrentPlayer();
 
-    public Page<Player> getAll(Pageable pageable);
+    Page<Player> getAll(Pageable pageable);
     
-    public List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
+    List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
 
-    public List<Game> getGamesByPlayerExternalId(UUID playerExternalId);
+    List<Game> getGamesByPlayerExternalId(UUID playerExternalId);
 
-    public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId);
+    List<Clash> getClashesByPlayerExternalId(UUID playerExternalId);
 
-    public List<Log> getLogsByPlayerExternalId(UUID playerExternalId);
+    List<Log> getLogsByPlayerExternalId(UUID playerExternalId);
 
-    public PlayerStats getPlayerStatsByExternalId(UUID externalId);
+    List<Ticket> getTicketsByPlayerExternalId(UUID playerExternalId);
 
-    public GlobalPlayerStats getGlobalStats();
+    PlayerStats getPlayerStatsByExternalId(UUID externalId);
 
-    public PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId);
+    GlobalPlayerStats getGlobalStats();
+
+    PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId);
     
-    public PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences);
+    PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences);
 
-    public Player changeUsernameByExternalId(UUID playerExternalId, String username);
+    Player updateUsernameByExternalId(UUID playerExternalId, String username);
 
-    public void deleteInactivePlayers();
+    Player updateEmailByExternalId(UUID playerExternalId, String username);
 
-    public List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
+    void deleteInactivePlayers();
 
-    public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
+    List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
+
+    void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
     
 }

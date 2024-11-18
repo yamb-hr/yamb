@@ -1,7 +1,6 @@
 package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.hateoas.RepresentationModel;
@@ -14,8 +13,9 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private Set<String> roles;
-    private boolean isRegistered;
+    private String email;
+    private boolean isEmailVerified;
+    private boolean isAdmin;
 
     public PlayerResponse() {}
 
@@ -50,21 +50,29 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
     public void setName(String name) {
         this.name = name;
     }
-
-    public Set<String> getRoles() {
-        return roles;
+    
+    public String getEmail() {
+        return email;
     }
 
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public boolean isRegistered() {
-        return isRegistered;
+    public boolean isEmailVerified() {
+        return isEmailVerified;
     }
 
-    public void setRegistered(boolean isRegistered) {
-        this.isRegistered = isRegistered;
+    public void setEmailVerified(boolean isEmailVerified) {
+        this.isEmailVerified = isEmailVerified;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
 }

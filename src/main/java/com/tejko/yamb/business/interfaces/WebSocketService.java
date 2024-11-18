@@ -11,16 +11,16 @@ import com.tejko.yamb.domain.models.WebSocketMessage;
 
 public interface WebSocketService {
 
-    public void publicMessage(WebSocketMessage messageRequest, Principal principal);
+    void publicMessage(WebSocketMessage messageRequest, Principal principal);
 
-    public void privateMessage(WebSocketMessage messageRequest, Principal principal);
+    void privateMessage(WebSocketMessage messageRequest, Principal principal);
 
-    public void handleSessionConnected(SessionConnectEvent event);
+    void handleSessionConnected(SessionConnectEvent event);
 
-    public void handleSessionDisconnect(SessionDisconnectEvent event);
+    void handleSessionDisconnect(SessionDisconnectEvent event);
 
-    public void handleSessionSubscribeEvent(SessionSubscribeEvent event);
+    void handleSessionSubscribeEvent(SessionSubscribeEvent event);
     
-    public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event);
+    void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event);
     
 }

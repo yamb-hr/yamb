@@ -142,7 +142,7 @@ public class GameController {
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		gameService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(GameController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(GameController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
 

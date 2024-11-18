@@ -59,7 +59,7 @@ public class LogController {
 	public ResponseEntity<Void> deleteAll() {
 		logService.deleteAll();
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(LogController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(LogController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
 	
