@@ -50,12 +50,17 @@ public class Ticket {
     @Column(name = "updated_at", updatable = true)
     private LocalDateTime updatedAt;
 
-    @GeneratedValue(generator = "string-sequence-generator")
+    @GeneratedValue(generator = "ticket_code_generator")
     @GenericGenerator(
-        name = "string-sequence-generator",
-        strategy = "com.tejko.yamb.domain.util.StringSequenceIdentifier"
+        name = "ticket_code_generator",
+        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+        parameters = {
+            @org.hibernate.annotations.Parameter(name = "sequence_name", value = "ticket_code_seq"),
+            @org.hibernate.annotations.Parameter(name = "initial_value", value = "800"),
+            @org.hibernate.annotations.Parameter(name = "increment_size", value = "1")
+        }
     )
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(name = "code", nullable = false, unique = true, length = 10)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -106,8 +111,24 @@ public class Ticket {
         return updatedAt;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public Set<String> getEmailAddresses() {
+        return emailAddresses;
+    }
+
+    public void setEmailAddresses(Set<String> emailAddresses) {
+        this.emailAddresses = emailAddresses;
+    }
+
     public Player getPlayer() {
         return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public Set<String> getEmailAddress() {
@@ -118,8 +139,16 @@ public class Ticket {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public TicketStatus getStatus() {

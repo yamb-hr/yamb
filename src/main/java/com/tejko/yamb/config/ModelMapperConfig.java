@@ -2,6 +2,7 @@ package com.tejko.yamb.config;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
+import com.tejko.yamb.api.dto.requests.TicketRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
@@ -24,6 +26,7 @@ import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
+import com.tejko.yamb.api.dto.responses.TicketResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
@@ -36,6 +39,7 @@ import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 
 @Configuration
 public class ModelMapperConfig {
@@ -194,6 +198,40 @@ public ModelMapper modelMapper() {
         modelMapper.createTypeMap(PlayerWithToken.class, AuthResponse.class)
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
             .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
-    }
+
+        // ticket
+        modelMapper.createTypeMap(Ticket.class, TicketResponse.class)
+            .addMapping(Ticket::getExternalId, TicketResponse::setId)
+            .addMapping(Ticket::getCreatedAt, TicketResponse::setCreatedAt)
+            .addMapping(Ticket::getUpdatedAt, TicketResponse::setUpdatedAt)
+            .addMapping(Ticket::getCode, TicketResponse::setCode)
+            .addMapping(Ticket::getTitle, TicketResponse::setTitle)
+            .addMapping(Ticket::getDescription, TicketResponse::setDescription)
+            .addMapping(Ticket::getStatus, TicketResponse::setStatus)
+            .addMapping(Ticket::getEmailAddress, TicketResponse::setEmailAddresses)
+            .addMappings(mapper -> mapper.map(Ticket::getPlayer, TicketResponse::setPlayer));
+
+        modelMapper.createTypeMap(TicketRequest.class, Ticket.class)
+            .addMappings(mapper -> {
+                mapper.using((Converter<UUID, Player>) context -> {
+                    UUID playerId = context.getSource();
+                    if (playerId == null) {
+                        return null;
+                    }
+                    return playerService.findByExternalId(playerId).orElse(null);
+                }).map(TicketRequest::getPlayerId, Ticket::setPlayer);
+
+                mapper.using((Converter<Set<String>, Set<String>>) context -> {
+                    Set<String> emails = context.getSource();
+                    if (emails == null) {
+                        return null;
+                    }
+                    return Set.copyOf(emails);
+                }).map(TicketRequest::getEmailAddresses, Ticket::setEmailAddresses);
+            })
+            .addMapping(TicketRequest::getTitle, Ticket::setTitle)
+            .addMapping(TicketRequest::getDescription, Ticket::setDescription);
+        }
+        
 
 }

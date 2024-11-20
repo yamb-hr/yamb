@@ -1,6 +1,7 @@
 package com.tejko.yamb.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -85,17 +86,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
+	@Value("${spring.profiles.active:default}")
+	private String activeProfile;
+
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
+		
 		return new WebMvcConfigurer() {
+			
+			private final String[] DEV_ORIGINS = {
+				"http://localhost:3000",
+			};
+
+			private final String[] PROD_ORIGINS = {
+				"https://jamb.com.hr"
+			};
+
+			private final String[] ALLOWED_METHODS = {
+				"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+			};
+
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry) {
+				String[] allowedOrigins = "dev".equalsIgnoreCase(activeProfile) ? DEV_ORIGINS : PROD_ORIGINS;
+
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:3000", "https://jamb.com.hr", "https://yamb-eb04975539ef.herokuapp.com")
-					.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+					.allowedOrigins(allowedOrigins)
+					.allowedMethods(ALLOWED_METHODS)
 					.allowCredentials(true);
 			}
+			
 		};
-	} 
+	}
+
 
 }

@@ -286,4 +286,10 @@ public class PlayerServiceImpl implements PlayerService {
         playerRepo.save(parentPlayer);
     }
 
+    @Override
+    public void deleteByExternalId(UUID externalId) {
+        Player player = getByExternalId(externalId);
+        playerRepo.delete(player);
+    }
+
 }

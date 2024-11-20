@@ -1,5 +1,6 @@
 package com.tejko.yamb.api.dto.requests;
 
+import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.constraints.NotBlank;
@@ -8,7 +9,7 @@ public class TicketRequest {
 
     private UUID playerId;
 
-    private String emailAddresses;
+    private Set<String> emailAddresses;
 
     @NotBlank(message = "error.title_required")
     private String title;
@@ -24,11 +25,11 @@ public class TicketRequest {
         this.playerId = playerId;
     }
 
-    public String getEmailAddresses() {
+    public Set<String> getEmailAddresses() {
         return emailAddresses;
     }
 
-    public void setEmailAddresses(String emailAddresses) {
+    public void setEmailAddresses(Set<String> emailAddresses) {
         this.emailAddresses = emailAddresses;
     }
 
@@ -47,8 +48,5 @@ public class TicketRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    
-
     
 }

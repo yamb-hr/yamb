@@ -16,6 +16,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -159,6 +160,13 @@ public class PlayerController {
 	public ResponseEntity<Void> mergePlayers(@Valid @RequestBody PlayerMergeRequest playerMergeRequest) {
 		playerService.mergePlayers(playerMergeRequest.getParentId(), playerMergeRequest.getPlayerIds());
 		return ResponseEntity.accepted().build();
+	}
+
+	@DeleteMapping("/{externalId}")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Void> mergePlayers(@PathVariable UUID externalId) {
+		playerService.deleteByExternalId(externalId);
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/me")

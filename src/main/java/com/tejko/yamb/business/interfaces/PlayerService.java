@@ -25,6 +25,8 @@ public interface PlayerService extends UserDetailsService {
 
     Player getByExternalId(UUID externalId);
 
+    void deleteByExternalId(UUID externalId);
+
     Player getCurrentPlayer();
 
     Page<Player> getAll(Pageable pageable);

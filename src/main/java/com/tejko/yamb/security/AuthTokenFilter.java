@@ -39,7 +39,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (isProtectedEndpoint(request.getRequestURI())) {
-            System.out.println(request.getRequestURI());
+            System.out.println(request.getMethod() + " " + request.getRequestURI());
             String authToken = parseToken(request);
             if (authToken != null && jwtUtil.validateToken(authToken)) {
                 UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
