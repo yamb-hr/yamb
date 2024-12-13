@@ -19,7 +19,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -50,19 +49,6 @@ public class Ticket {
     @Column(name = "updated_at", updatable = true)
     private LocalDateTime updatedAt;
 
-    @GeneratedValue(generator = "ticket_code_generator")
-    @GenericGenerator(
-        name = "ticket_code_generator",
-        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-        parameters = {
-            @org.hibernate.annotations.Parameter(name = "sequence_name", value = "ticket_code_seq"),
-            @org.hibernate.annotations.Parameter(name = "initial_value", value = "800"),
-            @org.hibernate.annotations.Parameter(name = "increment_size", value = "1")
-        }
-    )
-    @Column(name = "code", nullable = false, unique = true, length = 10)
-    private String code;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = true)
     private Player player;
@@ -79,7 +65,7 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TicketStatus status;
+    private TicketStatus status = TicketStatus.NEW;
 
     protected Ticket() {}
 
@@ -91,8 +77,8 @@ public class Ticket {
         this.status = status;
     }
     
-    public static Ticket getInstance(Player player, Set<String> emailAddress, String title, String description) {
-        return new Ticket(player, emailAddress, title, description, TicketStatus.NEW);
+    public static Ticket getInstance(Player player, Set<String> emailAddresses, String title, String description) {
+        return new Ticket(player, emailAddresses, title, description, TicketStatus.NEW);
     }
 
     public Long getId() {
@@ -109,10 +95,6 @@ public class Ticket {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public String getCode() {
-        return code;
     }
 
     public Set<String> getEmailAddresses() {

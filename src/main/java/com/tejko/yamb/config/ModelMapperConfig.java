@@ -204,7 +204,6 @@ public ModelMapper modelMapper() {
             .addMapping(Ticket::getExternalId, TicketResponse::setId)
             .addMapping(Ticket::getCreatedAt, TicketResponse::setCreatedAt)
             .addMapping(Ticket::getUpdatedAt, TicketResponse::setUpdatedAt)
-            .addMapping(Ticket::getCode, TicketResponse::setCode)
             .addMapping(Ticket::getTitle, TicketResponse::setTitle)
             .addMapping(Ticket::getDescription, TicketResponse::setDescription)
             .addMapping(Ticket::getStatus, TicketResponse::setStatus)

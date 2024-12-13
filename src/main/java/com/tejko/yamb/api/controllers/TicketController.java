@@ -66,7 +66,7 @@ public class TicketController {
 	@PostMapping("")	
 	@PreAuthorize("isAuthenticated() and (#ticketRequest.playerId == principal.externalId or hasAuthority('ADMIN'))")
 	public ResponseEntity<TicketResponse> create(@Valid @RequestBody TicketRequest ticketRequest) {
-		TicketResponse ticketResponse = ticketModelAssembler.toModel(ticketService.create(ticketModelAssembler.fromModel(ticketRequest)));
+		TicketResponse ticketResponse = ticketModelAssembler.toModel(ticketService.create(ticketRequest.getEmailAddresses(), ticketRequest.getTitle(), ticketRequest.getDescription()));
 		URI location = ServletUriComponentsBuilder
 			.fromCurrentRequest()
 			.path("/{externalId}")

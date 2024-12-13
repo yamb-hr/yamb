@@ -1,6 +1,7 @@
 package com.tejko.yamb.business.services;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.tejko.yamb.business.interfaces.TicketService;
 import com.tejko.yamb.domain.models.Ticket;
 import com.tejko.yamb.domain.repositories.TicketRepository;
+import com.tejko.yamb.security.AuthContext;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -35,7 +37,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Ticket create(Ticket ticket) {
+    public Ticket create(Set<String> emailAddresses, String title, String description) {
+        Ticket ticket = Ticket.getInstance(AuthContext.getAuthenticatedPlayer(), emailAddresses, title, description);
         ticketRepo.save(ticket);
         return ticket;
     }

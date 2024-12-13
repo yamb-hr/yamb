@@ -1,6 +1,7 @@
 package com.tejko.yamb.business.interfaces;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -14,7 +15,7 @@ public interface TicketService {
 
     public Page<Ticket> getAll(Pageable pageable);
     
-    public Ticket create(Ticket ticket);
+    public Ticket create(Set<String> emailAddresses, String title, String description);
 
     public Ticket patchByExternalId(UUID externalId, Map<String, Object> updates);
 
