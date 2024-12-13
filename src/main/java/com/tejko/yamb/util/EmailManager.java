@@ -1,6 +1,7 @@
 package com.tejko.yamb.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Map;
 
 @Component
@@ -96,7 +98,13 @@ public class EmailManager {
     }
 
     private String loadTemplate(String templateName) throws IOException {
-        ClassPathResource resource = new ClassPathResource("templates/en/" + templateName);
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        String localeDirectory = currentLocale.getLanguage();
+        ClassPathResource resource = new ClassPathResource("templates/" + localeDirectory + "/" + templateName);
+
+        if (!resource.exists()) {
+            resource = new ClassPathResource("templates/en/" + templateName);
+        }
 
         if (!resource.exists()) {
             throw new FileNotFoundException("Template not found: " + templateName);

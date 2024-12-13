@@ -23,7 +23,7 @@ public class PlayerListener {
     }
 
     public boolean isEmailUpdated(Player player) {
-        if (player == null || player.getEmail() == null || player.getPreviousEmail() == null) {
+        if (player == null || player.getEmail() == null) {
             return false;
         }
         return !player.getEmail().equals(player.getPreviousEmail());
