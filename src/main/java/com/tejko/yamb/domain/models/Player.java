@@ -95,6 +95,9 @@ public class Player implements UserDetails, Principal {
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PlayerPreferences preferences;
 
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Image avatar;
+
     protected Player() {}
 
     protected Player(String email, String username, String password, Set<Role> roles) {
@@ -211,6 +214,14 @@ public class Player implements UserDetails, Principal {
         this.preferences = preferences;
     }
     
+    public Image getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Image avatar) {
+        this.avatar = avatar;
+    }
+
     @Override  
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

@@ -21,6 +21,7 @@ import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.GlobalScoreStatsResponse;
+import com.tejko.yamb.api.dto.responses.ImageResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
@@ -32,6 +33,7 @@ import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
+import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
@@ -82,7 +84,14 @@ public ModelMapper modelMapper() {
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
             .addMapping(Player::getUpdatedAt, PlayerResponse::setUpdatedAt)
             .addMapping(Player::getUsername, PlayerResponse::setName)
+            .addMapping(Player::getAvatar, PlayerResponse::setAvatar)
             .addMappings(mapper -> mapper.using(isAdminConverter).map(src -> src, PlayerResponse::setAdmin));
+
+        // image
+        modelMapper.createTypeMap(Image.class, ImageResponse.class)
+            .addMapping(Image::getExternalId, ImageResponse::setId)
+            .addMapping(Image::getName, ImageResponse::setName)
+            .addMapping(Image::getUrl, ImageResponse::setUrl);
         
         // role
         modelMapper.createTypeMap(Role.class, String.class)

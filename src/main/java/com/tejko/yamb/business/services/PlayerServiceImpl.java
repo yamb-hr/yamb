@@ -1,6 +1,7 @@
 package com.tejko.yamb.business.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,11 +13,13 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
+import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
@@ -32,6 +35,7 @@ import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.repositories.TicketRepository;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.CloudinaryClient;
 import com.tejko.yamb.util.EmailManager;
 
 @Service
@@ -44,12 +48,13 @@ public class PlayerServiceImpl implements PlayerService {
     private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
     private final TicketRepository ticketRepo;
+    private final CloudinaryClient cloudinaryClient;
 
     @Autowired
     public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, 
                             GameRepository gameRepo, ClashRepository clashRepo, 
                             RelationshipRepository relationshipRepo, LogRepository logRepo, 
-                            TicketRepository ticketRepo) {
+                            TicketRepository ticketRepo, CloudinaryClient cloudinaryClient) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
         this.gameRepo = gameRepo;
@@ -57,6 +62,7 @@ public class PlayerServiceImpl implements PlayerService {
         this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
         this.ticketRepo = ticketRepo;
+        this.cloudinaryClient = cloudinaryClient;
     }
 
     @Override
@@ -290,6 +296,42 @@ public class PlayerServiceImpl implements PlayerService {
     public void deleteByExternalId(UUID externalId) {
         Player player = getByExternalId(externalId);
         playerRepo.delete(player);
+    }
+
+    @Override
+    public Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar) {
+        validateAvatar(avatar);
+        Player player = getByExternalId(playerExternalId);
+        Image existingAvatar = player.getAvatar();
+        String oldPublicId = (existingAvatar != null) ? existingAvatar.getPublicId() : null;
+
+        Map uploadedFile = cloudinaryClient.uploadFile(avatar, "avatars", oldPublicId);
+        if (uploadedFile == null) {
+            throw new IllegalArgumentException("Failed to upload new avatar.");
+        }
+
+        if (existingAvatar != null) {
+            existingAvatar.setName((String) uploadedFile.get("name"));
+            existingAvatar.setUrl((String) uploadedFile.get("url"));
+            existingAvatar.setPublicId((String) uploadedFile.get("public_id"));
+        } else {
+            Image newAvatar = Image.getInstance(player, (String) uploadedFile.get("name"), (String) uploadedFile.get("url"), (String) uploadedFile.get("public_id"));
+            player.setAvatar(newAvatar);
+        }
+
+        playerRepo.save(player);
+
+        return player;
+}
+
+
+    private void validateAvatar(MultipartFile avatar) {
+        if (avatar.getName().isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        if (avatar.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
     }
 
 }

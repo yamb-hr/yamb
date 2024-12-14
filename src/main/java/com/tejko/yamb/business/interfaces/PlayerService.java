@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
@@ -58,5 +59,7 @@ public interface PlayerService extends UserDetailsService {
     List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
 
     void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
+
+    Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar);
     
 }
