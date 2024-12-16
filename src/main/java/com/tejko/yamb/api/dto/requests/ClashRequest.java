@@ -1,6 +1,6 @@
 package com.tejko.yamb.api.dto.requests;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
@@ -10,23 +10,48 @@ import com.tejko.yamb.domain.enums.ClashType;
 
 public class ClashRequest {
     
+    // @NotNull(message = "error.name_required")
+    private String name;
+
+    @NotNull(message = "error.player_ids_required")
+    private UUID ownerId;
+
     @NotEmpty(message = "error.player_ids_required")
-    private List<UUID> playerIds;
+    private Set<UUID> playerIds;
 
     @NotNull(message = "error.type_required")
     private ClashType type;
 
     public ClashRequest() {}
 
-    public List<UUID> getPlayerIds() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Set<UUID> getPlayerIds() {
         return playerIds;
     }
-    public void setPlayerIds(List<UUID> playerIds) {
+
+    public void setPlayerIds(Set<UUID> playerIds) {
         this.playerIds = playerIds;
     }
+
     public ClashType getType() {
         return type;
     }
+
     public void setType(ClashType type) {
         this.type = type;
     }

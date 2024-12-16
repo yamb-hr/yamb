@@ -1,10 +1,8 @@
 package com.tejko.yamb.config;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -17,6 +15,7 @@ import org.springframework.context.annotation.Primary;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.requests.TicketRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
+import com.tejko.yamb.api.dto.responses.ClashPlayerResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
@@ -30,6 +29,7 @@ import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.api.dto.responses.TicketResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Clash.ClashPlayer;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
@@ -54,19 +54,18 @@ public class ModelMapperConfig {
     }
 
     @Bean
-@Primary
-public ModelMapper modelMapper() {
-    ModelMapper modelMapper = new ModelMapper();
-    modelMapper.getConfiguration()
-        .setFieldMatchingEnabled(true)
-        .setFieldAccessLevel(AccessLevel.PRIVATE)
-        .setAmbiguityIgnored(true)
-        .setSkipNullEnabled(true)
-        .setImplicitMappingEnabled(false);
-
-    configureMappings(modelMapper);
-    return modelMapper;
-}
+    @Primary
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+            .setFieldMatchingEnabled(true)
+            .setFieldAccessLevel(AccessLevel.PRIVATE)
+            .setAmbiguityIgnored(true)
+            .setSkipNullEnabled(true)
+            .setImplicitMappingEnabled(false);
+        configureMappings(modelMapper);
+        return modelMapper;
+    }
 
     private void configureMappings(ModelMapper modelMapper) {
 
@@ -146,27 +145,23 @@ public ModelMapper modelMapper() {
         modelMapper.createTypeMap(Game.Dice.class, GameResponse.Dice.class)
             .addMapping(Game.Dice::getIndex, GameResponse.Dice::setIndex)   
             .addMapping(Game.Dice::getValue, GameResponse.Dice::setValue);
-
-        // clash
-        Converter<List<UUID>, List<PlayerResponse>> playerListConverter = context ->
-            context.getSource().stream()
-                .map(playerId -> {
-                    Optional<Player> player = playerService.findByExternalId(playerId);
-                    return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
-                })
-                .collect(Collectors.toList());
                 
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
             .addMapping(Clash::getCreatedAt, ClashResponse::setCreatedAt)
             .addMapping(Clash::getUpdatedAt, ClashResponse::setUpdatedAt)
+            .addMapping(Clash::getName, ClashResponse::setName)
             .addMapping(Clash::getType, ClashResponse::setType)
             .addMapping(Clash::getStatus, ClashResponse::setStatus)
-            .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
+            .addMapping(Clash::getPlayers, ClashResponse::setPlayers)
+            .addMapping(Clash::getTurn, ClashResponse::setTurn)
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
-            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner))
-            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getCurrentPlayerId, ClashResponse::setCurrentPlayer))
-            .addMappings(mapper -> mapper.using(playerListConverter).map(Clash::getPlayerIds, ClashResponse::setPlayers));
+            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner));
+
+        modelMapper.createTypeMap(ClashPlayer.class, ClashPlayerResponse.class)
+            .addMapping(ClashPlayer::getId, ClashPlayerResponse::setId)
+            .addMapping(ClashPlayer::getGameId, ClashPlayerResponse::setGameId)
+            .addMapping(ClashPlayer::getStatus, ClashPlayerResponse::setStatus);
 
         // stats
         modelMapper.createTypeMap(GlobalPlayerStats.class, GlobalPlayerStatsResponse.class)

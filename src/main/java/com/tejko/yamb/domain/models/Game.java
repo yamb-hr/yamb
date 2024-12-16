@@ -11,6 +11,7 @@ import javax.persistence.Id;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,12 +19,14 @@ import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 import com.tejko.yamb.domain.exceptions.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.domain.exceptions.AnnouncementNotAllowedException;
 import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
 import com.tejko.yamb.domain.exceptions.BoxUnavailableException;
 import com.tejko.yamb.domain.exceptions.GameLockedException;
 import com.tejko.yamb.domain.exceptions.GameNotCompletedException;
+import com.tejko.yamb.domain.exceptions.IllegalGameStateException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 import com.tejko.yamb.domain.exceptions.RollRequiredException;
 import com.tejko.yamb.util.ScoreCalculator;
@@ -34,6 +37,7 @@ public class Game {
     @Id
     private String id;
 
+    @Indexed
     @Field(name = "external_id")
     private UUID externalId = UUID.randomUUID();
 
@@ -63,19 +67,23 @@ public class Game {
     @Field("status")
     private GameStatus status;
 
+    @Field("type")
+    private GameType type;
+
     protected Game() {}
 
-    protected Game(UUID playerId, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status, boolean locked) {
+    protected Game(UUID playerId, Sheet sheet, List<Dice> dices, int rollCount, BoxType announcement, GameStatus status, GameType type) {
         this.playerId = playerId;
         this.sheet = sheet;
         this.dices = dices;
         this.rollCount = rollCount;
         this.announcement = announcement;
         this.status = status;
+        this.type = type;
     }
 
-    public static Game getInstance(UUID playerId) {
-        return new Game(playerId, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS, false);
+    public static Game getInstance(UUID playerId, GameType type) {
+        return new Game(playerId, Sheet.getInstance(), generateDices(), 0, null, GameStatus.IN_PROGRESS, type);
     }
 
     public String getId() {
@@ -116,6 +124,10 @@ public class Game {
 
     public GameStatus getStatus() {
         return status;
+    }
+
+    public GameType getType() {
+        return type;
     }
 
     public int getTotalSum() {
@@ -184,7 +196,6 @@ public class Game {
 
     public boolean isLocked() {
         return status == GameStatus.COMPLETED || status == GameStatus.ARCHIVED;
-
     }
 
     private void validateRoll(int[] diceToRoll) {
@@ -242,6 +253,8 @@ public class Game {
     private void validateRestart() {
         if (isLocked()) {
             throw new GameLockedException();
+        } else if (GameType.CLASH.equals(type)) {
+            throw new IllegalGameStateException("Clash cannot be restarted");
         }
     }
 
@@ -295,9 +308,9 @@ public class Game {
         private int index;
         private int value;
 
-        private Dice() {}
+        protected Dice() {}
 
-        private Dice(int index, int value) {
+        protected Dice(int index, int value) {
             this.index = index;
             this.value = value;
         }
@@ -324,9 +337,9 @@ public class Game {
 
         private List<Column> columns;
     
-        private Sheet() { }
+        protected Sheet() { }
     
-        private Sheet(List<Column> columns) {
+        protected Sheet(List<Column> columns) {
             this.columns = columns;
         }
     
@@ -402,9 +415,9 @@ public class Game {
         private ColumnType type;
         private List<Box> boxes;
 
-        private Column() {}
+        protected Column() {}
 
-        private Column (ColumnType type, List<Box> boxes) {
+        protected Column (ColumnType type, List<Box> boxes) {
             this.type = type; 
             this.boxes = boxes;
         }
@@ -495,9 +508,9 @@ public class Game {
         private BoxType type;
         private Integer value;
     
-        private Box() {}
+        protected Box() {}
     
-        private Box(BoxType type, Integer value) {
+        protected Box(BoxType type, Integer value) {
             this.type = type;
             this.value = value;
         }  

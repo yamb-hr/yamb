@@ -35,6 +35,7 @@ import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.repositories.TicketRepository;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.ActivePlayerDirectory;
 import com.tejko.yamb.util.CloudinaryClient;
 import com.tejko.yamb.util.EmailManager;
 
@@ -82,6 +83,11 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Page<Player> getAllActive(Pageable pageable) {
+        return playerRepo.findAllByExternalIdIn(ActivePlayerDirectory.getActivePlayerExternalIdSet(), pageable);
+    }
+
+    @Override
     public List<Score> getScoresByPlayerExternalId(UUID playerExternalId) {
         Player player = getByExternalId(playerExternalId);
         List<Score> scores = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
@@ -96,7 +102,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId) {
-        List<Clash> clashes = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(playerExternalId);
+        List<Clash> clashes = clashRepo.findAllByPlayerIdOrderByUpdatedAtDesc(playerExternalId);
         return clashes;
     }
 
@@ -269,9 +275,9 @@ public class PlayerServiceImpl implements PlayerService {
             scoresToMerge.forEach(score -> score.setPlayer(parentPlayer));
             scoreRepo.saveAll(scoresToMerge);
 
-            List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(player.getExternalId());
-            clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
-            clashRepo.saveAll(clashesToMerge);
+            // List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(player.getExternalId());
+            // clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
+            // clashRepo.saveAll(clashesToMerge);
 
             List<Log> logsToMerge = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
             logsToMerge.forEach(log -> log.setPlayer(parentPlayer));

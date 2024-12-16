@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.tejko.yamb.api.controllers.ClashController;
 import com.tejko.yamb.api.controllers.PlayerController;
+import com.tejko.yamb.api.dto.responses.ClashPlayerResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
-import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.domain.models.Clash;
 
 import java.util.List;
@@ -37,10 +37,9 @@ public class ClashModelAssembler implements RepresentationModelAssembler<Clash, 
         clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
         if (clashResponse.getOwner() != null) clashResponse.getOwner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getOwner().getId())).withSelfRel());
         if (clashResponse.getWinner() != null) clashResponse.getWinner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getWinner().getId())).withSelfRel());
-        if (clashResponse.getCurrentPlayer() != null) clashResponse.getCurrentPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getCurrentPlayer().getId())).withSelfRel());
-        if (clashResponse.getPlayers() != null) {
-            for (PlayerResponse playerResponse : clashResponse.getPlayers()) {
-                playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
+        if (clashResponse.getPlayers() != null && !clashResponse.getPlayers().isEmpty()) {
+            for (ClashPlayerResponse playerResponse : clashResponse.getPlayers()) {
+                if (playerResponse != null) playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
             }
         }
 

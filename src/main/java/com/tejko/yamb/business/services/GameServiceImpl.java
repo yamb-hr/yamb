@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.BoxType;
-import com.tejko.yamb.domain.enums.ClashStatus;
-import com.tejko.yamb.domain.enums.ClashType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Player;
@@ -52,8 +51,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getOrCreate(UUID playerExternalId) {
-        Optional<Game> existingGame = gameRepo.findByPlayerIdAndStatusIn(playerExternalId, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
-        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId)));
+        Optional<Game> existingGame = gameRepo.findByPlayerIdAndTypeAndStatusIn(playerExternalId, GameType.NORMAL, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
+        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId, GameType.NORMAL)));
         return game;
     }
 
@@ -61,6 +60,9 @@ public class GameServiceImpl implements GameService {
     public Game rollByExternalId(UUID externalId, int[] diceToRoll) {
         Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
+        if (GameType.CLASH.equals(game.getType())) {
+            validateTurnByGameExternalId(externalId);
+        }
         game.roll(diceToRoll);
         gameRepo.save(game);
         return game;
@@ -70,9 +72,11 @@ public class GameServiceImpl implements GameService {
     public Game announceByExternalId(UUID externalId, BoxType boxType) {
         Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
+        if (GameType.CLASH.equals(game.getType())) {
+            validateTurnByGameExternalId(externalId);
+        }
         game.announce(boxType);
         gameRepo.save(game);
-        advanceTurnIfWithinClash(game);
         return game;
     }
 
@@ -80,6 +84,9 @@ public class GameServiceImpl implements GameService {
     public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType) {    
         Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
+        if (GameType.CLASH.equals(game.getType())) {
+            validateTurnByGameExternalId(externalId);
+        }
         game.fill(columnType, boxType);
         if (game.getStatus() == GameStatus.COMPLETED) {
             Player player = AuthContext.getAuthenticatedPlayer();
@@ -87,9 +94,12 @@ public class GameServiceImpl implements GameService {
             scoreRepo.save(score);
         }
         gameRepo.save(game);
-        advanceTurnIfWithinClash(game);
+        if (GameType.CLASH.equals(game.getType())) {
+            advanceTurnByGameExternalId(externalId);
+        }
         return game;
     }
+
 
     @Override
     public Game completeByExternalId(UUID externalId) {
@@ -116,13 +126,22 @@ public class GameServiceImpl implements GameService {
         gameRepo.save(game);
         return game;
     }
+    
+    private void validateTurnByGameExternalId(UUID gameExternalId) {
+        Game game = getByExternalId(gameExternalId);
+        Clash clash = clashRepo.findByGameId(gameExternalId).get();
+        UUID currentPlayerId = clash.getPlayers().get(clash.getTurn()).getId();
+        if (!game.getPlayerId().equals(currentPlayerId)) {
+            throw new IllegalStateException("Not your turn");
+        }
+    }
 
-    private void advanceTurnIfWithinClash(Game game) {
-        Optional<Clash> existingClash = clashRepo.findByCurrentPlayerIdAndStatusAndType(game.getPlayerId(), ClashStatus.IN_PROGRESS, ClashType.LIVE);
+    private void advanceTurnByGameExternalId(UUID gameExternalId) {
+        Optional<Clash> existingClash = clashRepo.findByGameId(gameExternalId);
         if (existingClash.isPresent()) {
             Clash clash = existingClash.get();
             clash.advanceTurn();
-            if (clash.getOwnerId().equals(clash.getCurrentPlayerId()) && gameRepo.existsByPlayerIdAndStatus(clash.getCurrentPlayerId(), GameStatus.COMPLETED)) {
+            if (clash.getOwnerId().equals(clash.getPlayers().get(clash.getTurn()).getId()) && gameRepo.existsByPlayerIdAndStatus(clash.getOwnerId(), GameStatus.COMPLETED)) {
                 clash.complete();
             }
             clashRepo.save(clash);
@@ -141,5 +160,9 @@ public class GameServiceImpl implements GameService {
         gameRepo.deleteByExternalId(externalId);
     }
 
+    @Override
+    public void deleteAll() {
+        gameRepo.deleteAll();
+    }
 
 }

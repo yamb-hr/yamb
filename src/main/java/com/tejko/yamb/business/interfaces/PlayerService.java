@@ -31,6 +31,8 @@ public interface PlayerService extends UserDetailsService {
     Player getCurrentPlayer();
 
     Page<Player> getAll(Pageable pageable);
+
+    Page<Player> getAllActive(Pageable pageable);
     
     List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
 

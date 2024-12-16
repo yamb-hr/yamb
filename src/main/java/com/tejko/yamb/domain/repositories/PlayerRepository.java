@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -14,6 +15,10 @@ import com.tejko.yamb.domain.models.Player;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     Optional<Player> findByExternalId(UUID externalId);
+
+    List<Player> findAllByExternalIdIn(Set<UUID> externalIds);
+
+    Page<Player> findAllByExternalIdIn(Set<UUID> externalIds, Pageable pageable);
 
     Optional<Player> findByUsername(String username);
 

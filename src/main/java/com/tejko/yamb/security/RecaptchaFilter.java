@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -41,11 +42,14 @@ public class RecaptchaFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
     
+	@Value("${spring.profiles.active:default}")
+	private String activeProfile;
+
     // recaptcha is only required for (guest) registration
     private boolean isProtectedEndpoint(String requestURI) {
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
         String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
-        return requestURI.equals(registerUri) || requestURI.equals(registerGuestUri);
+        return !"dev".equalsIgnoreCase(activeProfile) && (requestURI.equals(registerUri) || requestURI.equals(registerGuestUri));
     }
 
 }

@@ -229,6 +229,11 @@ public class Player implements UserDetails, Principal {
             .collect(Collectors.toList());
     }
 
+    public boolean isAdmin() {
+        return roles != null && roles.stream()
+            .anyMatch(role -> "ADMIN".equalsIgnoreCase(role.getLabel()));
+    }
+
     @Override    
     public boolean isAccountNonExpired() {
         return true;

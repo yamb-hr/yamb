@@ -1,15 +1,18 @@
 package com.tejko.yamb.domain.models;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.Id;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,6 +27,7 @@ public class Clash {
     private String id;
 
     @Field(name = "external_id")
+    @Indexed
     private UUID externalId = UUID.randomUUID();
 
     @CreatedDate
@@ -33,18 +37,22 @@ public class Clash {
     @LastModifiedDate
     @Field("updated_at")
     private LocalDateTime updatedAt;
-
-    @Field("player_ids")
-    private List<UUID> playerIds;
     
-    @Field("invitations")
-    private Map<UUID, InvitationStatus> invitations;
+    @Field("players")
+    private List<ClashPlayer> players;
+
+    @Indexed
+    @Field("player_hash")
+    private String playerHash;
+    
+    @Field("name")
+    private String name;
 
     @Field("owner_id")
     private UUID ownerId;
 
-    @Field("current_player_id")
-    private UUID currentPlayerId;
+    @Field("turn")
+    private int turn;
 
     @Field("winner_id")
     private UUID winnerId;
@@ -57,26 +65,28 @@ public class Clash {
 
     protected Clash() {}
 
-    public Clash(UUID ownerId, List<UUID> playerIds, Map<UUID, InvitationStatus> invitations, ClashType type, ClashStatus status) {
+    public Clash(String name, UUID ownerId, int turn, List<ClashPlayer> players, String playerHash, ClashType type, ClashStatus status) {
+        this.name = name;
         this.ownerId = ownerId;
-        this.playerIds = playerIds;
-        this.invitations = invitations;
+        this.turn = turn;
+        this.players = players;
+        this.playerHash = playerHash;
         this.type = type;
         this.status = status;
-        this.currentPlayerId = ownerId;
     }
 
-    public static Clash getInstance(UUID ownerId, List<UUID> playerIds, ClashType type) {
-        return new Clash(ownerId, playerIds, generateParticipants(ownerId, playerIds), type, ClashStatus.IN_PROGRESS);
+    public static Clash getInstance(String name, UUID ownerId, Set<UUID> playerIds, ClashType type) {
+        List<ClashPlayer> players = generatePlayers(ownerId, playerIds);
+        String playerHash = generatePlayerHash(playerIds);
+        return new Clash(name, ownerId, 0, players, playerHash, type, ClashStatus.PENDING);
     }
 
-    private static Map<UUID, InvitationStatus> generateParticipants(UUID ownerId, List<UUID> playerIds) {
-        Map<UUID, InvitationStatus> participants = new HashMap<>();
+    private static List<ClashPlayer> generatePlayers(UUID ownerId, Set<UUID> playerIds) {
+        List<ClashPlayer> players = new ArrayList<>();
         for (UUID playerId : playerIds) {
-            participants.put(playerId, InvitationStatus.PENDING);
+            players.add(ClashPlayer.getInstance(playerId, (ownerId.equals(playerId) ? InvitationStatus.ACCEPTED : InvitationStatus.PENDING)));
         }
-        participants.put(ownerId, InvitationStatus.ACCEPTED);
-        return participants;
+        return players;
     }
 
     public String getId() {
@@ -95,24 +105,32 @@ public class Clash {
         return updatedAt;
     }
 
-    public List<UUID> getPlayerIds() {
-        return playerIds;
+    public List<ClashPlayer> getPlayers() {
+        return players;
     }
 
-    public Map<UUID, InvitationStatus> getInvitations() {
-        return invitations;
+    public String getPlayerHash() {
+        return playerHash;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public UUID getOwnerId() {
         return ownerId;
     }
 
-    public UUID getCurrentPlayerId() {
-        return currentPlayerId;
-    }
-
     public UUID getWinnerId() {
         return winnerId;
+    }
+
+    public void setWinnerId(UUID winnerId) {
+        this.winnerId = winnerId;
     }
 
     public ClashType getType() {
@@ -123,51 +141,121 @@ public class Clash {
         return status;
     }
 
-    public void acceptInvitation(UUID playerId) {
-        validateAccept(playerId);
+    public int getTurn() {
+        return turn;
+    }
+
+    public void addPlayer(UUID playerId) {
+        if (status != ClashStatus.PENDING) {
+            throw new IllegalStateException("Cannot add players after the clash has started.");
+        }
+        if (players.stream().anyMatch(player -> player.getId().equals(playerId))) {
+            throw new IllegalArgumentException("Player already part of the clash.");
+        }
+        players.add(new ClashPlayer(playerId, InvitationStatus.PENDING));
+        updatePlayerHash();
+    }
+
+    public void removePlayer(UUID playerId) {
+        if (status != ClashStatus.PENDING) {
+            throw new IllegalStateException("Cannot remove players after the clash has started.");
+        }
+        players.removeIf(player -> player.getId().equals(playerId));
+        updatePlayerHash();
+    }
+
+    public void acceptInvitation(UUID playerId, UUID gameId) {
+        ClashPlayer player = getPlayer(playerId);
+        if (player.getStatus() != InvitationStatus.PENDING) {
+            throw new IllegalStateException("Player invitation is not pending.");
+        }
+        player.setStatus(InvitationStatus.ACCEPTED);
+        player.setGameId(gameId);
+        if (allInvitationsAccepted()) {
+            this.status = ClashStatus.IN_PROGRESS;
+        }
     }
 
     public void declineInvitation(UUID playerId) {
-        validateDecline(playerId);
+        ClashPlayer player = getPlayer(playerId);
+        if (player.getStatus() != InvitationStatus.PENDING) {
+            throw new IllegalStateException("Player invitation is not pending.");
+        }
+        player.setStatus(InvitationStatus.DECLINED);
     }
 
-    private void validateAccept(UUID playerId) {
-        if (!invitations.containsKey(playerId)) {
-            throw new IllegalStateException();
-        } else if (!InvitationStatus.PENDING.equals(invitations.get(playerId))) {
-            throw new IllegalStateException();
-        }
+    public ClashPlayer getPlayer(UUID playerId) {
+        return players.stream()
+            .filter(player -> player.getId().equals(playerId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Player not part of this clash."));
     }
-
-    private void validateDecline(UUID playerId) {
-        if (!invitations.containsKey(playerId)) {
-            throw new IllegalStateException();
-        } else if (!InvitationStatus.PENDING.equals(invitations.get(playerId))) {
-            throw new IllegalStateException();
-        }
-    }   
+    
+    private boolean allInvitationsAccepted() {
+        return players.stream().allMatch(player -> player.getStatus() == InvitationStatus.ACCEPTED);
+    }
 
     public void advanceTurn() {
-        int currentIndex = playerIds.indexOf(currentPlayerId);
-        int nextIndex = (currentIndex + 1) % playerIds.size();
-        currentPlayerId = playerIds.get(nextIndex);
-    }
-
-    public void replacePlayer(UUID oldPlayerExternalId, UUID newPlayerExternalId) {
-        playerIds.set(playerIds.indexOf(oldPlayerExternalId), newPlayerExternalId);
-        if (ownerId == oldPlayerExternalId) {
-            ownerId = newPlayerExternalId;
-        }
-        if (currentPlayerId == oldPlayerExternalId) {
-            currentPlayerId = newPlayerExternalId;
-        }
-        if (winnerId == oldPlayerExternalId) {
-            winnerId = newPlayerExternalId;
-        }
+        turn = ++turn % players.size();
     }
 
     public void complete() {
         status = ClashStatus.COMPLETED;
+    }
+    
+    public static String generatePlayerHash(Set<UUID> playerIds) {
+        List<UUID> sortedPlayers = new ArrayList<>(playerIds);
+        Collections.sort(sortedPlayers);
+        return String.join("-", sortedPlayers.stream().map(UUID::toString).toArray(String[]::new));
+    }
+
+    private void updatePlayerHash() {
+        playerHash = generatePlayerHash(players.stream()
+            .map(ClashPlayer::getId)
+            .collect(Collectors.toSet()));
+    }
+
+    public static class ClashPlayer {
+
+        private UUID id;
+        private UUID gameId;
+        private InvitationStatus status;
+
+        protected ClashPlayer() {}
+
+        protected ClashPlayer(UUID id, InvitationStatus status) {
+            this.id = id;
+            this.status = status;
+        }
+
+        public static ClashPlayer getInstance(UUID id, InvitationStatus status) {
+            return new ClashPlayer(id, status);
+        }
+
+        public UUID getId() {
+            return id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public UUID getGameId() {
+            return gameId;
+        }
+
+        public void setGameId(UUID gameId) {
+            this.gameId = gameId;
+        }
+
+        public InvitationStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(InvitationStatus status) {
+            this.status = status;
+        }
+
     }
     
 }

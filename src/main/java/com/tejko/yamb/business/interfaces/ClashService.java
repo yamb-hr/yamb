@@ -1,6 +1,7 @@
 package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -15,14 +16,16 @@ public interface ClashService {
 
     Page<Clash> getAll(Pageable pageable);
 
-    Clash getOrCreate(List<UUID> playerExternalIds, ClashType type);
+    Clash create(String name, UUID ownerExternalId, Set<UUID> playerExternalIds, ClashType type);
     
     List<Clash> getByPlayerExternalId(UUID playerExternalId);
 
-    Clash acceptInvitationByExternalId(UUID externalId);
+    Clash acceptInvitationByExternalId(UUID externalId, UUID playerExternalId);
 
-    Clash declineInvitationByExternalId(UUID externalId);
+    Clash declineInvitationByExternalId(UUID externalId, UUID playerExternalId);
 
     void deleteByExternalId(UUID externalId);
+    
+    void deleteAll();
 
 }

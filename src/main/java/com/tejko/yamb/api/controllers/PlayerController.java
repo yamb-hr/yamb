@@ -91,6 +91,13 @@ public class PlayerController {
 		return ResponseEntity.ok(pagedPlayers);
 	}
 
+	@GetMapping("/active")
+	public ResponseEntity<CollectionModel<PlayerResponse>> getAllActive(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Player.class, PlayerResponse.class);
+        CollectionModel<PlayerResponse> players = playerModelAssembler.toCollectionModel(playerService.getAllActive(modifiedPageable));
+		return ResponseEntity.ok(players);
+	}
+
 	@GetMapping("/stats")
 	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<GlobalPlayerStatsResponse> getGlobalStats() {

@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,15 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.api.assemblers.GameModelAssembler;
 import com.tejko.yamb.api.dto.requests.ActionRequest;
 import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.business.interfaces.GameService;
+import com.tejko.yamb.business.interfaces.WebSocketService;
 import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.models.Game;
-import com.tejko.yamb.domain.models.WebSocketMessage;
 import com.tejko.yamb.util.SortFieldTranslator;
 
 
@@ -44,17 +42,15 @@ public class GameController {
 
 	private final GameService gameService;
 	private final GameModelAssembler gameModelAssembler;
-	private final SimpMessagingTemplate simpMessagingTemplate;
-	private final ObjectMapper objectMapper;
 	private final SortFieldTranslator sortFieldTranslator;
+	private final WebSocketService webSocketService;
 
 	@Autowired
-	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper, SortFieldTranslator sortFieldTranslator) {
+	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, SortFieldTranslator sortFieldTranslator, WebSocketService webSocketService) {
 		this.gameService = gameService;
 		this.gameModelAssembler = gameModelAssembler;
-		this.simpMessagingTemplate = simpMessagingTemplate;
-		this.objectMapper = objectMapper;
 		this.sortFieldTranslator = sortFieldTranslator;
+		this.webSocketService = webSocketService;
 	}
 	
 	@GetMapping("/{externalId}")
@@ -91,8 +87,7 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> rollByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameResponse gameResponse = gameModelAssembler.toModel(gameService.rollByExternalId(externalId,actionRequest.getDiceToRoll()));
-		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ROLL, gameResponse);
-		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
+		webSocketService.convertAndSend("/topic/games/" + gameResponse.getId(), gameResponse, MessageType.ROLL);
 		return ResponseEntity.ok(gameResponse);
 	}
 
@@ -100,8 +95,7 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> announceByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameResponse gameResponse = gameModelAssembler.toModel(gameService.announceByExternalId(externalId,actionRequest.getBoxType()));
-		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
-		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
+		webSocketService.convertAndSend("/topic/games/" + gameResponse.getId(), gameResponse, MessageType.ANNOUNCE);
 		return ResponseEntity.ok(gameResponse);
 	}
 
@@ -109,8 +103,7 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> fillByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameResponse gameResponse = gameModelAssembler.toModel(gameService.fillByExternalId(externalId,actionRequest.getColumnType(), actionRequest.getBoxType()));
-		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
-		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
+		webSocketService.convertAndSend("/topic/games/" + gameResponse.getId(), gameResponse, MessageType.FILL);
 		return ResponseEntity.ok(gameResponse);
 	}
 
@@ -118,8 +111,7 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> restartByExternalId(@PathVariable UUID externalId) {
 		GameResponse gameResponse = gameModelAssembler.toModel(gameService.restartByExternalId(externalId));
-		WebSocketMessage message = new WebSocketMessage(objectMapper, MessageType.ANNOUNCE, gameResponse);
-		simpMessagingTemplate.convertAndSend("/topic/games/" + gameResponse.getId(), message, message.getHeaders());
+		webSocketService.convertAndSend("/topic/games/" + gameResponse.getId(), gameResponse, MessageType.RESTART);
 		return ResponseEntity.ok(gameResponse);
 	}
 
@@ -141,6 +133,15 @@ public class GameController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		gameService.deleteByExternalId(externalId);
+		return ResponseEntity.noContent()
+			.location(linkTo(methodOn(GameController.class).getAll(Pageable.unpaged())).toUri())
+			.build();
+	}
+	
+	@DeleteMapping("")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Void> deleteAll() {
+		gameService.deleteAll();
 		return ResponseEntity.noContent()
 			.location(linkTo(methodOn(GameController.class).getAll(Pageable.unpaged())).toUri())
 			.build();

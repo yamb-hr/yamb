@@ -31,4 +31,6 @@ public interface GameService {
 
     void deleteByExternalId(UUID externalId);
 
+    void deleteAll();
+
 }

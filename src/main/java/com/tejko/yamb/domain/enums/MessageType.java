@@ -5,6 +5,7 @@ public enum MessageType {
     ROLL,
     ANNOUNCE,
     FILL,
+    RESTART,
     CLASH,
     PLAYERS,
     ACCEPT,
