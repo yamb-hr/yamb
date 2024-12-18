@@ -48,6 +48,7 @@ public class PlayerModelAssembler implements RepresentationModelAssembler<Player
         playerResponse.add(linkTo(methodOn(PlayerController.class).updateEmailByExternalId(playerResponse.getId(), null)).withRel("email"));
         playerResponse.add(linkTo(methodOn(PlayerController.class).getPlayerStatsByExternalId(playerResponse.getId())).withRel("stats"));
         playerResponse.add(linkTo(methodOn(PlayerController.class).updateAvatarByExternalId(playerResponse.getId(), null)).withRel("avatar"));
+        playerResponse.add(linkTo(methodOn(PlayerController.class).getNotificationsByPlayerExternalId(playerResponse.getId())).withRel("notifications"));
 
         return playerResponse;
     }

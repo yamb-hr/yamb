@@ -13,7 +13,7 @@ import com.tejko.yamb.domain.enums.GameStatus;
 
 @Relation(collectionRelation = "games")
 public class GameResponse extends RepresentationModel<GameResponse> {
- 
+
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,6 +24,10 @@ public class GameResponse extends RepresentationModel<GameResponse> {
     private GameStatus status;
     private PlayerResponse player;
     private int totalSum;
+    private int previousRollCount;
+    private int[] latestDiceRolled;
+    private ColumnType latestColumnFilled;
+    private BoxType latestBoxFilled;
 
     public GameResponse() {}
     
@@ -105,6 +109,38 @@ public class GameResponse extends RepresentationModel<GameResponse> {
 
     public void setPlayer(PlayerResponse player) {
         this.player = player;
+    }
+
+    public int getPreviousRollCount() {
+        return previousRollCount;
+    }
+
+    public void setPreviousRollCount(int previousRollCount) {
+        this.previousRollCount = previousRollCount;
+    }
+
+    public int[] getLatestDiceRolled() {
+        return latestDiceRolled;
+    }
+
+    public void setLatestDiceRolled(int[] latestDiceRolled) {
+        this.latestDiceRolled = latestDiceRolled;
+    }
+
+    public ColumnType getLatestColumnFilled() {
+        return latestColumnFilled;
+    }
+
+    public void setLatestColumnFilled(ColumnType latestColumnFilled) {
+        this.latestColumnFilled = latestColumnFilled;
+    }
+
+    public BoxType getLatestBoxFilled() {
+        return latestBoxFilled;
+    }
+
+    public void setLatestBoxFilled(BoxType latestBoxFilled) {
+        this.latestBoxFilled = latestBoxFilled;
     }
 
     public static class Dice {

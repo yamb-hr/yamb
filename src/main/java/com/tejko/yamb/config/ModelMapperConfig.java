@@ -129,6 +129,10 @@ public class ModelMapperConfig {
             .addMapping(Game::getAnnouncement, GameResponse::setAnnouncement)
             .addMapping(Game::getStatus, GameResponse::setStatus)
             .addMapping(Game::getTotalSum, GameResponse::setTotalSum)
+            .addMapping(Game::getLatestDiceRolled, GameResponse::setLatestDiceRolled)
+            .addMapping(Game::getPreviousRollCount, GameResponse::setPreviousRollCount)
+            .addMapping(Game::getLatestColumnFilled, GameResponse::setLatestColumnFilled)
+            .addMapping(Game::getLatestBoxFilled, GameResponse::setLatestBoxFilled)
             .addMappings(mapper -> mapper.using(playerConverter).map(Game::getPlayerId, GameResponse::setPlayer));
 
         modelMapper.createTypeMap(Game.Sheet.class, GameResponse.Sheet.class)

@@ -13,6 +13,7 @@ import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
@@ -63,5 +64,9 @@ public interface PlayerService extends UserDetailsService {
     void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
 
     Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar);
+
+    List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId);
+
+    void deleteNotificationsByPlayerExternalId(UUID playerExternalId);
     
 }

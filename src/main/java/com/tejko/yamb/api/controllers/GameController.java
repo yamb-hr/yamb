@@ -107,6 +107,13 @@ public class GameController {
 		return ResponseEntity.ok(gameResponse);
 	}
 
+	@PutMapping("/{externalId}/undo")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<GameResponse> undoFillByExternalId(@PathVariable UUID externalId) {
+		GameResponse gameResponse = gameModelAssembler.toModel(gameService.undoFillByExternalId(externalId));
+		return ResponseEntity.ok(gameResponse);
+	}
+
 	@PutMapping("/{externalId}/restart")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameResponse> restartByExternalId(@PathVariable UUID externalId) {

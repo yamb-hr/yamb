@@ -10,5 +10,6 @@ public enum MessageType {
     PLAYERS,
     ACCEPT,
     DECLINE,
+    NOTIFICATION
 
 }

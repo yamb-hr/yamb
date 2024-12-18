@@ -21,6 +21,7 @@ import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
@@ -30,6 +31,7 @@ import com.tejko.yamb.domain.models.Ticket;
 import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.LogRepository;
+import com.tejko.yamb.domain.repositories.NotificationRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
@@ -49,13 +51,15 @@ public class PlayerServiceImpl implements PlayerService {
     private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
     private final TicketRepository ticketRepo;
+    private final NotificationRepository notificationRepo;
     private final CloudinaryClient cloudinaryClient;
 
     @Autowired
     public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, 
                             GameRepository gameRepo, ClashRepository clashRepo, 
                             RelationshipRepository relationshipRepo, LogRepository logRepo, 
-                            TicketRepository ticketRepo, CloudinaryClient cloudinaryClient) {
+                            TicketRepository ticketRepo, NotificationRepository notificationRepo,
+                            CloudinaryClient cloudinaryClient) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
         this.gameRepo = gameRepo;
@@ -63,6 +67,7 @@ public class PlayerServiceImpl implements PlayerService {
         this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
         this.ticketRepo = ticketRepo;
+        this.notificationRepo = notificationRepo;
         this.cloudinaryClient = cloudinaryClient;
     }
 
@@ -300,8 +305,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public void deleteByExternalId(UUID externalId) {
-        Player player = getByExternalId(externalId);
-        playerRepo.delete(player);
+        playerRepo.deleteByExternalId(externalId);
     }
 
     @Override
@@ -328,8 +332,19 @@ public class PlayerServiceImpl implements PlayerService {
         playerRepo.save(player);
 
         return player;
-}
+    }
 
+    @Override
+    public List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        return notificationRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+    }
+
+    @Override
+    public void deleteNotificationsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        notificationRepo.deleteAllByPlayerId(player.getId());
+    }
 
     private void validateAvatar(MultipartFile avatar) {
         if (avatar.getName().isEmpty()) {
@@ -339,5 +354,6 @@ public class PlayerServiceImpl implements PlayerService {
             throw new IllegalArgumentException();
         }
     }
+
 
 }

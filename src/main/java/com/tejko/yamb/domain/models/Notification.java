@@ -5,15 +5,23 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.tejko.yamb.domain.enums.NotificationType;
+import com.tejko.yamb.domain.listeners.NotificationListener;
+
 @Entity(name = "notification")
+@EntityListeners(NotificationListener.class)
 @Table(name = "notification", indexes = {
     @Index(name = "idx_notification_external_id", columnList = "external_id")
 })
@@ -31,16 +39,24 @@ public class Notification {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // private Player player;
+    @OneToOne
+    @JoinColumn(name = "player_id")
+    private Player player;
 
-    // protected Notification() {}
+    private String content;
 
-    protected Notification(/*Player player*/) {
-        // this.player = player;
+    private NotificationType type;
+
+    protected Notification() {}
+
+    protected Notification(Player player, String content, NotificationType type) {
+        this.player = player;
+        this.content = content;
+        this.type = type;
     }
 
-    public static Notification getInstance(/*Player player*/) {
-        return new Notification(/*player*/);
+    public static Notification getInstance(Player player, String content, NotificationType type) {
+        return new Notification(player, content, type);
     }
 
     public Long getId() {
@@ -53,6 +69,25 @@ public class Notification {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+    
+	@PrePersist
+    private void ensureExternalId() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
     }
     
 }

@@ -37,6 +37,7 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
         gameResponse.add(linkTo(methodOn(GameController.class).rollByExternalId(gameResponse.getId(), null)).withRel("roll"));
         gameResponse.add(linkTo(methodOn(GameController.class).announceByExternalId(gameResponse.getId(), null)).withRel("announce"));
         gameResponse.add(linkTo(methodOn(GameController.class).fillByExternalId(gameResponse.getId(), null)).withRel("fill"));
+        gameResponse.add(linkTo(methodOn(GameController.class).undoFillByExternalId(gameResponse.getId())).withRel("undo"));
         gameResponse.add(linkTo(methodOn(GameController.class).restartByExternalId(gameResponse.getId())).withRel("restart"));
         gameResponse.add(linkTo(methodOn(GameController.class).archiveByExternalId(gameResponse.getId())).withRel("archive"));
         gameResponse.add(linkTo(methodOn(GameController.class).completeByExternalId(gameResponse.getId())).withRel("complete"));

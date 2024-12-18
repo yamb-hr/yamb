@@ -9,15 +9,19 @@ import com.tejko.yamb.util.EmailManager;
 
 public class PlayerListener {
 
+    private final EmailManager emailManager;
+
     @Autowired
-    private EmailManager emailSender;
+    public PlayerListener(EmailManager emailManager) {
+        this.emailManager = emailManager;
+    }
 
     @PostUpdate
     public void onEmailUpdate(Player player) {
         if (isEmailUpdated(player)) {
             if (!player.isEmailVerified() && player.getEmailVerificationToken() != null) {
                 String verificationLink = "https://jamb.com.hr/email-verification?token=" + player.getEmailVerificationToken();
-                emailSender.sendVerificationEmail(player.getEmail(), player.getUsername(), verificationLink);
+                emailManager.sendVerificationEmail(player.getEmail(), player.getUsername(), verificationLink);
             }
         }
     }

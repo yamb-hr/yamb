@@ -81,7 +81,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType) {    
+    public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType) {
         Game game = getByExternalId(externalId);
         checkPermission(game.getPlayerId());
         if (GameType.CLASH.equals(game.getType())) {
@@ -97,6 +97,14 @@ public class GameServiceImpl implements GameService {
         if (GameType.CLASH.equals(game.getType())) {
             advanceTurnByGameExternalId(externalId);
         }
+        return game;
+    }
+
+    public Game undoFillByExternalId(UUID externalId) {
+        Game game = getByExternalId(externalId);
+        checkPermission(game.getPlayerId());
+        game.undoFill();
+        gameRepo.save(game);
         return game;
     }
 

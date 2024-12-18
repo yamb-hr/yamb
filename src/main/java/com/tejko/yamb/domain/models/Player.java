@@ -98,6 +98,9 @@ public class Player implements UserDetails, Principal {
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Image avatar;
 
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Notification notifications;
+
     protected Player() {}
 
     protected Player(String email, String username, String password, Set<Role> roles) {

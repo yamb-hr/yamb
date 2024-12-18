@@ -23,6 +23,8 @@ public interface GameService {
 
     Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType);
 
+    Game undoFillByExternalId(UUID externalId);
+
     Game restartByExternalId(UUID externalId);
 
     Game completeByExternalId(UUID externalId);

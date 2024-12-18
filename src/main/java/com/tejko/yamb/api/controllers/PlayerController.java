@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.tejko.yamb.api.assemblers.ClashModelAssembler;
 import com.tejko.yamb.api.assemblers.GameModelAssembler;
 import com.tejko.yamb.api.assemblers.LogModelAssembler;
+import com.tejko.yamb.api.assemblers.NotificationModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
 import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
@@ -41,6 +42,7 @@ import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
+import com.tejko.yamb.api.dto.responses.NotificationResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
@@ -62,12 +64,14 @@ public class PlayerController {
 	private final RelationshipModelAssembler relationshipModelAssembler;
 	private final LogModelAssembler logModelAssembler;
 	private final SortFieldTranslator sortFieldTranslator;
+	private final NotificationModelAssembler notificationModelAssembler;
 
 	@Autowired
 	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, 
 							ScoreModelAssembler scoreModelAssembler, GameModelAssembler gameModelAssembler,
 							ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, 
-							LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator) {
+							LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator,
+							NotificationModelAssembler notificationModelAssembler) {
 		this.playerService = playerService;
 		this.playerModelAssembler = playerModelAssembler;
 		this.scoreModelAssembler = scoreModelAssembler;
@@ -76,6 +80,7 @@ public class PlayerController {
 		this.relationshipModelAssembler = relationshipModelAssembler;
 		this.logModelAssembler = logModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;
+		this.notificationModelAssembler = notificationModelAssembler;
 	}
 
 	@GetMapping("/{externalId}")
@@ -217,5 +222,19 @@ public class PlayerController {
 		playerResponse.setEmailVerified(player.isEmailVerified());
 		return ResponseEntity.ok(playerResponse);
 	}
+
+	@GetMapping("/{externalId}/notifications")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+    public ResponseEntity<CollectionModel<NotificationResponse>> getNotificationsByPlayerExternalId(@PathVariable UUID externalId) {
+		CollectionModel<NotificationResponse> notificationResponses = notificationModelAssembler.toCollectionModel(playerService.getNotificationsByPlayerExternalId(externalId));
+		return ResponseEntity.ok(notificationResponses);
+    }
+
+	@DeleteMapping("/{externalId}/notifications")
+	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+    public ResponseEntity<Void> deleteNotificationsByPlayerExternalId(@PathVariable UUID externalId) {
+		playerService.deleteNotificationsByPlayerExternalId(externalId);
+		return ResponseEntity.noContent().build();
+    }
 
 }

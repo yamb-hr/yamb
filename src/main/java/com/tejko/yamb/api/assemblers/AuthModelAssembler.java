@@ -40,6 +40,7 @@ public class AuthModelAssembler implements RepresentationModelAssembler<PlayerWi
         authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).updateEmailByExternalId(authResponse.getPlayer().getId(), null)).withRel("email"));
         authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getPlayerStatsByExternalId(authResponse.getPlayer().getId())).withRel("stats"));
         authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).updateAvatarByExternalId(authResponse.getPlayer().getId(), null)).withRel("avatar"));
+        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getNotificationsByPlayerExternalId(authResponse.getPlayer().getId())).withRel("notifications"));
         
         return authResponse;
     }

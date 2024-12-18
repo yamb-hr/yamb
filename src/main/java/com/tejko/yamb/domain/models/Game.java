@@ -29,6 +29,7 @@ import com.tejko.yamb.domain.exceptions.GameNotCompletedException;
 import com.tejko.yamb.domain.exceptions.IllegalGameStateException;
 import com.tejko.yamb.domain.exceptions.RollLimitExceededException;
 import com.tejko.yamb.domain.exceptions.RollRequiredException;
+import com.tejko.yamb.domain.exceptions.UndoClashGameException;
 import com.tejko.yamb.util.ScoreCalculator;
 
 @Document(collection = "games")
@@ -69,6 +70,18 @@ public class Game {
 
     @Field("type")
     private GameType type;
+
+    @Field("latest_dice_rolled")
+    private int[] latestDiceRolled;
+
+    @Field("previous_roll_count")
+    private int previousRollCount;
+
+    @Field("latest_column_filled")
+    private ColumnType latestColumnFilled;
+
+    @Field("latest_box_filled")
+    private BoxType latestBoxFilled;
 
     protected Game() {}
 
@@ -130,10 +143,26 @@ public class Game {
         return type;
     }
 
+    public int[] getLatestDiceRolled() {
+        return latestDiceRolled;
+    }
+
+    public int getPreviousRollCount() {
+        return previousRollCount;
+    }
+
+    public ColumnType getLatestColumnFilled() {
+        return latestColumnFilled;
+    }
+
+    public BoxType getLatestBoxFilled() {
+        return latestBoxFilled;
+    }
+
     public int getTotalSum() {
         return sheet.getTotalSum();
     }
-
+    
     private static List<Dice> generateDices() {
         List<Dice> dices = new ArrayList<>();
         for (int i = 0; i < GameConstants.DICE_LIMIT; i++) {
@@ -160,6 +189,9 @@ public class Game {
             }
         }
         rollCount += 1;
+        latestDiceRolled = diceToRoll;
+        latestColumnFilled = null;
+        latestBoxFilled = null;
     }
 
     public int[] getDiceValues() {
@@ -172,8 +204,33 @@ public class Game {
         if (sheet.isCompleted() ) {
             status = GameStatus.COMPLETED;
         }
+        previousRollCount = rollCount;
         rollCount = 0;
         announcement = null;
+        latestColumnFilled = columnType;
+        latestBoxFilled = boxType;
+    }
+
+    public void undoFill() {
+        validateUndoFill();
+        sheet.undoFill(latestColumnFilled, latestBoxFilled);
+        if (ColumnType.ANNOUNCEMENT.equals(latestColumnFilled)) {
+            announcement = latestBoxFilled;
+        }
+        latestColumnFilled = null;
+        latestBoxFilled = null;
+        rollCount = previousRollCount;
+        previousRollCount = 0;
+    }
+
+    private void validateUndoFill() {
+        if (latestColumnFilled == null || latestBoxFilled == null) {
+            throw new IllegalGameStateException("Cannot be undone");
+        } else if (isLocked()) {
+            throw new GameLockedException();
+        } else if (GameType.CLASH.equals(type)) {
+            throw new UndoClashGameException();
+        }
     }
     
     public void announce(BoxType boxType) {
@@ -399,6 +456,10 @@ public class Game {
         public void fill(ColumnType columnType, BoxType boxType, int value) {
             columns.get(columnType.ordinal()).fill(boxType, value);
         }
+
+        public void undoFill(ColumnType columnType, BoxType boxType) {
+            columns.get(columnType.ordinal()).undoFill(boxType);
+        }
     
         public boolean areAllNonAnnouncementColumnsCompleted() {
             for (Column column : columns) {
@@ -501,6 +562,11 @@ public class Game {
             selectedBox.fill(value);
         }
 
+        public void undoFill(BoxType boxType) {
+            Box latestBoxFilled = boxes.get(boxType.ordinal());
+            latestBoxFilled.undoFill();
+        }
+
     }
 
     public static class Box implements Serializable {
@@ -529,6 +595,10 @@ public class Game {
     
         public void fill(int value) {
             this.value = value;
+        }
+
+        public void undoFill() {
+            this.value = null;
         }
     
     }
