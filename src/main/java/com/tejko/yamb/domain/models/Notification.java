@@ -17,6 +17,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tejko.yamb.domain.enums.NotificationType;
 import com.tejko.yamb.domain.listeners.NotificationListener;
 
@@ -41,6 +42,7 @@ public class Notification {
 
     @OneToOne
     @JoinColumn(name = "player_id")
+    @JsonIgnore
     private Player player;
 
     private String content;

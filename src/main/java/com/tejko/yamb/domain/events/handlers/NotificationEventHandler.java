@@ -22,9 +22,10 @@ public class NotificationEventHandler {
     @EventListener
     public void handleNotificationCreated(NotificationCreatedEvent event) {
         Notification notification = event.getNotification();
-        webSocketManager.convertAndSend(
-            "/topic/players/" + notification.getPlayer().getExternalId(), 
-            notification.getContent(), 
+        System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+        webSocketManager.convertAndSendToUser(
+            notification.getPlayer().getExternalId(), 
+            notification, 
             MessageType.NOTIFICATION
         );
     }

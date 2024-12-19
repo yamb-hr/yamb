@@ -43,7 +43,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void privateMessage(WebSocketMessage message, Principal principal) {
         UUID senderExternalId = UUID.fromString(principal.getName());
         message.setSenderId(senderExternalId);
-        webSocketManager.convertAndSendToUser(message);
+        webSocketManager.sendToUser(message);
     }
 
     @Override
