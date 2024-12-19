@@ -2,27 +2,16 @@ package com.tejko.yamb.domain.listeners;
 
 import javax.persistence.PostUpdate;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import com.tejko.yamb.domain.events.PlayerEmailUpdatedEvent;
 import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.util.EmailManager;
+import com.tejko.yamb.util.ApplicationContextProvider;
 
 public class PlayerListener {
 
-    private final EmailManager emailManager;
-
-    @Autowired
-    public PlayerListener(EmailManager emailManager) {
-        this.emailManager = emailManager;
-    }
-
     @PostUpdate
     public void onEmailUpdate(Player player) {
-        if (isEmailUpdated(player)) {
-            if (!player.isEmailVerified() && player.getEmailVerificationToken() != null) {
-                String verificationLink = "https://jamb.com.hr/email-verification?token=" + player.getEmailVerificationToken();
-                emailManager.sendVerificationEmail(player.getEmail(), player.getUsername(), verificationLink);
-            }
+        if (isEmailUpdated(player) && !player.isEmailVerified() && player.getEmailVerificationToken() != null) {
+            ApplicationContextProvider.publishEvent(new PlayerEmailUpdatedEvent(player));
         }
     }
 
@@ -32,5 +21,5 @@ public class PlayerListener {
         }
         return !player.getEmail().equals(player.getPreviousEmail());
     }
-
+    
 }

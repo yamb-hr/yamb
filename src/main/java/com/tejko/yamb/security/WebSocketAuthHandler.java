@@ -50,4 +50,5 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
         }
         return null;
     }
+    
 }
