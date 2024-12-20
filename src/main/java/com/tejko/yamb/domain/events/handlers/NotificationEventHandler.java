@@ -22,7 +22,6 @@ public class NotificationEventHandler {
     @EventListener
     public void handleNotificationCreated(NotificationCreatedEvent event) {
         Notification notification = event.getNotification();
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++");
         webSocketManager.convertAndSendToUser(
             notification.getPlayer().getExternalId(), 
             notification, 

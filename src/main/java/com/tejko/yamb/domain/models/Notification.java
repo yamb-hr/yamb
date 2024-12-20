@@ -91,5 +91,10 @@ public class Notification {
             this.externalId = UUID.randomUUID();
         }
     }
+
+    @Override
+    public String toString() {
+        return type + " " + player.getName() + " " + content;
+    }
     
 }

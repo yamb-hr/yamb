@@ -37,9 +37,13 @@ public class WebSocketManager {
     }
 
     public void convertAndSendToUser(UUID playerExternalId, Object content, MessageType type) {
-        System.out.println("----------------------------" + type + " " + playerExternalId);
         WebSocketMessage message = WebSocketMessage.getInstance(generatePayload(content), type);
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(playerExternalId), "/private", message, message.getHeaders());
+        simpMessagingTemplate.convertAndSendToUser(
+            String.valueOf(playerExternalId),
+            "/private",
+            message,
+            message.getHeaders()
+        );
     }
 
     private byte[] generatePayload(Object content) {

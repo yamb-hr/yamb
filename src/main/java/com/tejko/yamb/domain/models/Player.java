@@ -188,7 +188,6 @@ public class Player implements UserDetails, Principal {
         passwordResetToken = null;
     }
 
-    
     public String getPasswordResetToken() {
         return passwordResetToken;
     }
