@@ -14,6 +14,7 @@ public class NotificationResponse extends RepresentationModel<NotificationRespon
     private UUID id;
     private LocalDateTime createdAt;
     private String content;
+    private String link;
     private NotificationType type;
 
     public NotificationResponse() {}
@@ -41,6 +42,14 @@ public class NotificationResponse extends RepresentationModel<NotificationRespon
     public void setContent(String content) {
         this.content = content;
     }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }    
 
     public NotificationType getType() {
         return type;

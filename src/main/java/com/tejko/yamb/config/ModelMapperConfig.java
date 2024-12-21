@@ -22,6 +22,7 @@ import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.GlobalScoreStatsResponse;
 import com.tejko.yamb.api.dto.responses.ImageResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
+import com.tejko.yamb.api.dto.responses.NotificationResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
@@ -35,6 +36,7 @@ import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
 import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
@@ -238,7 +240,13 @@ public class ModelMapperConfig {
             })
             .addMapping(TicketRequest::getTitle, Ticket::setTitle)
             .addMapping(TicketRequest::getDescription, Ticket::setDescription);
-        }
-        
+
+        modelMapper.createTypeMap(Notification.class, NotificationResponse.class)
+            .addMapping(Notification::getExternalId, NotificationResponse::setId)
+            .addMapping(Notification::getContent, NotificationResponse::setContent)
+            .addMapping(Notification::getLink, NotificationResponse::setLink)
+            .addMapping(Notification::getType, NotificationResponse::setType);
+
+    }
 
 }

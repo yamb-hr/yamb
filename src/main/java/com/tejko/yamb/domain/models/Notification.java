@@ -47,18 +47,21 @@ public class Notification {
 
     private String content;
 
+    private String link;
+
     private NotificationType type;
 
     protected Notification() {}
 
-    protected Notification(Player player, String content, NotificationType type) {
+    protected Notification(Player player, String content, String link, NotificationType type) {
         this.player = player;
         this.content = content;
+        this.link = link;
         this.type = type;
     }
 
-    public static Notification getInstance(Player player, String content, NotificationType type) {
-        return new Notification(player, content, type);
+    public static Notification getInstance(Player player, String content, String link, NotificationType type) {
+        return new Notification(player, content, link, type);
     }
 
     public Long getId() {
@@ -79,6 +82,10 @@ public class Notification {
 
     public String getContent() {
         return content;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     public NotificationType getType() {
