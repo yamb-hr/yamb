@@ -75,9 +75,9 @@ public class ClashModelAssembler implements RepresentationModelAssembler<Clash, 
             }
         }
 
-        clashResponse.add(linkTo(methodOn(ClashController.class)
-            .getByExternalId(clashResponse.getId()))
-            .withSelfRel());
+        clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
+        clashResponse.add(linkTo(methodOn(ClashController.class).acceptInvitationByExternalId(clashResponse.getId(), null)).withRel("accept"));
+        clashResponse.add(linkTo(methodOn(ClashController.class).declineInvitationByExternalId(clashResponse.getId(), null)).withRel("decline"));
 
         return clashResponse;
     }
@@ -123,9 +123,9 @@ public class ClashModelAssembler implements RepresentationModelAssembler<Clash, 
                     }
                 }
 
-                clashResponse.add(linkTo(methodOn(ClashController.class)
-                    .getByExternalId(clashResponse.getId()))
-                    .withSelfRel());
+                clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
+                clashResponse.add(linkTo(methodOn(ClashController.class).acceptInvitationByExternalId(clashResponse.getId(), null)).withRel("accept"));
+                clashResponse.add(linkTo(methodOn(ClashController.class).declineInvitationByExternalId(clashResponse.getId(), null)).withRel("decline"));
 
                 return clashResponse;
             })

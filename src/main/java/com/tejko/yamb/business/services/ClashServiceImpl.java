@@ -83,7 +83,7 @@ public class ClashServiceImpl implements ClashService {
         Player owner = playerRepo.findByExternalId(clash.getOwnerId()).get();
         for (Player player : players) {
             if (!owner.getExternalId().equals(player.getExternalId())) {
-                notifications.add(Notification.getInstance(player, "You have been invited to join a clash by " + owner.getUsername(), "https://jamb.com.hr/clashes/" + clash.getExternalId(), NotificationType.CLASH_INVITATION));
+                notifications.add(Notification.getInstance(player, "You have been invited to join a clash by " + owner.getUsername(), "/clashes/" + clash.getExternalId(), NotificationType.CLASH_INVITATION));
             }
         }
 

@@ -66,6 +66,7 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
                 Player player = playerMap.get(pid);
                 PlayerResponse playerResponse = modelMapper.map(player, PlayerResponse.class);
                 response.setPlayer(playerResponse);
+                if (response.getPlayer() != null) response.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(response.getPlayer().getId())).withSelfRel());
             }
 
             return response;
