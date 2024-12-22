@@ -9,6 +9,7 @@ import com.tejko.yamb.domain.enums.InvitationStatus;
 public class ClashPlayerResponse extends RepresentationModel<ClashPlayerResponse> {
  
     private UUID id;
+    private String name;
     private UUID gameId;
     private InvitationStatus status;
     
@@ -20,6 +21,14 @@ public class ClashPlayerResponse extends RepresentationModel<ClashPlayerResponse
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public UUID getGameId() {

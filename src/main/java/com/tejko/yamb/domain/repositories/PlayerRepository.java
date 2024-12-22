@@ -44,6 +44,4 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     List<Player> findAllByExternalIdInOrderByUpdatedAtDesc(List<UUID> externalIds);
 
-    void deleteByExternalId(UUID externalId);
-
 }

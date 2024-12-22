@@ -61,6 +61,7 @@ public class ClashController {
 	}
 
 	@GetMapping("")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PagedModel<ClashResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Clash.class, ClashResponse.class);
 		PagedModel<ClashResponse> pagedClashs = clashModelAssembler.toPagedModel(clashService.getAll(modifiedPageable));

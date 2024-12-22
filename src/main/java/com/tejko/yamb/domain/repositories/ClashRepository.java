@@ -37,6 +37,5 @@ public interface ClashRepository extends MongoRepository<Clash, String> {
     Optional<Clash> findByGameId(UUID gameId);
 
     List<Clash> findAllByOrderByUpdatedAtDesc();
-
-    void deleteByExternalId(UUID externalId);
+    
 }

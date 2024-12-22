@@ -152,6 +152,7 @@ public class ModelMapperConfig {
             .addMapping(Game.Dice::getIndex, GameResponse.Dice::setIndex)   
             .addMapping(Game.Dice::getValue, GameResponse.Dice::setValue);
                 
+        // clash
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
             .addMapping(Clash::getCreatedAt, ClashResponse::setCreatedAt)
@@ -164,10 +165,20 @@ public class ModelMapperConfig {
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
             .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner));
 
+        Converter<UUID, String> playerNameConverter = context -> {
+            UUID playerId = context.getSource();
+            if (playerId == null) {
+                return null;
+            }
+            Optional<Player> player = playerService.findByExternalId(playerId);
+            return player.map(Player::getUsername).orElse(null);
+        };
+
         modelMapper.createTypeMap(ClashPlayer.class, ClashPlayerResponse.class)
             .addMapping(ClashPlayer::getId, ClashPlayerResponse::setId)
             .addMapping(ClashPlayer::getGameId, ClashPlayerResponse::setGameId)
-            .addMapping(ClashPlayer::getStatus, ClashPlayerResponse::setStatus);
+            .addMapping(ClashPlayer::getStatus, ClashPlayerResponse::setStatus)
+            .addMappings(mapper -> mapper.using(playerNameConverter).map(ClashPlayer::getId, ClashPlayerResponse::setName));
 
         // stats
         modelMapper.createTypeMap(GlobalPlayerStats.class, GlobalPlayerStatsResponse.class)
@@ -241,8 +252,10 @@ public class ModelMapperConfig {
             .addMapping(TicketRequest::getTitle, Ticket::setTitle)
             .addMapping(TicketRequest::getDescription, Ticket::setDescription);
 
+        // notification
         modelMapper.createTypeMap(Notification.class, NotificationResponse.class)
             .addMapping(Notification::getExternalId, NotificationResponse::setId)
+            .addMapping(Notification::getCreatedAt, NotificationResponse::setCreatedAt)
             .addMapping(Notification::getContent, NotificationResponse::setContent)
             .addMapping(Notification::getLink, NotificationResponse::setLink)
             .addMapping(Notification::getType, NotificationResponse::setType);

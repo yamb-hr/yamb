@@ -14,8 +14,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
 
-    void deleteByExternalId(UUID externalId);
-
     void deleteAllByPlayerId(Long playerId);
     
 }

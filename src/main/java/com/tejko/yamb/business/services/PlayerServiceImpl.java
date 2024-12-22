@@ -305,7 +305,8 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public void deleteByExternalId(UUID externalId) {
-        playerRepo.deleteByExternalId(externalId);
+        Player player = getByExternalId(externalId);
+        playerRepo.delete(player);
     }
 
     @Override
@@ -343,7 +344,8 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void deleteNotificationsByPlayerExternalId(UUID playerExternalId) {
         Player player = getByExternalId(playerExternalId);
-        notificationRepo.deleteAllByPlayerId(player.getId());
+        List<Notification> notifications = notificationRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+        notificationRepo.deleteAll(notifications);
     }
 
     private void validateAvatar(MultipartFile avatar) {

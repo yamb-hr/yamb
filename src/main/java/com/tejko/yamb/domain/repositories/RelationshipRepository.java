@@ -22,6 +22,4 @@ public interface RelationshipRepository extends JpaRepository<PlayerRelationship
       "OR (pr.id.player.id = :relatedPlayerId AND pr.id.relatedPlayer.id = :playerId) ORDER BY updatedAt")
    Optional<PlayerRelationship> findByPlayerIds(Long playerId, Long relatedPlayerId);
 
-   void deleteByExternalId(UUID externalId);
-
 }

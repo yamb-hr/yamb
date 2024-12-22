@@ -60,6 +60,7 @@ public class GameController {
 	}
 
 	@GetMapping("")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PagedModel<GameResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, Game.class, GameResponse.class);
 		PagedModel<GameResponse> pagedGames = gameModelAssembler.toPagedModel(gameService.getAll(modifiedPageable));

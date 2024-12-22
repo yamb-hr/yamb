@@ -131,7 +131,8 @@ public class ClashServiceImpl implements ClashService {
 
     @Override
     public void deleteByExternalId(UUID externalId) {
-        clashRepo.deleteByExternalId(externalId);
+        Clash clash = getByExternalId(externalId);
+        clashRepo.delete(clash);
     }
 
     @Override

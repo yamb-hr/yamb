@@ -40,7 +40,8 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
 	public void deleteByExternalId(UUID externalId) {
-		scoreRepo.deleteByExternalId(externalId);
+		Score score = getByExternalId(externalId);
+		scoreRepo.delete(score);
 	}
 
     @Override

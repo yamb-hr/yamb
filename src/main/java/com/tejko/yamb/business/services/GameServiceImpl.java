@@ -165,7 +165,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void deleteByExternalId(UUID externalId) {
-        gameRepo.deleteByExternalId(externalId);
+        Game game = getByExternalId(externalId);
+        gameRepo.delete(game);
     }
 
     @Override
