@@ -4,12 +4,12 @@ import org.springframework.hateoas.RepresentationModel;
 
 public class AuthResponse extends RepresentationModel<AuthResponse> {
 
-    private PlayerResponse player;
+    private PlayerDetailResponse player;
     private String token;
 
     public AuthResponse() {}
 
-    public AuthResponse(PlayerResponse player, String token) {
+    public AuthResponse(PlayerDetailResponse player, String token) {
         this.player = player;
         this.token = token;
     }
@@ -22,11 +22,11 @@ public class AuthResponse extends RepresentationModel<AuthResponse> {
         this.token = token;
     }
 
-    public PlayerResponse getPlayer() {
+    public PlayerDetailResponse getPlayer() {
         return player;
     }
 
-    public void setPlayer(PlayerResponse player) {
+    public void setPlayer(PlayerDetailResponse player) {
         this.player = player;
     }
     

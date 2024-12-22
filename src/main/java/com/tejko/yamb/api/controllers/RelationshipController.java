@@ -39,7 +39,8 @@ public class RelationshipController {
 	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public RelationshipController(RelationshipService relationshipService, RelationshipModelAssembler relationshipModelAssembler, SortFieldTranslator sortFieldTranslator) {
+	public RelationshipController(RelationshipService relationshipService, RelationshipModelAssembler relationshipModelAssembler,
+								  SortFieldTranslator sortFieldTranslator) {
 		this.relationshipService = relationshipService;
 		this.relationshipModelAssembler = relationshipModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;

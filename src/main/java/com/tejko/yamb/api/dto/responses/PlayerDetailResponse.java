@@ -6,22 +6,19 @@ import java.util.UUID;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
-import com.tejko.yamb.domain.enums.ClashStatus;
-import com.tejko.yamb.domain.enums.ClashType;
+@Relation(collectionRelation = "players")
+public class PlayerDetailResponse extends RepresentationModel<PlayerDetailResponse> {
 
-@Relation(collectionRelation = "clashes")
-public class ClashResponse extends RepresentationModel<ClashResponse> {
- 
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private PlayerResponse owner;
-    private PlayerResponse winner;
-    private ClashStatus status;
-    private ClashType type;
-    
-    public ClashResponse() {}
+    private String email;
+    private boolean isEmailVerified;
+    private boolean isAdmin;
+    private ImageResponse avatar;
+
+    public PlayerDetailResponse() {}
 
     public UUID getId() {
         return id;
@@ -54,39 +51,37 @@ public class ClashResponse extends RepresentationModel<ClashResponse> {
     public void setName(String name) {
         this.name = name;
     }
-
-    public PlayerResponse getOwner() {
-        return owner;
-    }
-
-    public void setOwner(PlayerResponse owner) {
-        this.owner = owner;
-    }
-
-    public PlayerResponse getWinner() {
-        return winner;
-    }
-
-    public void setWinner(PlayerResponse winner) {
-        this.winner = winner;
-    }
-
-    public ClashStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ClashStatus status) {
-        this.status = status;
-    }
-
-    public ClashType getType() {
-        return type;
-    }
-
-    public void setType(ClashType type) {
-        this.type = type;
-    }
     
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean isEmailVerified) {
+        this.isEmailVerified = isEmailVerified;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public ImageResponse getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(ImageResponse avatar) {
+        this.avatar = avatar;
+    }
+
 }
-
-

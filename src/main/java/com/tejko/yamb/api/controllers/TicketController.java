@@ -42,7 +42,8 @@ public class TicketController {
 	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public TicketController(TicketService ticketService, TicketModelAssembler ticketModelAssembler, SortFieldTranslator sortFieldTranslator) {
+	public TicketController(TicketService ticketService, TicketModelAssembler ticketModelAssembler, 
+							SortFieldTranslator sortFieldTranslator) {
 		this.ticketService = ticketService;
 		this.ticketModelAssembler = ticketModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;

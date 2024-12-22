@@ -3,6 +3,7 @@ package com.tejko.yamb.business.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -316,7 +317,7 @@ public class PlayerServiceImpl implements PlayerService {
         Image existingAvatar = player.getAvatar();
         String oldPublicId = (existingAvatar != null) ? existingAvatar.getPublicId() : null;
 
-        Map uploadedFile = cloudinaryClient.uploadFile(avatar, "avatars", oldPublicId);
+        Map<String, Object> uploadedFile = cloudinaryClient.uploadFile(avatar, "avatars", oldPublicId);
         if (uploadedFile == null) {
             throw new IllegalArgumentException("Failed to upload new avatar.");
         }
@@ -357,5 +358,9 @@ public class PlayerServiceImpl implements PlayerService {
         }
     }
 
+    @Override
+    public List<Player> findAllByExternalIds(Set<UUID> playerExternalIds) {
+        return playerRepo.findAllByExternalIdIn(playerExternalIds);
+    }
 
 }

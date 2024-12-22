@@ -9,15 +9,16 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "logs")
-public class LogResponse extends RepresentationModel<LogResponse> {
+public class LogDetailResponse extends RepresentationModel<LogDetailResponse> {
 
     private UUID id;
     private LocalDateTime createdAt;
     private PlayerResponse player;
+    private Object data;
     private String message;
     private Level level;
 
-    public LogResponse() {}
+    public LogDetailResponse() {}
 
     public UUID getId() {
         return id;
@@ -41,6 +42,14 @@ public class LogResponse extends RepresentationModel<LogResponse> {
 
     public void setPlayer(PlayerResponse player) {
         this.player = player;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public String getMessage() {

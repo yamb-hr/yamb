@@ -13,9 +13,6 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String name;
-    private String email;
-    private boolean isEmailVerified;
-    private boolean isAdmin;
     private ImageResponse avatar;
 
     public PlayerResponse() {}
@@ -50,30 +47,6 @@ public class PlayerResponse extends RepresentationModel<PlayerResponse> {
 
     public void setName(String name) {
         this.name = name;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public boolean isEmailVerified() {
-        return isEmailVerified;
-    }
-
-    public void setEmailVerified(boolean isEmailVerified) {
-        this.isEmailVerified = isEmailVerified;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
     }
 
     public ImageResponse getAvatar() {

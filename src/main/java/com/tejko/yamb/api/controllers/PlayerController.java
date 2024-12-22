@@ -1,8 +1,5 @@
 package com.tejko.yamb.api.controllers;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -29,9 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.tejko.yamb.api.assemblers.ClashModelAssembler;
 import com.tejko.yamb.api.assemblers.GameModelAssembler;
+import com.tejko.yamb.api.assemblers.GlobalPlayerStatsModelAssembler;
 import com.tejko.yamb.api.assemblers.LogModelAssembler;
 import com.tejko.yamb.api.assemblers.NotificationModelAssembler;
+import com.tejko.yamb.api.assemblers.PlayerDetailModelAssembler;
 import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
+import com.tejko.yamb.api.assemblers.PlayerPreferencesModelAssembler;
+import com.tejko.yamb.api.assemblers.PlayerStatsModelAssembler;
 import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
 import com.tejko.yamb.api.dto.requests.EmailRequest;
@@ -43,6 +44,7 @@ import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
 import com.tejko.yamb.api.dto.responses.NotificationResponse;
+import com.tejko.yamb.api.dto.responses.PlayerDetailResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
@@ -58,6 +60,7 @@ public class PlayerController {
 
 	private final PlayerService playerService;
 	private final PlayerModelAssembler playerModelAssembler;
+	private final PlayerDetailModelAssembler playerDetailModelAssembler;
 	private final ScoreModelAssembler scoreModelAssembler;
 	private final GameModelAssembler gameModelAssembler;
 	private final ClashModelAssembler clashModelAssembler;
@@ -65,15 +68,21 @@ public class PlayerController {
 	private final LogModelAssembler logModelAssembler;
 	private final SortFieldTranslator sortFieldTranslator;
 	private final NotificationModelAssembler notificationModelAssembler;
+	private final PlayerStatsModelAssembler playerStatsModelAssembler;
+	private final PlayerPreferencesModelAssembler playerPreferencesModelAssembler;
+	private final GlobalPlayerStatsModelAssembler globalPlayerStatsModelAssembler;
 
 	@Autowired
 	public PlayerController(PlayerService playerService, PlayerModelAssembler playerModelAssembler, 
-							ScoreModelAssembler scoreModelAssembler, GameModelAssembler gameModelAssembler,
-							ClashModelAssembler clashModelAssembler, RelationshipModelAssembler relationshipModelAssembler, 
-							LogModelAssembler logModelAssembler, SortFieldTranslator sortFieldTranslator,
-							NotificationModelAssembler notificationModelAssembler) {
+							PlayerDetailModelAssembler playerDetailModelAssembler, ScoreModelAssembler scoreModelAssembler, 
+							GameModelAssembler gameModelAssembler, ClashModelAssembler clashModelAssembler, 
+							RelationshipModelAssembler relationshipModelAssembler, LogModelAssembler logModelAssembler, 
+							SortFieldTranslator sortFieldTranslator, NotificationModelAssembler notificationModelAssembler,
+							PlayerStatsModelAssembler playerStatsModelAssembler, PlayerPreferencesModelAssembler playerPreferencesModelAssembler, 
+							GlobalPlayerStatsModelAssembler globalPlayerStatsModelAssembler) {
 		this.playerService = playerService;
 		this.playerModelAssembler = playerModelAssembler;
+		this.playerDetailModelAssembler = playerDetailModelAssembler;
 		this.scoreModelAssembler = scoreModelAssembler;
 		this.gameModelAssembler = gameModelAssembler;
 		this.clashModelAssembler = clashModelAssembler;
@@ -81,6 +90,9 @@ public class PlayerController {
 		this.logModelAssembler = logModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;
 		this.notificationModelAssembler = notificationModelAssembler;
+		this.playerStatsModelAssembler = playerStatsModelAssembler;
+		this.playerPreferencesModelAssembler = playerPreferencesModelAssembler;
+		this.globalPlayerStatsModelAssembler = globalPlayerStatsModelAssembler;
 	}
 
 	@GetMapping("/{externalId}")
@@ -106,7 +118,7 @@ public class PlayerController {
 	@GetMapping("/stats")
 	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<GlobalPlayerStatsResponse> getGlobalStats() {
-		GlobalPlayerStatsResponse globalPlayerStatsResponse = playerModelAssembler.toModel(playerService.getGlobalStats());
+		GlobalPlayerStatsResponse globalPlayerStatsResponse = globalPlayerStatsModelAssembler.toModel(playerService.getGlobalStats());
         return ResponseEntity.ok(globalPlayerStatsResponse);
     }
 
@@ -141,24 +153,22 @@ public class PlayerController {
 	@GetMapping("/{externalId}/stats")
 	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<PlayerStatsResponse> getPlayerStatsByExternalId(@PathVariable UUID externalId) {
-		PlayerStatsResponse playerStatsResponse = playerModelAssembler.toModel(playerService.getPlayerStatsByExternalId(externalId));
+		PlayerStatsResponse playerStatsResponse = playerStatsModelAssembler.toModel(playerService.getPlayerStatsByExternalId(externalId));
         return ResponseEntity.ok(playerStatsResponse);
     }
 
 	@GetMapping("/{externalId}/preferences")
 	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
     public ResponseEntity<PlayerPreferencesResponse> getPreferencesByPlayerExternalId(@PathVariable UUID externalId) {
-		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.getPreferencesByPlayerExternalId(externalId));
+		PlayerPreferencesResponse playerPreferencesResponse = playerPreferencesModelAssembler.toModel(playerService.getPreferencesByPlayerExternalId(externalId));
         return ResponseEntity.ok(playerPreferencesResponse);
     }
 
 	@PutMapping("/{externalId}/preferences")
 	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
     public ResponseEntity<EntityModel<PlayerPreferencesResponse>> setPreferencesByPlayerExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerPreferencesRequest playerPreferencesRequest) {
-		PlayerPreferencesResponse playerPreferencesResponse = playerModelAssembler.toModel(playerService.setPreferencesByPlayerExternalId(externalId, playerModelAssembler.fromModel(playerPreferencesRequest)));
+		PlayerPreferencesResponse playerPreferencesResponse = playerPreferencesModelAssembler.toModel(playerService.setPreferencesByPlayerExternalId(externalId, playerPreferencesModelAssembler.fromModel(playerPreferencesRequest)));
 		EntityModel<PlayerPreferencesResponse> preferencesModel = EntityModel.of(playerPreferencesResponse);
-        preferencesModel.add(linkTo(methodOn(PlayerController.class).setPreferencesByPlayerExternalId(externalId, playerPreferencesRequest)).withSelfRel());
-        preferencesModel.add(linkTo(methodOn(PlayerController.class).getByExternalId(externalId)).withRel("player"));
         return ResponseEntity.ok(preferencesModel);
     }
 
@@ -178,49 +188,41 @@ public class PlayerController {
 
 	@DeleteMapping("/{externalId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Void> mergePlayers(@PathVariable UUID externalId) {
+	public ResponseEntity<Void> deleteById(@PathVariable UUID externalId) {
 		playerService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PlayerResponse> getCurrentPlayer() {
+    public ResponseEntity<PlayerDetailResponse> getCurrentPlayer() {
 		Player player = playerService.getCurrentPlayer();
-		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
-		playerResponse.setEmail(player.getEmail());
-		playerResponse.setEmailVerified(player.isEmailVerified());
-		return ResponseEntity.ok(playerResponse);
+		PlayerDetailResponse playerDetailResponse = playerDetailModelAssembler.toModel(player);
+		return ResponseEntity.ok(playerDetailResponse);
 	}
 
 	@PutMapping("/{externalId}/username")
 	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
-	public ResponseEntity<PlayerResponse> updateUsernameByExternalId(@PathVariable UUID externalId, @Valid @RequestBody UsernameRequest usernameRequest) {
+	public ResponseEntity<PlayerDetailResponse> updateUsernameByExternalId(@PathVariable UUID externalId, @Valid @RequestBody UsernameRequest usernameRequest) {
 		Player player = playerService.updateUsernameByExternalId(externalId, usernameRequest.getUsername());
-		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
-		playerResponse.setEmail(player.getEmail());
-		playerResponse.setEmailVerified(player.isEmailVerified());
-		return ResponseEntity.ok(playerResponse);
+		PlayerDetailResponse playerDetailResponse = playerDetailModelAssembler.toModel(player);
+		return ResponseEntity.ok(playerDetailResponse);
 	}
 
 	@PutMapping("/{externalId}/email")
 	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
-    public ResponseEntity<PlayerResponse> updateEmailByExternalId(@PathVariable UUID externalId, @Valid @RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<PlayerDetailResponse> updateEmailByExternalId(@PathVariable UUID externalId, @Valid @RequestBody EmailRequest emailRequest) {
 		Player player = playerService.updateEmailByExternalId(externalId, emailRequest.getEmail());
-		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
-		playerResponse.setEmail(player.getEmail());
-		playerResponse.setEmailVerified(player.isEmailVerified());
-		return ResponseEntity.ok(playerResponse);
+		PlayerDetailResponse playerDetailResponse = playerDetailModelAssembler.toModel(player);
+		return ResponseEntity.ok(playerDetailResponse);
     }
 
 	@PutMapping("/{externalId}/avatar")
 	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
-	public ResponseEntity<PlayerResponse> updateAvatarByExternalId(@PathVariable UUID externalId, @RequestParam MultipartFile file) {
+	public ResponseEntity<PlayerDetailResponse> updateAvatarByExternalId(@PathVariable UUID externalId, @RequestParam MultipartFile file) {
 		Player player = playerService.updateAvatarByExternalId(externalId, file);
-		PlayerResponse playerResponse = playerModelAssembler.toModel(player);
-		playerResponse.setEmail(player.getEmail());
-		playerResponse.setEmailVerified(player.isEmailVerified());
-		return ResponseEntity.ok(playerResponse);
+		PlayerDetailResponse playerDetailResponse = playerDetailModelAssembler.toModel(player);
+		return ResponseEntity.ok(playerDetailResponse);
 	}
 
 	@GetMapping("/{externalId}/notifications")

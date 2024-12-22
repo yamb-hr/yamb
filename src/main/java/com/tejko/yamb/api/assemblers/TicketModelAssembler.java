@@ -13,20 +13,23 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.api.controllers.TicketController;
 import com.tejko.yamb.api.controllers.PlayerController;
+import com.tejko.yamb.api.controllers.TicketController;
 import com.tejko.yamb.api.dto.requests.TicketRequest;
 import com.tejko.yamb.api.dto.responses.TicketResponse;
+import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Ticket;
 
 @Component
 public class TicketModelAssembler implements RepresentationModelAssembler<Ticket, TicketResponse> {
 
     private final ModelMapper modelMapper;
+    private final PlayerService playerService;
 
     @Autowired
-    public TicketModelAssembler(ModelMapper modelMapper) {
+    public TicketModelAssembler(ModelMapper modelMapper, PlayerService playerService) {
         this.modelMapper = modelMapper;
+        this.playerService = playerService;
     }
 
     @Override
@@ -34,8 +37,8 @@ public class TicketModelAssembler implements RepresentationModelAssembler<Ticket
         
         TicketResponse ticketResponse = modelMapper.map(ticket, TicketResponse.class);
 		ticketResponse.add(linkTo(methodOn(TicketController.class).getByExternalId(ticketResponse.getId())).withSelfRel());
-		if (ticketResponse.getPlayer() != null) ticketResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(ticketResponse.getPlayer().getId())).withSelfRel());
-        
+        if (ticketResponse.getPlayer() != null) ticketResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(ticketResponse.getPlayer().getId())).withSelfRel());
+
         return ticketResponse;
     }
 
@@ -54,6 +57,7 @@ public class TicketModelAssembler implements RepresentationModelAssembler<Ticket
 
     public Ticket fromModel(TicketRequest ticketRequest) {
         Ticket ticket = modelMapper.map(ticketRequest, Ticket.class);
+        ticket.setPlayer(playerService.getByExternalId(ticketRequest.getPlayerId()));
         return ticket;
     }
 

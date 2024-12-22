@@ -15,36 +15,36 @@ import org.springframework.stereotype.Component;
 
 import com.tejko.yamb.api.controllers.LogController;
 import com.tejko.yamb.api.controllers.PlayerController;
-import com.tejko.yamb.api.dto.responses.LogResponse;
+import com.tejko.yamb.api.dto.responses.LogDetailResponse;
 import com.tejko.yamb.domain.models.Log;
 
 @Component
-public class LogModelAssembler implements RepresentationModelAssembler<Log, LogResponse> {
+public class LogDetailModelAssembler implements RepresentationModelAssembler<Log, LogDetailResponse> {
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public LogModelAssembler(ModelMapper modelMapper) {
+    public LogDetailModelAssembler(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public LogResponse toModel(Log log) {
+    public LogDetailResponse toModel(Log log) {
         
-        LogResponse logResponse = modelMapper.map(log, LogResponse.class);
-		logResponse.add(linkTo(methodOn(LogController.class).getByExternalId(logResponse.getId())).withSelfRel());
-        if (logResponse.getPlayer() != null) logResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(logResponse.getPlayer().getId())).withSelfRel());
+        LogDetailResponse logDetailResponse = modelMapper.map(log, LogDetailResponse.class);
+		logDetailResponse.add(linkTo(methodOn(LogController.class).getByExternalId(logDetailResponse.getId())).withSelfRel());
+        if (logDetailResponse.getPlayer() != null) logDetailResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(logDetailResponse.getPlayer().getId())).withSelfRel());
 
-        return logResponse;
+        return logDetailResponse;
     }
 
-    public PagedModel<LogResponse> toPagedModel(Page<Log> logs) {
+    public PagedModel<LogDetailResponse> toPagedModel(Page<Log> logs) {
 
-        List<LogResponse> logResponses = logs.stream()
+        List<LogDetailResponse> logDetailResponses = logs.stream()
             .map(this::toModel)
             .collect(Collectors.toList());
 
-        PagedModel<LogResponse> pagedLogs = PagedModel.of(logResponses, new PagedModel.PageMetadata(
+        PagedModel<LogDetailResponse> pagedLogs = PagedModel.of(logDetailResponses, new PagedModel.PageMetadata(
             logs.getSize(), logs.getNumber(), logs.getTotalElements(), logs.getTotalPages()
         ));
 

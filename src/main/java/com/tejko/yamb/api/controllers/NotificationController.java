@@ -38,7 +38,8 @@ public class NotificationController {
 	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public NotificationController(NotificationService notificationService, NotificationModelAssembler notificationModelAssembler, SortFieldTranslator sortFieldTranslator) {
+	public NotificationController(NotificationService notificationService, NotificationModelAssembler notificationModelAssembler, 
+								  SortFieldTranslator sortFieldTranslator) {
 		this.notificationService = notificationService;
 		this.notificationModelAssembler = notificationModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;

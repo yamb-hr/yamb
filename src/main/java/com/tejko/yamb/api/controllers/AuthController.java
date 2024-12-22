@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tejko.yamb.api.assemblers.AuthModelAssembler;
-import com.tejko.yamb.api.assemblers.PlayerModelAssembler;
+import com.tejko.yamb.api.assemblers.PlayerDetailModelAssembler;
 import com.tejko.yamb.api.dto.requests.AuthRequest;
 import com.tejko.yamb.api.dto.requests.EmailRequest;
 import com.tejko.yamb.api.dto.requests.PasswordChangeRequest;
 import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
-import com.tejko.yamb.api.dto.responses.PlayerResponse;
+import com.tejko.yamb.api.dto.responses.PlayerDetailResponse;
 import com.tejko.yamb.business.interfaces.AuthService;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerWithToken;
@@ -35,13 +35,14 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthModelAssembler authModelAssembler;
-    private final PlayerModelAssembler playerModelAssembler;
+    private final PlayerDetailModelAssembler playerDetailModelAssembler;
 
     @Autowired
-    public AuthController(AuthService authService, AuthModelAssembler authModelAssembler, PlayerModelAssembler playerModelAssembler) {
+    public AuthController(AuthService authService, AuthModelAssembler authModelAssembler, 
+                          PlayerDetailModelAssembler playerDetailModelAssembler) {
         this.authService = authService;
         this.authModelAssembler = authModelAssembler;
-        this.playerModelAssembler = playerModelAssembler;
+        this.playerDetailModelAssembler = playerDetailModelAssembler;
     }
 
     @PostMapping("/token")
@@ -54,21 +55,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<PlayerResponse> register(@Valid @RequestBody AuthRequest authRequest) {
+    public ResponseEntity<PlayerDetailResponse> register(@Valid @RequestBody AuthRequest authRequest) {
         
         Player player = authService.register(authRequest.getEmail(), authRequest.getUsername(), authRequest.getPassword());
-        PlayerResponse playerResponse = playerModelAssembler.toModel(player);
-        playerResponse.setEmail(player.getEmail());
-		playerResponse.setEmailVerified(player.isEmailVerified());
-        playerResponse.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
+        PlayerDetailResponse playerDetailResponse = playerDetailModelAssembler.toModel(player);
+        playerDetailResponse.setEmail(player.getEmail());
+		playerDetailResponse.setEmailVerified(player.isEmailVerified());
+        playerDetailResponse.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
                 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(playerResponse.getId())
+            .buildAndExpand(playerDetailResponse.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(playerResponse);
+        return ResponseEntity.created(location).body(playerDetailResponse);
     }
 
     @PostMapping("/register-guest")

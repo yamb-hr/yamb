@@ -29,7 +29,8 @@ public class ScoreController {
 	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public ScoreController(ScoreService scoreService, ScoreModelAssembler scoreModelAssembler, SortFieldTranslator sortFieldTranslator) {
+	public ScoreController(ScoreService scoreService, ScoreModelAssembler scoreModelAssembler, 
+						   SortFieldTranslator sortFieldTranslator) {
 		this.scoreService = scoreService;
 		this.scoreModelAssembler = scoreModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;

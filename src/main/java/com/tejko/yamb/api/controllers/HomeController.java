@@ -48,8 +48,9 @@ public class HomeController {
     private String appVersion;
 
     @Autowired
-    public HomeController(Environment environment, JdbcTemplate jdbcTemplate, MongoTemplate mongoTemplate, RestTemplate restTemplate, 
-                            ResponseTimeAspect responseTimeAspect, GlobalExceptionHandler globalExceptionHandler) {
+    public HomeController(Environment environment, JdbcTemplate jdbcTemplate, 
+                          MongoTemplate mongoTemplate, RestTemplate restTemplate, 
+                          ResponseTimeAspect responseTimeAspect, GlobalExceptionHandler globalExceptionHandler) {
         this.environment = environment;
         this.jdbcTemplate = jdbcTemplate;
         this.mongoTemplate = mongoTemplate;

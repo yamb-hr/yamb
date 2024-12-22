@@ -2,6 +2,7 @@ package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -68,5 +69,7 @@ public interface PlayerService extends UserDetailsService {
     List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId);
 
     void deleteNotificationsByPlayerExternalId(UUID playerExternalId);
-    
+
+    List<Player> findAllByExternalIds(Set<UUID> playerExternalIds);
+
 }

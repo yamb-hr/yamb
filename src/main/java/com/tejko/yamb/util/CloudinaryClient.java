@@ -20,7 +20,7 @@ public class CloudinaryClient {
     private static final double MAX_FILE_SIZE = 520 * 1024;
     private static final String[] ALLOWED_MIME_TYPES = {"image/jpeg", "image/png"};
 
-    public Map uploadFile(MultipartFile file, String folderName, String oldPublicId) {
+    public Map<String, Object> uploadFile(MultipartFile file, String folderName, String oldPublicId) {
         try {
             validateFile(file);
             if (oldPublicId != null && !oldPublicId.isEmpty()) {
@@ -29,7 +29,10 @@ public class CloudinaryClient {
     
             HashMap<Object, Object> options = new HashMap<>();
             options.put("folder", folderName);
-            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadedFile = (Map<String, Object>) cloudinary
+                .uploader()
+                .upload(file.getBytes(), options);          
             return uploadedFile;
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,9 +40,10 @@ public class CloudinaryClient {
         }
     }
 
-    public Map deleteFile(String publicId) {
+    public Map<String, Object> deleteFile(String publicId) {
         try {
-            Map result = cloudinary.uploader().destroy(publicId, new HashMap<>());
+            @SuppressWarnings("unchecked")
+            Map<String, Object> result = (Map<String, Object>) cloudinary.uploader().destroy(publicId, new HashMap<>());
             return result;
         } catch (IOException e) {
             e.printStackTrace();

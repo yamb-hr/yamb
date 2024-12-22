@@ -30,7 +30,8 @@ public class WebSocketController {
     private final WebSocketService webSocketService;
 
     @Autowired
-    public WebSocketController(WebSocketService webSocketService, PlayerRepository playerRepo, PlayerModelAssembler playerModelAssembler) {
+    public WebSocketController(WebSocketService webSocketService, PlayerRepository playerRepo, 
+                               PlayerModelAssembler playerModelAssembler) {
         this.webSocketService = webSocketService;
         this.playerRepo = playerRepo;
         this.playerModelAssembler = playerModelAssembler;

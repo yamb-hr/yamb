@@ -16,12 +16,12 @@ import com.tejko.yamb.domain.models.PlayerWithToken;
 public class AuthModelAssembler implements RepresentationModelAssembler<PlayerWithToken, AuthResponse> {
 
     private final ModelMapper modelMapper;
-    private final PlayerModelAssembler playerModelAssembler;
+    private final PlayerDetailModelAssembler playerDetailModelAssembler;
 
     @Autowired
-    public AuthModelAssembler(ModelMapper modelMapper, PlayerModelAssembler playerModelAssembler) {
+    public AuthModelAssembler(ModelMapper modelMapper, PlayerDetailModelAssembler playerDetailModelAssembler) {
         this.modelMapper = modelMapper;
-        this.playerModelAssembler = playerModelAssembler;
+        this.playerDetailModelAssembler = playerDetailModelAssembler;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AuthModelAssembler implements RepresentationModelAssembler<PlayerWi
         authResponse.add(linkTo(methodOn(AuthController.class).sendPasswordResetEmail(null)).withRel("password-reset-token"));
         authResponse.add(linkTo(methodOn(AuthController.class).resetPassword(null, null)).withRel("password-token"));
         authResponse.add(linkTo(methodOn(AuthController.class).verifyEmail(null)).withRel("verify-email"));
-        authResponse.setPlayer(playerModelAssembler.toModel(playerWithToken.getPlayer()));
+        authResponse.setPlayer(playerDetailModelAssembler.toModel(playerWithToken.getPlayer()));
         
         return authResponse;
     }
