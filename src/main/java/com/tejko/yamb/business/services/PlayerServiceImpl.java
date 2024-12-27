@@ -186,7 +186,6 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId) {
         checkPermission(playerExternalId);
 
-        
         Player player = getByExternalId(playerExternalId);
         if (player.getPreferences() == null) {
             throw new ResourceNotFoundException("error.not_found.preferences");

@@ -10,6 +10,7 @@ import org.springframework.hateoas.server.core.Relation;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 
 @Relation(collectionRelation = "games")
 public class GameDetailResponse extends RepresentationModel<GameDetailResponse> {
@@ -28,6 +29,7 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
     private int[] latestDiceRolled;
     private ColumnType latestColumnFilled;
     private BoxType latestBoxFilled;
+    private GameType type;
 
     public GameDetailResponse() {}
     
@@ -141,6 +143,14 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
 
     public void setLatestBoxFilled(BoxType latestBoxFilled) {
         this.latestBoxFilled = latestBoxFilled;
+    }
+
+    public GameType getType() {
+        return type;
+    }
+
+    public void setType(GameType type) {
+        this.type = type;
     }
 
     public static class Dice {

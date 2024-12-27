@@ -7,6 +7,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 
 @Relation(collectionRelation = "games")
 public class GameResponse extends RepresentationModel<GameResponse> {
@@ -17,6 +18,7 @@ public class GameResponse extends RepresentationModel<GameResponse> {
     private GameStatus status;
     private PlayerResponse player;
     private int totalSum;
+    private GameType type;
 
     public GameResponse() {}
     
@@ -66,6 +68,14 @@ public class GameResponse extends RepresentationModel<GameResponse> {
 
     public void setPlayer(PlayerResponse player) {
         this.player = player;
+    }
+
+    public GameType getType() {
+        return type;
+    }
+
+    public void setType(GameType type) {
+        this.type = type;
     }
 
 }

@@ -66,14 +66,14 @@ public class NotificationController {
 	}
 
 	@GetMapping("/{externalId}")
-	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<NotificationResponse> getByExternalId(@PathVariable UUID externalId) {
 		NotificationResponse notificationResponse = notificationModelAssembler.toModel(notificationService.getByExternalId(externalId));
 		return ResponseEntity.ok(notificationResponse);
 	}
 
 	@DeleteMapping("/{externalId}")
-	@PreAuthorize("isAuthenticated() and (#externalId == principal.externalId or hasAuthority('ADMIN'))")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		notificationService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent().build();
