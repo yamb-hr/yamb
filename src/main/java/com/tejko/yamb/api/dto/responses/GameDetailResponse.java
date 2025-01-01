@@ -30,6 +30,7 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
     private ColumnType latestColumnFilled;
     private BoxType latestBoxFilled;
     private GameType type;
+    private float progress;
 
     public GameDetailResponse() {}
     
@@ -153,6 +154,14 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
         this.type = type;
     }
 
+    public float getProgress() {
+        return progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+    
     public static class Dice {
 
         private int index;
@@ -262,7 +271,7 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
         }
     
     }
-    
+
 }
 
 

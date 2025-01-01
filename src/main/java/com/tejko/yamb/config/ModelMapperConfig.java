@@ -126,7 +126,8 @@ public class ModelMapperConfig {
             .addMapping(Game::getUpdatedAt, GameResponse::setUpdatedAt)
             .addMapping(Game::getStatus, GameResponse::setStatus)
             .addMapping(Game::getTotalSum, GameResponse::setTotalSum)
-            .addMapping(Game::getType, GameResponse::setType);
+            .addMapping(Game::getType, GameResponse::setType)
+            .addMapping(Game::getProgress, GameResponse::setProgress);
 
         modelMapper.createTypeMap(Game.class, GameDetailResponse.class)
             .addMapping(Game::getExternalId, GameDetailResponse::setId)
@@ -142,7 +143,8 @@ public class ModelMapperConfig {
             .addMapping(Game::getPreviousRollCount, GameDetailResponse::setPreviousRollCount)
             .addMapping(Game::getLatestColumnFilled, GameDetailResponse::setLatestColumnFilled)
             .addMapping(Game::getLatestBoxFilled, GameDetailResponse::setLatestBoxFilled)
-            .addMapping(Game::getType, GameDetailResponse::setType);
+            .addMapping(Game::getType, GameDetailResponse::setType)
+            .addMapping(Game::getProgress, GameDetailResponse::setProgress);
 
         modelMapper.createTypeMap(Game.Sheet.class, GameDetailResponse.Sheet.class)
             .addMapping(Game.Sheet::getColumns, GameDetailResponse.Sheet::setColumns);

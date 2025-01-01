@@ -18,6 +18,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import com.tejko.yamb.api.controllers.GameController;
 import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
@@ -67,6 +68,7 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
                 PlayerResponse playerResponse = modelMapper.map(player, PlayerResponse.class);
                 response.setPlayer(playerResponse);
                 if (response.getPlayer() != null) response.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(response.getPlayer().getId())).withSelfRel());
+                response.add(linkTo(methodOn(GameController.class).getByExternalId(response.getId())).withSelfRel());
             }
 
             return response;

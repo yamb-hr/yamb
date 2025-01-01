@@ -174,6 +174,18 @@ public class Game {
     public boolean isAnnouncementRequired() {
         return rollCount == 1 && announcement == null && sheet.areAllNonAnnouncementColumnsCompleted();
     }
+
+    public float getProgress() {
+        int completedBoxes = 0;
+        for (Column column : sheet.getColumns()) {
+            for (Box box : column.getBoxes()) {
+                if (box.getValue() != null) {
+                    completedBoxes++;
+                }
+            }
+        }
+        return completedBoxes / 52.0f;
+    }
     
     public void roll(int[] diceToRoll) {
         validateRoll(diceToRoll);

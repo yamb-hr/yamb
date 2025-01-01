@@ -19,6 +19,7 @@ public class GameResponse extends RepresentationModel<GameResponse> {
     private PlayerResponse player;
     private int totalSum;
     private GameType type;
+    private float progress;
 
     public GameResponse() {}
     
@@ -78,6 +79,14 @@ public class GameResponse extends RepresentationModel<GameResponse> {
         this.type = type;
     }
 
+    public float getProgress() {
+        return progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+    
 }
 
 
