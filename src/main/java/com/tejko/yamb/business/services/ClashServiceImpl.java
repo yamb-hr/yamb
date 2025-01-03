@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.tejko.yamb.api.events.ClashUpdatedEvent;
 import com.tejko.yamb.business.interfaces.ClashService;
 import com.tejko.yamb.domain.enums.ClashStatus;
 import com.tejko.yamb.domain.enums.ClashType;
@@ -27,6 +28,7 @@ import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.NotificationRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.ApplicationContextProvider;
 
 @Service
 public class ClashServiceImpl implements ClashService {
@@ -119,6 +121,7 @@ public class ClashServiceImpl implements ClashService {
         clash.acceptInvitation(playerExternalId, game.getExternalId());
         clash.getPlayer(playerExternalId).setGameId(game.getExternalId());
         clashRepo.save(clash);
+        ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         return clash;
     }
 
@@ -126,8 +129,26 @@ public class ClashServiceImpl implements ClashService {
     public Clash declineInvitationByExternalId(UUID externalId, UUID playerExternalId) {
         Clash clash = getByExternalId(externalId);
         clash.declineInvitation(playerExternalId);
-        return clashRepo.save(clash);
+        clashRepo.save(clash);
+        ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
+        return clash;
     }
+
+    @Override
+    public Clash addPlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds) {
+        Clash clash = getByExternalId(externalId);
+        clash.addPlayers(playerExternalIds);
+        clashRepo.save(clash);
+        ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
+        return clash;    }
+
+    @Override
+    public Clash removePlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds) {
+        Clash clash = getByExternalId(externalId);
+        clash.removePlayers(playerExternalIds);
+        clashRepo.save(clash);
+        ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
+        return clash;    }
 
     @Override
     public void deleteByExternalId(UUID externalId) {

@@ -11,6 +11,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.tejko.yamb.api.events.ClashUpdatedEvent;
+import com.tejko.yamb.api.events.GameUpdatedEvent;
 import com.tejko.yamb.business.interfaces.GameService;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
@@ -21,6 +23,7 @@ import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.ApplicationContextProvider;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
 import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
@@ -65,6 +68,7 @@ public class GameServiceImpl implements GameService {
         }
         game.roll(diceToRoll);
         gameRepo.save(game);
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -77,6 +81,7 @@ public class GameServiceImpl implements GameService {
         }
         game.announce(boxType);
         gameRepo.save(game);
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -97,6 +102,7 @@ public class GameServiceImpl implements GameService {
         if (GameType.CLASH.equals(game.getType())) {
             advanceTurnByGameExternalId(externalId);
         }
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -105,6 +111,7 @@ public class GameServiceImpl implements GameService {
         checkPermission(game.getPlayerId());
         game.undoFill();
         gameRepo.save(game);
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -114,6 +121,7 @@ public class GameServiceImpl implements GameService {
         Game game = getByExternalId(externalId);
         game.complete();
         gameRepo.save(game);
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -123,6 +131,7 @@ public class GameServiceImpl implements GameService {
         checkPermission(game.getPlayerId());
         game.restart();
         gameRepo.save(game);
+        ApplicationContextProvider.publishEvent(new GameUpdatedEvent(game));
         return game;
     }
 
@@ -153,6 +162,7 @@ public class GameServiceImpl implements GameService {
                 clash.complete();
             }
             clashRepo.save(clash);
+            ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         }
     }
 

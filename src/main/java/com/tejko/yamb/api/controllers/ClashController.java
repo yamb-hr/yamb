@@ -29,11 +29,10 @@ import com.tejko.yamb.api.assemblers.ClashDetailModelAssembler;
 import com.tejko.yamb.api.assemblers.ClashModelAssembler;
 import com.tejko.yamb.api.dto.requests.ClashRequest;
 import com.tejko.yamb.api.dto.requests.PlayerIdRequest;
+import com.tejko.yamb.api.dto.requests.PlayerIdSetRequest;
 import com.tejko.yamb.api.dto.responses.ClashDetailResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.business.interfaces.ClashService;
-import com.tejko.yamb.business.interfaces.WebSocketService;
-import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.util.SortFieldTranslator;
 
@@ -47,17 +46,14 @@ public class ClashController {
 	private final ClashModelAssembler clashModelAssembler;
 	private final ClashDetailModelAssembler clashDetailModelAssembler;
 	private final SortFieldTranslator sortFieldTranslator;
-	private final WebSocketService webSocketService;
 
 	@Autowired
 	public ClashController(ClashService clashService, ClashModelAssembler clashModelAssembler, 
-						   ClashDetailModelAssembler clashDetailModelAssembler, SortFieldTranslator sortFieldTranslator, 
-						   WebSocketService webSocketService) {
+						   ClashDetailModelAssembler clashDetailModelAssembler, SortFieldTranslator sortFieldTranslator) {
 		this.clashService = clashService;
 		this.clashModelAssembler = clashModelAssembler;
 		this.clashDetailModelAssembler = clashDetailModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;
-		this.webSocketService = webSocketService;
 	}
 	
 	@GetMapping("/{externalId}")
@@ -90,7 +86,6 @@ public class ClashController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ClashDetailResponse> acceptInvitationByExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerIdRequest playerIdRequest) {
 		ClashDetailResponse clashDetailResponse = clashDetailModelAssembler.toModel(clashService.acceptInvitationByExternalId(externalId, playerIdRequest.getPlayerId()));
-		webSocketService.convertAndSend("/topic/clashes/" + clashDetailResponse.getId(), clashDetailResponse, MessageType.ACCEPT);
 		return ResponseEntity.ok(clashDetailResponse);
 	}
 
@@ -98,7 +93,6 @@ public class ClashController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<ClashDetailResponse> declineInvitationByExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerIdRequest playerIdRequest) {
 		ClashDetailResponse clashDetailResponse = clashDetailModelAssembler.toModel(clashService.declineInvitationByExternalId(externalId, playerIdRequest.getPlayerId()));
-		webSocketService.convertAndSend("/topic/clashes/" + clashDetailResponse.getId(), clashDetailResponse, MessageType.DECLINE);
 		return ResponseEntity.ok(clashDetailResponse);
 	}
 	
@@ -119,5 +113,20 @@ public class ClashController {
 			.location(linkTo(methodOn(ClashController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
+
+	@PutMapping("/{externalId}/players/add")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ClashDetailResponse> addPlayersByExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerIdSetRequest playerIdSetRequest) {
+		ClashDetailResponse clashDetailResponse = clashDetailModelAssembler.toModel(clashService.addPlayersByExternalId(externalId, playerIdSetRequest.getPlayerIds()));
+		return ResponseEntity.ok(clashDetailResponse);
+	}
+
+	@PutMapping("/{externalId}/players/remove")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ClashDetailResponse> removePlayersByExternalId(@PathVariable UUID externalId, @Valid @RequestBody PlayerIdSetRequest playerIdSetRequest) {
+		ClashDetailResponse clashDetailResponse = clashDetailModelAssembler.toModel(clashService.removePlayersByExternalId(externalId, playerIdSetRequest.getPlayerIds()));
+		return ResponseEntity.ok(clashDetailResponse);
+	}
+
 
 }

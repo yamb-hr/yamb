@@ -9,6 +9,7 @@ import org.springframework.hateoas.server.core.Relation;
 
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
+import com.tejko.yamb.domain.enums.GameAction;
 import com.tejko.yamb.domain.enums.GameStatus;
 import com.tejko.yamb.domain.enums.GameType;
 
@@ -31,6 +32,7 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
     private BoxType latestBoxFilled;
     private GameType type;
     private float progress;
+    private GameAction lastAction;
 
     public GameDetailResponse() {}
     
@@ -160,6 +162,10 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
 
     public void setProgress(float progress) {
         this.progress = progress;
+    }
+
+    public GameAction getLastAction() {
+        return lastAction;
     }
     
     public static class Dice {

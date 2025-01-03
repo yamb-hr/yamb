@@ -1,10 +1,10 @@
-package com.tejko.yamb.domain.events.handlers;
+package com.tejko.yamb.api.events.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.tejko.yamb.domain.events.PlayerEmailUpdatedEvent;
+import com.tejko.yamb.api.events.PlayerEmailUpdatedEvent;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.util.EmailManager;
 

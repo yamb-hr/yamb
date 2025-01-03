@@ -10,7 +10,7 @@ import com.tejko.yamb.domain.enums.ClashType;
 
 public class ClashRequest {
     
-    // @NotNull(message = "error.name_required")
+    @NotNull(message = "error.name_required")
     private String name;
 
     @NotNull(message = "error.player_ids_required")

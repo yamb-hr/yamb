@@ -102,6 +102,8 @@ public class ClashDetailModelAssembler implements RepresentationModelAssembler<C
         clashDetailResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashDetailResponse.getId())).withSelfRel());
         clashDetailResponse.add(linkTo(methodOn(ClashController.class).acceptInvitationByExternalId(clashDetailResponse.getId(), null)).withRel("accept"));
         clashDetailResponse.add(linkTo(methodOn(ClashController.class).declineInvitationByExternalId(clashDetailResponse.getId(), null)).withRel("decline"));
+        clashDetailResponse.add(linkTo(methodOn(ClashController.class).addPlayersByExternalId(clashDetailResponse.getId(), null)).withRel("add"));
+        clashDetailResponse.add(linkTo(methodOn(ClashController.class).removePlayersByExternalId(clashDetailResponse.getId(), null)).withRel("remove"));
     
         return clashDetailResponse;
     }

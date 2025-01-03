@@ -23,6 +23,10 @@ public interface ClashService {
     Clash acceptInvitationByExternalId(UUID externalId, UUID playerExternalId);
 
     Clash declineInvitationByExternalId(UUID externalId, UUID playerExternalId);
+    
+    Clash addPlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds);
+    
+    Clash removePlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds);
 
     void deleteByExternalId(UUID externalId);
     

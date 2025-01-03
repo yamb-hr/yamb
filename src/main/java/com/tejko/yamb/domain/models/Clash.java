@@ -145,23 +145,48 @@ public class Clash {
         return turn;
     }
 
-    public void addPlayer(UUID playerId) {
+    public void addPlayers(Set<UUID> playerIds) {
+        for (UUID playerId : playerIds) {
+            addPlayer(playerId);
+        }
+    }
+
+    public void removePlayers(Set<UUID> playerIds) {
+        for (UUID playerId : playerIds) {
+            removePlayer(playerId);
+        }
+    }
+
+    private void addPlayer(UUID playerId) {
+        validateAddPlayer(playerId);
+        players.add(new ClashPlayer(playerId, InvitationStatus.PENDING));
+        updatePlayerHash();
+    }
+
+    private void validateAddPlayer(UUID playerId) {
         if (status != ClashStatus.PENDING) {
             throw new IllegalStateException("Cannot add players after the clash has started.");
         }
         if (players.stream().anyMatch(player -> player.getId().equals(playerId))) {
             throw new IllegalArgumentException("Player already part of the clash.");
         }
-        players.add(new ClashPlayer(playerId, InvitationStatus.PENDING));
-        updatePlayerHash();
     }
 
-    public void removePlayer(UUID playerId) {
-        if (status != ClashStatus.PENDING) {
-            throw new IllegalStateException("Cannot remove players after the clash has started.");
-        }
+    private void removePlayer(UUID playerId) {
+        validateRemovePlayer();
         players.removeIf(player -> player.getId().equals(playerId));
         updatePlayerHash();
+        if (allInvitationsAccepted()) {
+            this.status = ClashStatus.IN_PROGRESS;
+        }
+    }
+
+    private void validateRemovePlayer() {
+        if (status != ClashStatus.PENDING) {
+            throw new IllegalStateException("Cannot remove players after the clash has started.");
+        } else if (players.size() == 2) {
+            throw new IllegalStateException("Cannot have a clash with just one player");
+        }
     }
 
     public void acceptInvitation(UUID playerId, UUID gameId) {

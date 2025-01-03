@@ -31,8 +31,6 @@ import com.tejko.yamb.api.dto.requests.GameRequest;
 import com.tejko.yamb.api.dto.responses.GameDetailResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.business.interfaces.GameService;
-import com.tejko.yamb.business.interfaces.WebSocketService;
-import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.util.SortFieldTranslator;
 
@@ -46,17 +44,14 @@ public class GameController {
 	private final GameModelAssembler gameModelAssembler;
 	private final GameDetailModelAssembler gameDetailModelAssembler;
 	private final SortFieldTranslator sortFieldTranslator;
-	private final WebSocketService webSocketService;
 
 	@Autowired
 	public GameController(GameService gameService, GameModelAssembler gameModelAssembler, 
-						  GameDetailModelAssembler gameDetailModelAssembler, SortFieldTranslator sortFieldTranslator, 
-						  WebSocketService webSocketService) {
+						  GameDetailModelAssembler gameDetailModelAssembler, SortFieldTranslator sortFieldTranslator) {
 		this.gameService = gameService;
 		this.gameModelAssembler = gameModelAssembler;
 		this.gameDetailModelAssembler = gameDetailModelAssembler;
 		this.sortFieldTranslator = sortFieldTranslator;
-		this.webSocketService = webSocketService;
 	}
 	
 	@GetMapping("/{externalId}")
@@ -94,7 +89,6 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameDetailResponse> rollByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameDetailResponse gameDetailResponse = gameDetailModelAssembler.toModel(gameService.rollByExternalId(externalId,actionRequest.getDiceToRoll()));
-		webSocketService.convertAndSend("/topic/games/" + gameDetailResponse.getId(), gameDetailResponse, MessageType.ROLL);
 		return ResponseEntity.ok(gameDetailResponse);
 	}
 
@@ -102,7 +96,6 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameDetailResponse> announceByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameDetailResponse gameDetailResponse = gameDetailModelAssembler.toModel(gameService.announceByExternalId(externalId,actionRequest.getBoxType()));
-		webSocketService.convertAndSend("/topic/games/" + gameDetailResponse.getId(), gameDetailResponse, MessageType.ANNOUNCE);
 		return ResponseEntity.ok(gameDetailResponse);
 	}
 
@@ -110,7 +103,6 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameDetailResponse> fillByExternalId(@PathVariable UUID externalId, @Valid @RequestBody ActionRequest actionRequest) {
 		GameDetailResponse gameDetailResponse = gameDetailModelAssembler.toModel(gameService.fillByExternalId(externalId,actionRequest.getColumnType(), actionRequest.getBoxType()));
-		webSocketService.convertAndSend("/topic/games/" + gameDetailResponse.getId(), gameDetailResponse, MessageType.FILL);
 		return ResponseEntity.ok(gameDetailResponse);
 	}
 
@@ -125,7 +117,6 @@ public class GameController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<GameDetailResponse> restartByExternalId(@PathVariable UUID externalId) {
 		GameDetailResponse gameDetailResponse = gameDetailModelAssembler.toModel(gameService.restartByExternalId(externalId));
-		webSocketService.convertAndSend("/topic/games/" + gameDetailResponse.getId(), gameDetailResponse, MessageType.RESTART);
 		return ResponseEntity.ok(gameDetailResponse);
 	}
 

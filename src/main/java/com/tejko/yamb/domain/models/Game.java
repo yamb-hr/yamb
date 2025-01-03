@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.tejko.yamb.domain.constants.GameConstants;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
+import com.tejko.yamb.domain.enums.GameAction;
 import com.tejko.yamb.domain.enums.GameStatus;
 import com.tejko.yamb.domain.enums.GameType;
 import com.tejko.yamb.domain.exceptions.AnnouncementAlreadyMadeException;
@@ -82,6 +83,9 @@ public class Game {
 
     @Field("latest_box_filled")
     private BoxType latestBoxFilled;
+
+    @Field("last_action")
+    private GameAction lastAction;
 
     protected Game() {}
 
@@ -204,6 +208,7 @@ public class Game {
         latestDiceRolled = diceToRoll;
         latestColumnFilled = null;
         latestBoxFilled = null;
+        lastAction = GameAction.ROLL;
     }
 
     public int[] getDiceValues() {
@@ -221,6 +226,7 @@ public class Game {
         announcement = null;
         latestColumnFilled = columnType;
         latestBoxFilled = boxType;
+        lastAction = GameAction.FILL;
     }
 
     public void undoFill() {
@@ -233,6 +239,11 @@ public class Game {
         latestBoxFilled = null;
         rollCount = previousRollCount;
         previousRollCount = 0;
+        if (announcement != null && previousRollCount == 1) {
+            lastAction = GameAction.ANNOUNCE;
+        } else {
+            lastAction = GameAction.ROLL;
+        }
     }
 
     private void validateUndoFill() {
@@ -248,6 +259,7 @@ public class Game {
     public void announce(BoxType boxType) {
         validateAnnouncement(boxType);
         announcement = boxType;
+        lastAction = GameAction.ANNOUNCE;
     }
 
     public void restart() {
@@ -256,6 +268,7 @@ public class Game {
         announcement = null;
         sheet = Sheet.getInstance();
         dices = generateDices();
+        lastAction = null;
     }
 
     public void archive() {

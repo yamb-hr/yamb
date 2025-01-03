@@ -6,10 +6,12 @@ public enum MessageType {
     ANNOUNCE,
     FILL,
     RESTART,
+    GAME,
     CLASH,
     PLAYERS,
     ACCEPT,
     DECLINE,
-    NOTIFICATION
+    NOTIFICATION,
+    UPDATE
 
 }

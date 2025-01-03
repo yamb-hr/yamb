@@ -2,7 +2,7 @@ package com.tejko.yamb.domain.listeners;
 
 import javax.persistence.PostUpdate;
 
-import com.tejko.yamb.domain.events.PlayerEmailUpdatedEvent;
+import com.tejko.yamb.api.events.PlayerEmailUpdatedEvent;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.util.ApplicationContextProvider;
 

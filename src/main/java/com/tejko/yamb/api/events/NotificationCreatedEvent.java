@@ -1,4 +1,4 @@
-package com.tejko.yamb.domain.events;
+package com.tejko.yamb.api.events;
 
 import com.tejko.yamb.domain.models.Notification;
 
