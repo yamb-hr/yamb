@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.tejko.yamb.api.controllers.ClashController;
 import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.dto.responses.ClashDetailResponse;
+import com.tejko.yamb.api.dto.responses.ImageResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
@@ -88,6 +89,7 @@ public class ClashDetailModelAssembler implements RepresentationModelAssembler<C
                     Player p = playerMap.get(clashPlayer.getId());
                     if (p != null) {
                         clashPlayerResponse.setName(p.getUsername());
+                        if (p.getAvatar() != null) clashPlayerResponse.setAvatar(modelMapper.map(p.getAvatar(), ImageResponse.class));
                         clashPlayerResponse.add(linkTo(methodOn(PlayerController.class)
                             .getByExternalId(clashPlayerResponse.getId()))
                             .withSelfRel());
