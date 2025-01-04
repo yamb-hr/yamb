@@ -1,7 +1,6 @@
 package com.tejko.yamb.business.services;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +22,6 @@ import com.tejko.yamb.domain.models.Clash;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
-import com.tejko.yamb.domain.models.Clash.ClashPlayer;
 import com.tejko.yamb.domain.repositories.ClashRepository;
 import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.NotificationRepository;
@@ -69,18 +67,12 @@ public class ClashServiceImpl implements ClashService {
         Clash clash = Clash.getInstance(name, ownerExternalId, playerExternalIds, type);
         clash.getPlayer(ownerExternalId).setGameId(game.getExternalId());
         clashRepo.save(clash);
-        List<Notification> notifications = generateClashNotifications(clash);
+        List<Notification> notifications = generateClashNotifications(clash, playerExternalIds);
         notificationRepo.saveAll(notifications);
         return clash;
     }
 
-    private List<Notification> generateClashNotifications(Clash clash) {
-        
-        Set<UUID> playerExternalIds = new HashSet<>();
-        for (ClashPlayer player : clash.getPlayers()) {
-            playerExternalIds.add(player.getId());
-        }
-
+    private List<Notification> generateClashNotifications(Clash clash, Set<UUID> playerExternalIds) {
         List<Player> players = playerRepo.findAllByExternalIdIn(playerExternalIds);
         List<Notification> notifications = new ArrayList<>();
         Player owner = playerRepo.findByExternalId(clash.getOwnerId()).get();
@@ -89,7 +81,6 @@ public class ClashServiceImpl implements ClashService {
                 notifications.add(Notification.getInstance(player, "You have been invited to join a clash by " + owner.getUsername(), "/clashes/" + clash.getExternalId(), NotificationType.CLASH_INVITATION));
             }
         }
-
         return notifications;
     }
 
@@ -141,6 +132,7 @@ public class ClashServiceImpl implements ClashService {
         checkPermission(clash.getOwnerId());
         clash.addPlayers(playerExternalIds);
         clashRepo.save(clash);
+        notificationRepo.saveAll(generateClashNotifications(clash, playerExternalIds));
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         return clash;    }
 
