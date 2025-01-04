@@ -114,6 +114,7 @@ public class ClashDetailResponse extends RepresentationModel<ClashDetailResponse
         private UUID gameId;
         private InvitationStatus status;
         private ImageResponse avatar;
+        private Integer score;
         
         public ClashPlayer() {}
 
@@ -155,6 +156,14 @@ public class ClashDetailResponse extends RepresentationModel<ClashDetailResponse
 
         public void setAvatar(ImageResponse avatar) {
             this.avatar = avatar;
+        }
+
+        public Integer getScore() {
+            return score;
+        }
+
+        public void setScore(Integer score) {
+            this.score = score;
         }
 
     }

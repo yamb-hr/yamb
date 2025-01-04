@@ -182,7 +182,8 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(ClashPlayer.class, ClashDetailResponse.ClashPlayer.class)
             .addMapping(ClashPlayer::getId, ClashDetailResponse.ClashPlayer::setId)
             .addMapping(ClashPlayer::getGameId, ClashDetailResponse.ClashPlayer::setGameId)
-            .addMapping(ClashPlayer::getStatus, ClashDetailResponse.ClashPlayer::setStatus);
+            .addMapping(ClashPlayer::getStatus, ClashDetailResponse.ClashPlayer::setStatus)
+            .addMapping(ClashPlayer::getScore, ClashDetailResponse.ClashPlayer::setScore);
 
         // stats
         modelMapper.createTypeMap(GlobalPlayerStats.class, GlobalPlayerStatsResponse.class)

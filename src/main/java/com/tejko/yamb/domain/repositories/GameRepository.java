@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,6 +14,8 @@ import com.tejko.yamb.domain.models.Game;
 public interface GameRepository extends MongoRepository<Game, String> {
     
     Optional<Game> findByExternalId(UUID externalId);
+
+    List<Game> findAllByExternalIdIn(Set<UUID> externalIds);
     
     Optional<Game> findByPlayerIdAndTypeAndStatusIn(UUID playerId, GameType type, List<GameStatus> statuses);
 

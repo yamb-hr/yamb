@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.tejko.yamb.api.events.ClashUpdatedEvent;
@@ -137,6 +138,7 @@ public class ClashServiceImpl implements ClashService {
     @Override
     public Clash addPlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds) {
         Clash clash = getByExternalId(externalId);
+        checkPermission(clash.getOwnerId());
         clash.addPlayers(playerExternalIds);
         clashRepo.save(clash);
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
@@ -145,6 +147,7 @@ public class ClashServiceImpl implements ClashService {
     @Override
     public Clash removePlayersByExternalId(UUID externalId, Set<UUID> playerExternalIds) {
         Clash clash = getByExternalId(externalId);
+        checkPermission(clash.getOwnerId());
         clash.removePlayers(playerExternalIds);
         clashRepo.save(clash);
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
@@ -153,12 +156,20 @@ public class ClashServiceImpl implements ClashService {
     @Override
     public void deleteByExternalId(UUID externalId) {
         Clash clash = getByExternalId(externalId);
+        checkPermission(clash.getOwnerId());
         clashRepo.delete(clash);
     }
 
     @Override
     public void deleteAll() {
         clashRepo.deleteAll();
+    }
+
+    private void checkPermission(UUID playerExternalId) {
+        Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();  
+        if (playerExternalId == null || authenticatedPlayer != null && !authenticatedPlayer.getExternalId().equals(playerExternalId)) {
+            throw new AccessDeniedException("error.access_denied");
+        }
     }
     
 }

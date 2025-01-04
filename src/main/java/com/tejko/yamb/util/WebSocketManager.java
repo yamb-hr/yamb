@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.domain.enums.MessageType;
 import com.tejko.yamb.domain.models.WebSocketMessage;
 
@@ -15,12 +13,10 @@ import com.tejko.yamb.domain.models.WebSocketMessage;
 public class WebSocketManager {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final ObjectMapper objectMapper;
 
     @Autowired
-    public WebSocketManager(SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper) {
+    public WebSocketManager(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
-        this.objectMapper = objectMapper;
     }
 
     public void send(String destination, WebSocketMessage message) {
@@ -32,12 +28,12 @@ public class WebSocketManager {
     }
 
     public void convertAndSend(String destination, Object content, MessageType type) {
-        WebSocketMessage message = WebSocketMessage.getInstance(generatePayload(content), type);
+        WebSocketMessage message = WebSocketMessage.getInstance(content, type);
         simpMessagingTemplate.convertAndSend(destination, message, message.getHeaders());
     }
 
     public void convertAndSendToUser(UUID playerExternalId, Object content, MessageType type) {
-        WebSocketMessage message = WebSocketMessage.getInstance(generatePayload(content), type);
+        WebSocketMessage message = WebSocketMessage.getInstance(content, type);
         simpMessagingTemplate.convertAndSendToUser(
             String.valueOf(playerExternalId),
             "/private",
@@ -46,16 +42,4 @@ public class WebSocketManager {
         );
     }
 
-    private byte[] generatePayload(Object content) {
-        if (content == null) {
-            System.err.println("Warning: Content is null in WebSocketMessage");
-            return new byte[0];
-        }    
-        try {
-            return objectMapper.writeValueAsBytes(content);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

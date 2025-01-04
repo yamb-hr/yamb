@@ -378,7 +378,7 @@ public class Game {
             roll(diceToRoll);
             fill(ColumnType.FREE, BoxType.values()[i]);
         }
-        for (int i = 0; i < BoxType.values().length; i++) {    
+        for (int i = 0; i < BoxType.values().length-2; i++) {    
             roll(diceToRoll);
             announce(BoxType.values()[i]);
             fill(ColumnType.ANNOUNCEMENT, BoxType.values()[i]);

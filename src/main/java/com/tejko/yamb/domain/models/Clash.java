@@ -141,6 +141,10 @@ public class Clash {
         return status;
     }
 
+    public void setStatus(ClashStatus status) {
+        this.status = status;
+    }
+
     public int getTurn() {
         return turn;
     }
@@ -223,10 +227,6 @@ public class Clash {
     public void advanceTurn() {
         turn = ++turn % players.size();
     }
-
-    public void complete() {
-        status = ClashStatus.COMPLETED;
-    }
     
     public static String generatePlayerHash(Set<UUID> playerIds) {
         List<UUID> sortedPlayers = new ArrayList<>(playerIds);
@@ -245,6 +245,7 @@ public class Clash {
         private UUID id;
         private UUID gameId;
         private InvitationStatus status;
+        private Integer score;
 
         protected ClashPlayer() {}
 
@@ -279,6 +280,14 @@ public class Clash {
 
         public void setStatus(InvitationStatus status) {
             this.status = status;
+        }
+
+        public Integer getScore() {
+            return score;
+        }
+
+        public void setScore(Integer score) {
+            this.score = score;
         }
 
     }

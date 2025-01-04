@@ -97,7 +97,7 @@ public class ClashController {
 	}
 	
 	@DeleteMapping("/{externalId}")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		clashService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent()

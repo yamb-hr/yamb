@@ -10,23 +10,23 @@ import org.springframework.messaging.MessageHeaders;
 
 import com.tejko.yamb.domain.enums.MessageType;
 
-public class WebSocketMessage implements Message<byte[]> {
+public class WebSocketMessage implements Message<Object> {
 
     private UUID senderId;
     private UUID receiverId;
-    private byte[] payload;
+    private Object payload;
     private MessageType type;
     private LocalDateTime timestamp; 
     private MessageHeaders headers;
 
-    protected WebSocketMessage(byte[] payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
+    protected WebSocketMessage(Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
         this.payload = payload;
         this.type = type;
         this.timestamp = timestamp;
         this.headers = headers;
     }
 
-    protected WebSocketMessage(UUID senderId, UUID receiverId, byte[] payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
+    protected WebSocketMessage(UUID senderId, UUID receiverId, Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.payload = payload;
@@ -35,13 +35,13 @@ public class WebSocketMessage implements Message<byte[]> {
         this.headers = headers;
     }
 
-    public static WebSocketMessage getInstance(UUID senderId, UUID receiverId, byte[] payload, MessageType type) {
+    public static WebSocketMessage getInstance(UUID senderId, UUID receiverId, Object payload, MessageType type) {
         LocalDateTime timestamp = LocalDateTime.now();
         MessageHeaders headers = generateHeaders(senderId, receiverId, type, timestamp);
         return new WebSocketMessage(senderId, receiverId, payload, type, timestamp, headers);
     }
 
-    public static WebSocketMessage getInstance(byte[] payload, MessageType type) {
+    public static WebSocketMessage getInstance(Object payload, MessageType type) {
         LocalDateTime timestamp = LocalDateTime.now();
         MessageHeaders headers = generateHeaders(null, null, type, timestamp);
         return new WebSocketMessage(payload, type, timestamp, headers);
@@ -85,7 +85,7 @@ public class WebSocketMessage implements Message<byte[]> {
     }
 
     @Override
-    public byte[] getPayload() {
+    public Object getPayload() {
         return payload;
     }
 
