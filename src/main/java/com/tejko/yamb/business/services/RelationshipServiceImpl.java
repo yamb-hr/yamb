@@ -113,7 +113,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void declineByExternalId(UUID externalId) {
         validateDeclineRelationship(externalId);
-        relationshipRepo.deleteByExternalId(externalId);
+        PlayerRelationship relationship = getByExternalId(externalId);
+        relationshipRepo.delete(relationship);
     }
 
     private void validateDeclineRelationship(UUID externalId) {
@@ -131,7 +132,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void deleteByExternalId(UUID externalId) {
         validateDeleteRelationship(externalId);
-        relationshipRepo.deleteByExternalId(externalId);
+        PlayerRelationship relationship = getByExternalId(externalId);
+        relationshipRepo.delete(relationship);
     }
 
     private void validateDeleteRelationship(UUID externalId) {

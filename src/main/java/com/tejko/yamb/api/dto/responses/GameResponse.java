@@ -1,29 +1,25 @@
 package com.tejko.yamb.api.dto.responses;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
-import com.tejko.yamb.domain.enums.BoxType;
-import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 
 @Relation(collectionRelation = "games")
 public class GameResponse extends RepresentationModel<GameResponse> {
- 
+
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Sheet sheet;
-    private List<Dice> dices;
-    private int rollCount;
-    private BoxType announcement;
     private GameStatus status;
     private PlayerResponse player;
     private int totalSum;
+    private GameType type;
+    private float progress;
 
     public GameResponse() {}
     
@@ -51,38 +47,6 @@ public class GameResponse extends RepresentationModel<GameResponse> {
         this.updatedAt = updatedAt;
     }
 
-    public Sheet getSheet() {
-        return sheet;
-    }
-
-    public void setSheet(Sheet sheet) {
-        this.sheet = sheet;
-    }
-
-    public List<Dice> getDices() {
-        return dices;
-    }
-
-    public void setDices(List<Dice> dices) {
-        this.dices = dices;
-    }
-
-    public int getRollCount() {
-        return rollCount;
-    }
-
-    public void setRollCount(int rollCount) {
-        this.rollCount = rollCount;
-    }
-
-    public BoxType getAnnouncement() {
-        return announcement;
-    }
-
-    public void setAnnouncement(BoxType announcement) {
-        this.announcement = announcement;
-    }
-
     public GameStatus getStatus() {
         return status;
     }
@@ -107,114 +71,20 @@ public class GameResponse extends RepresentationModel<GameResponse> {
         this.player = player;
     }
 
-    public static class Dice {
-
-        private int index;
-        private int value;
-
-        public Dice() {}
-
-        public Dice(int index, int value) {
-            this.index = index;
-            this.value = value;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
-    
+    public GameType getType() {
+        return type;
     }
 
-    public static class Sheet {
-
-        private List<Column> columns;
-
-        public Sheet() {}
-
-        public Sheet(List<Column> columns) {
-            this.columns = columns;
-        }
-
-        public List<Column> getColumns() {
-            return columns;
-        }
-
-        public void setColumns(List<Column> columns) {
-            this.columns = columns;
-        }
-
+    public void setType(GameType type) {
+        this.type = type;
     }
 
-    public static class Column {
-
-        private ColumnType type;
-        private List<Box> boxes;
-
-        public Column() {}
-
-        public Column(ColumnType type, List<Box> boxes) {
-            this.type = type;
-            this.boxes = boxes;
-        }
-
-        public ColumnType getType() {
-            return type;
-        }
-
-        public void setType(ColumnType type) {
-            this.type = type;
-        }
-
-        public List<Box> getBoxes() {
-            return boxes;
-        }
-
-        public void setBoxes(List<Box> boxes) {
-            this.boxes = boxes;
-        }
-
+    public float getProgress() {
+        return progress;
     }
 
-    public static class Box {
-
-        private BoxType type;
-        private Integer value;
-
-        public Box() {}
-
-        public Box(BoxType type, Integer value) {
-            this.type = type;
-            this.value = value;
-        }
-
-        public BoxType getType() {
-            return type;
-        }
-
-        public void setType(BoxType type) {
-            this.type = type;
-        }
-
-        public Integer getValue() {
-            return value;
-        }
-
-        public void setValue(Integer value) {
-            this.value = value;
-        }
-    
+    public void setProgress(float progress) {
+        this.progress = progress;
     }
     
 }

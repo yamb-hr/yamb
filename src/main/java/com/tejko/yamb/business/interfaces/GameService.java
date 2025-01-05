@@ -11,24 +11,28 @@ import org.springframework.data.domain.Pageable;
 
 public interface GameService {
 
-    public Game getByExternalId(UUID externalId);
+    Game getByExternalId(UUID externalId);
 
-    public Page<Game> getAll(Pageable pageable);
+    Page<Game> getAll(Pageable pageable);
 
-    public Game getOrCreate(UUID playerExternalId);
+    Game getOrCreate(UUID playerExternalId);
 
-    public Game rollByExternalId(UUID externalId, int[] diceToRoll);
+    Game rollByExternalId(UUID externalId, int[] diceToRoll);
 
-    public Game announceByExternalId(UUID externalId, BoxType boxType);
+    Game announceByExternalId(UUID externalId, BoxType boxType);
 
-    public Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType);
+    Game fillByExternalId(UUID externalId, ColumnType columnType, BoxType boxType);
 
-    public Game restartByExternalId(UUID externalId);
+    Game undoFillByExternalId(UUID externalId);
 
-    public Game completeByExternalId(UUID externalId);
+    Game restartByExternalId(UUID externalId);
 
-    public Game archiveByExternalId(UUID externalId);
+    Game completeByExternalId(UUID externalId);
 
-    public void deleteByExternalId(UUID externalId);
+    Game archiveByExternalId(UUID externalId);
+
+    void deleteByExternalId(UUID externalId);
+
+    void deleteAll();
 
 }

@@ -3,9 +3,16 @@ package com.tejko.yamb.api.assemblers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -15,46 +22,123 @@ import com.tejko.yamb.api.controllers.ClashController;
 import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
+import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
-
-import java.util.List;
+import com.tejko.yamb.domain.models.Player;
 
 @Component
 public class ClashModelAssembler implements RepresentationModelAssembler<Clash, ClashResponse> {
 
     private final ModelMapper modelMapper;
+    private final PlayerService playerService;
 
-    public ClashModelAssembler(ModelMapper modelMapper) {
+    @Autowired
+    public ClashModelAssembler(ModelMapper modelMapper, PlayerService playerService) {
         this.modelMapper = modelMapper;
+        this.playerService = playerService;
     }
 
     @Override
     public ClashResponse toModel(Clash clash) {
-        
+        Set<UUID> allPlayerIds = new HashSet<>();
+        if (clash.getOwnerId() != null) {
+            allPlayerIds.add(clash.getOwnerId());
+        }
+        if (clash.getWinnerId() != null) {
+            allPlayerIds.add(clash.getWinnerId());
+        }
+
+        Map<UUID, Player> playerMap = playerService.findAllByExternalIds(allPlayerIds).stream()
+            .collect(Collectors.toMap(Player::getExternalId, Function.identity()));
+
         ClashResponse clashResponse = modelMapper.map(clash, ClashResponse.class);
-        clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
-        if (clashResponse.getOwner() != null) clashResponse.getOwner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getOwner().getId())).withSelfRel());
-        if (clashResponse.getWinner() != null) clashResponse.getWinner().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getWinner().getId())).withSelfRel());
-        if (clashResponse.getCurrentPlayer() != null) clashResponse.getCurrentPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(clashResponse.getCurrentPlayer().getId())).withSelfRel());
-        if (clashResponse.getPlayers() != null) {
-            for (PlayerResponse playerResponse : clashResponse.getPlayers()) {
-                playerResponse.add(linkTo(methodOn(PlayerController.class).getByExternalId(playerResponse.getId())).withSelfRel());
+
+        if (clash.getOwnerId() != null) {
+            Player owner = playerMap.get(clash.getOwnerId());
+            if (owner != null) {
+                PlayerResponse ownerResponse = modelMapper.map(owner, PlayerResponse.class);
+                ownerResponse.add(linkTo(methodOn(PlayerController.class)
+                        .getByExternalId(ownerResponse.getId()))
+                        .withSelfRel());
+                clashResponse.setOwner(ownerResponse);
             }
         }
+
+        if (clash.getWinnerId() != null) {
+            Player winner = playerMap.get(clash.getWinnerId());
+            if (winner != null) {
+                PlayerResponse winnerResponse = modelMapper.map(winner, PlayerResponse.class);
+                winnerResponse.add(linkTo(methodOn(PlayerController.class)
+                        .getByExternalId(winnerResponse.getId()))
+                        .withSelfRel());
+                clashResponse.setWinner(winnerResponse);
+            }
+        }
+
+        clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
+        clashResponse.add(linkTo(methodOn(ClashController.class).acceptInvitationByExternalId(clashResponse.getId(), null)).withRel("accept"));
+        clashResponse.add(linkTo(methodOn(ClashController.class).declineInvitationByExternalId(clashResponse.getId(), null)).withRel("decline"));
 
         return clashResponse;
     }
 
     public PagedModel<ClashResponse> toPagedModel(Page<Clash> clashes) {
 
+        Set<UUID> allPlayerIds = new HashSet<>();
+        for (Clash clash : clashes) {
+            if (clash.getOwnerId() != null) {
+                allPlayerIds.add(clash.getOwnerId());
+            }
+            if (clash.getWinnerId() != null) {
+                allPlayerIds.add(clash.getWinnerId());
+            }
+        }
+
+        Map<UUID, Player> playerMap = playerService.findAllByExternalIds(allPlayerIds).stream()
+            .collect(Collectors.toMap(Player::getExternalId, Function.identity()));
+
         List<ClashResponse> clashResponses = clashes.stream()
-            .map(this::toModel)
+            .map(clash -> {
+                ClashResponse clashResponse = modelMapper.map(clash, ClashResponse.class);
+
+                if (clash.getOwnerId() != null) {
+                    Player owner = playerMap.get(clash.getOwnerId());
+                    if (owner != null) {
+                        PlayerResponse ownerResponse = modelMapper.map(owner, PlayerResponse.class);
+                        ownerResponse.add(linkTo(methodOn(PlayerController.class)
+                                .getByExternalId(ownerResponse.getId()))
+                                .withSelfRel());
+                        clashResponse.setOwner(ownerResponse);
+                    }
+                }
+
+                if (clash.getWinnerId() != null) {
+                    Player winner = playerMap.get(clash.getWinnerId());
+                    if (winner != null) {
+                        PlayerResponse winnerResponse = modelMapper.map(winner, PlayerResponse.class);
+                        winnerResponse.add(linkTo(methodOn(PlayerController.class)
+                                .getByExternalId(winnerResponse.getId()))
+                                .withSelfRel());
+                        clashResponse.setWinner(winnerResponse);
+                    }
+                }
+
+                clashResponse.add(linkTo(methodOn(ClashController.class).getByExternalId(clashResponse.getId())).withSelfRel());
+                clashResponse.add(linkTo(methodOn(ClashController.class).acceptInvitationByExternalId(clashResponse.getId(), null)).withRel("accept"));
+                clashResponse.add(linkTo(methodOn(ClashController.class).declineInvitationByExternalId(clashResponse.getId(), null)).withRel("decline"));
+
+                return clashResponse;
+            })
             .collect(Collectors.toList());
 
-        PagedModel<ClashResponse> pagedClashs = PagedModel.of(clashResponses, new PagedModel.PageMetadata(
-            clashes.getSize(), clashes.getNumber(), clashes.getTotalElements(), clashes.getTotalPages()
-        ));
-
-        return pagedClashs;
+        return PagedModel.of(
+            clashResponses,
+            new PagedModel.PageMetadata(
+                clashes.getSize(),
+                clashes.getNumber(),
+                clashes.getTotalElements(),
+                clashes.getTotalPages()
+            )
+        );
     }
 }

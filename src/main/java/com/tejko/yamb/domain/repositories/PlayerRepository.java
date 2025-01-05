@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -15,9 +16,19 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     Optional<Player> findByExternalId(UUID externalId);
 
+    List<Player> findAllByExternalIdIn(Set<UUID> externalIds);
+
+    Page<Player> findAllByExternalIdIn(Set<UUID> externalIds, Pageable pageable);
+
     Optional<Player> findByUsername(String username);
 
-    boolean existsByUsername(String username);
+    Optional<Player> findByEmail(String email);
+
+    Optional<Player> findByEmailVerificationToken(String token);
+
+    boolean existsByUsernameIgnoreCase(String username);
+
+    boolean existsByEmailIgnoreCaseAndEmailVerified(String email, boolean emailVerified);
     
     Optional<Player> findTop1ByOrderByCreatedAtDesc();
 
@@ -31,6 +42,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     
     List<Player> findAllByOrderByCreatedAtDesc();
 
-    List<Player> findAllByExternalIdIn(List<UUID> externalIds);
+    List<Player> findAllByExternalIdInOrderByUpdatedAtDesc(List<UUID> externalIds);
 
 }

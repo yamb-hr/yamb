@@ -2,51 +2,74 @@ package com.tejko.yamb.business.interfaces;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 
 public interface PlayerService extends UserDetailsService {
 
-    public Optional<Player> findByExternalId(UUID externalId);
+    Optional<Player> findByExternalId(UUID externalId);
 
-    public Player getByExternalId(UUID externalId);
+    Player getByExternalId(UUID externalId);
 
-    public Player getCurrentPlayer();
+    void deleteByExternalId(UUID externalId);
 
-    public Page<Player> getAll(Pageable pageable);
+    Player getCurrentPlayer();
+
+    Page<Player> getAll(Pageable pageable);
+
+    Page<Player> getAllActive(Pageable pageable);
     
-    public List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
+    List<Score> getScoresByPlayerExternalId(UUID playerExternalId);
 
-    public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId);
+    List<Game> getGamesByPlayerExternalId(UUID playerExternalId);
 
-    public List<Log> getLogsByPlayerExternalId(UUID playerExternalId);
+    List<Clash> getClashesByPlayerExternalId(UUID playerExternalId);
 
-    public PlayerStats getPlayerStatsByExternalId(UUID externalId);
+    List<Log> getLogsByPlayerExternalId(UUID playerExternalId);
 
-    public GlobalPlayerStats getGlobalStats();
+    List<Ticket> getTicketsByPlayerExternalId(UUID playerExternalId);
 
-    public PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId);
+    PlayerStats getPlayerStatsByExternalId(UUID externalId);
+
+    GlobalPlayerStats getGlobalStats();
+
+    PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId);
     
-    public PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences);
+    PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences);
 
-    public Player changeUsernameByExternalId(UUID playerExternalId, String username);
+    Player updateUsernameByExternalId(UUID playerExternalId, String username);
 
-    public void deleteInactivePlayers();
+    Player updateEmailByExternalId(UUID playerExternalId, String username);
 
-    public List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
+    void deleteInactivePlayers();
 
-    public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
-    
+    List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
+
+    void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
+
+    Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar);
+
+    List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId);
+
+    void deleteNotificationsByPlayerExternalId(UUID playerExternalId);
+
+    List<Player> findAllByExternalIds(Set<UUID> playerExternalIds);
+
 }

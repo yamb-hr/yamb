@@ -39,7 +39,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (isProtectedEndpoint(request.getRequestURI())) {
-            System.out.println(request.getRequestURI());
+            System.out.println(request.getMethod() + " " + request.getRequestURI());
             String authToken = parseToken(request);
             if (authToken != null && jwtUtil.validateToken(authToken)) {
                 UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
@@ -60,7 +60,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String tokenUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
         String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
-        return !requestURI.equals(tokenUri) && !requestURI.equals(registerGuestUri) && !requestURI.equals(registerUri);
+        String passwordResetUri = linkTo(methodOn(AuthController.class).sendPasswordResetEmail(null)).toUri().getPath();
+        
+        if (!requestURI.startsWith("/api")) {
+            return false;
+        }
+    
+        return !requestURI.equals(tokenUri) && 
+                !requestURI.equals(registerGuestUri) && 
+                !requestURI.equals(registerUri) &&
+                !requestURI.equals(passwordResetUri);
     }
 
     private String parseToken(HttpServletRequest request) {

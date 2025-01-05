@@ -8,43 +8,51 @@ import java.util.UUID;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tejko.yamb.domain.enums.MessageType;
 
-public class WebSocketMessage implements Message<byte[]> {
+public class WebSocketMessage implements Message<Object> {
 
-    private ObjectMapper objectMapper;
     private UUID senderId;
     private UUID receiverId;
-    private Object content;
+    private Object payload;
     private MessageType type;
-    private final LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp; 
     private MessageHeaders headers;
 
-    public WebSocketMessage(ObjectMapper objectMapper, MessageType type, Object content) {
-        this.objectMapper = objectMapper;
+    protected WebSocketMessage(Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
+        this.payload = payload;
         this.type = type;
-        this.content = content;
-        this.headers = createHeaders();
+        this.timestamp = timestamp;
+        this.headers = headers;
     }
 
-    public WebSocketMessage(ObjectMapper objectMapper, UUID senderId, UUID receiverId, MessageType type, Object content) {
-        this.objectMapper = objectMapper;
+    protected WebSocketMessage(UUID senderId, UUID receiverId, Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
         this.senderId = senderId;
         this.receiverId = receiverId;
-        this.content = content;
+        this.payload = payload;
         this.type = type;
-        this.headers = createHeaders();
+        this.timestamp = timestamp;
+        this.headers = headers;
     }
 
-    private MessageHeaders createHeaders() {
+    public static WebSocketMessage getInstance(UUID senderId, UUID receiverId, Object payload, MessageType type) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        MessageHeaders headers = generateHeaders(senderId, receiverId, type, timestamp);
+        return new WebSocketMessage(senderId, receiverId, payload, type, timestamp, headers);
+    }
+
+    public static WebSocketMessage getInstance(Object payload, MessageType type) {
+        LocalDateTime timestamp = LocalDateTime.now();
+        MessageHeaders headers = generateHeaders(null, null, type, timestamp);
+        return new WebSocketMessage(payload, type, timestamp, headers);
+    }
+
+    private static MessageHeaders generateHeaders(UUID senderId, UUID receiverId, MessageType type, LocalDateTime timestamp) {
         Map<String, Object> headerMap = new HashMap<>();
-        headerMap.put("senderId", senderId);
-        headerMap.put("receiverId", receiverId);
+        if (senderId != null) headerMap.put("senderId", senderId);
+        if (receiverId != null) headerMap.put("receiverId", receiverId);
         headerMap.put("messageType", type);
         headerMap.put("timestamp", timestamp);
-
         return new MessageHeaders(headerMap);
     }
 
@@ -64,14 +72,6 @@ public class WebSocketMessage implements Message<byte[]> {
         this.receiverId = receiverId;
     }
 
-    public Object getContent() {
-        return content;
-    }
-
-    public void setContent(Object content) {
-        this.content = content;
-    }
-
     public MessageType getType() {
         return type;
     }
@@ -85,17 +85,8 @@ public class WebSocketMessage implements Message<byte[]> {
     }
 
     @Override
-    public byte[] getPayload() {
-        if (content == null) {
-            System.err.println("Warning: Content is null in WebSocketMessage");
-            return new byte[0];
-        }    
-        try {
-            return objectMapper.writeValueAsBytes(content);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Object getPayload() {
+        return payload;
     }
 
     @Override

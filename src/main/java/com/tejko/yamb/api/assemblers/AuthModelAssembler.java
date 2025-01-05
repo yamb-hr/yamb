@@ -9,7 +9,6 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import com.tejko.yamb.api.controllers.AuthController;
-import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.domain.models.PlayerWithToken;
 
@@ -17,24 +16,22 @@ import com.tejko.yamb.domain.models.PlayerWithToken;
 public class AuthModelAssembler implements RepresentationModelAssembler<PlayerWithToken, AuthResponse> {
 
     private final ModelMapper modelMapper;
+    private final PlayerDetailModelAssembler playerDetailModelAssembler;
 
     @Autowired
-    public AuthModelAssembler(ModelMapper modelMapper) {
+    public AuthModelAssembler(ModelMapper modelMapper, PlayerDetailModelAssembler playerDetailModelAssembler) {
         this.modelMapper = modelMapper;
+        this.playerDetailModelAssembler = playerDetailModelAssembler;
     }
 
     @Override
     public AuthResponse toModel(PlayerWithToken playerWithToken) {
 
         AuthResponse authResponse = modelMapper.map(playerWithToken, AuthResponse.class);
-        authResponse.add(linkTo(methodOn(AuthController.class).resetPassword(null)).withRel("reset-password"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(authResponse.getPlayer().getId())).withSelfRel());
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getScoresByPlayerExternalId(authResponse.getPlayer().getId())).withRel("scores"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getClashesByPlayerExternalId(authResponse.getPlayer().getId())).withRel("clashes"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getLogsByPlayerExternalId(authResponse.getPlayer().getId())).withRel("logs"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getPreferencesByPlayerExternalId(authResponse.getPlayer().getId())).withRel("preferences"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).changeUsernameByExternalId(authResponse.getPlayer().getId(), null)).withRel("username"));
-        authResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getPlayerStatsByExternalId(authResponse.getPlayer().getId())).withRel("stats"));
+        authResponse.add(linkTo(methodOn(AuthController.class).sendPasswordResetEmail(null)).withRel("password-reset-token"));
+        authResponse.add(linkTo(methodOn(AuthController.class).resetPassword(null, null)).withRel("password-token"));
+        authResponse.add(linkTo(methodOn(AuthController.class).verifyEmail(null)).withRel("verify-email"));
+        authResponse.setPlayer(playerDetailModelAssembler.toModel(playerWithToken.getPlayer()));
         
         return authResponse;
     }

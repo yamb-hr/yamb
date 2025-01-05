@@ -1,6 +1,7 @@
 package com.tejko.yamb.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -18,12 +19,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
-import com.tejko.yamb.business.interfaces.RecaptchaService;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.security.AuthEntryPoint;
 import com.tejko.yamb.security.AuthTokenFilter;
 import com.tejko.yamb.security.RecaptchaFilter;
 import com.tejko.yamb.util.JwtUtil;
+import com.tejko.yamb.util.RecaptchaClient;
 
 @Configuration
 @EnableWebSecurity
@@ -34,15 +35,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final AuthEntryPoint unauthorizedHandler;
 	private final JwtUtil jwtUtil;
 	private final PlayerRepository playerRepository;
-	private final RecaptchaService recaptchaService;
+	private final RecaptchaClient recaptchaClient;
 
 	@Autowired
-	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaService recaptchaService) {
+	public WebSecurityConfig(PlayerService playerService, AuthEntryPoint unauthorizedHandler, JwtUtil jwtUtil, PlayerRepository playerRepository, RecaptchaClient recaptchaClient) {
 		this.playerService = playerService;
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.jwtUtil = jwtUtil;
 		this.playerRepository = playerRepository;
-		this.recaptchaService = recaptchaService;
+		this.recaptchaClient = recaptchaClient;
 	}
 
 	@Bean
@@ -52,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public RecaptchaFilter recaptchaFilter() {
-		return new RecaptchaFilter(recaptchaService);
+		return new RecaptchaFilter(recaptchaClient);
 	}
 
 	@Override
@@ -76,23 +77,47 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/**").permitAll()
-			.antMatchers("/**").permitAll();
+			.authorizeRequests()
+				.antMatchers("/**").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.anyRequest().permitAll();
+		
 		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.addFilterBefore(recaptchaFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
+	@Value("${spring.profiles.active:default}")
+	private String activeProfile;
+
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
+		
 		return new WebMvcConfigurer() {
+			
+			private final String[] DEV_ORIGINS = {
+				"http://localhost:3000",
+			};
+
+			private final String[] PROD_ORIGINS = {
+				"https://jamb.com.hr"
+			};
+
+			private final String[] ALLOWED_METHODS = {
+				"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+			};
+
 			@Override
 			public void addCorsMappings(@NonNull CorsRegistry registry) {
+				String[] allowedOrigins = "dev".equalsIgnoreCase(activeProfile) ? DEV_ORIGINS : PROD_ORIGINS;
+
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:3000", "https://jamb.com.hr")
-					.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+					.allowedOrigins(allowedOrigins)
+					.allowedMethods(ALLOWED_METHODS)
 					.allowCredentials(true);
 			}
+			
 		};
 	}
+
 
 }

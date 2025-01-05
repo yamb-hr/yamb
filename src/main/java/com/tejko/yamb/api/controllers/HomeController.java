@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class HomeController {
     private final ResponseTimeAspect responseTimeAspect;
     private final GlobalExceptionHandler globalExceptionHandler;
     
-    @Value("${RECAPTCHA_SECRET_KEY}")
+    @Value("${recaptcha.secret.key}")
     private String recaptchaSecretKey;
 
     @Value("${recaptcha.api.url}")
@@ -47,8 +48,9 @@ public class HomeController {
     private String appVersion;
 
     @Autowired
-    public HomeController(Environment environment, JdbcTemplate jdbcTemplate, MongoTemplate mongoTemplate, RestTemplate restTemplate, 
-                            ResponseTimeAspect responseTimeAspect, GlobalExceptionHandler globalExceptionHandler) {
+    public HomeController(Environment environment, JdbcTemplate jdbcTemplate, 
+                          MongoTemplate mongoTemplate, RestTemplate restTemplate, 
+                          ResponseTimeAspect responseTimeAspect, GlobalExceptionHandler globalExceptionHandler) {
         this.environment = environment;
         this.jdbcTemplate = jdbcTemplate;
         this.mongoTemplate = mongoTemplate;
@@ -72,9 +74,9 @@ public class HomeController {
         rootResource.add(linkTo(methodOn(AuthController.class).register(null)).withRel("register"));
         rootResource.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
         rootResource.add(linkTo(methodOn(GameController.class).getOrCreate(null)).withRel("get-or-create-game"));
-        rootResource.add(linkTo(methodOn(GameController.class).getAll(null)).withRel("games"));
-        rootResource.add(linkTo(methodOn(PlayerController.class).getAll(null)).withRel("players"));
-        rootResource.add(linkTo(methodOn(ScoreController.class).getAll(null)).withRel("scores"));
+        rootResource.add(linkTo(methodOn(GameController.class).getAll(Pageable.unpaged())).withRel("games"));
+        rootResource.add(linkTo(methodOn(PlayerController.class).getAll(Pageable.unpaged())).withRel("players"));
+        rootResource.add(linkTo(methodOn(ScoreController.class).getAll(Pageable.unpaged())).withRel("scores"));
 
         return ResponseEntity.ok(rootResource);
     }

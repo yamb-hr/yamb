@@ -32,9 +32,12 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
         String authToken = parseToken(request);
         if (authToken != null && jwtUtil.validateToken(authToken)) {
             UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
-            return playerRepo.findByExternalId(playerExternalId).orElse(null);
+            Principal principal = playerRepo.findByExternalId(playerExternalId)
+                                            .map(player -> (Principal) player)
+                                            .orElseThrow(() -> new HandshakeFailureException("Player not found"));
+            return principal;
         }
-        throw new HandshakeFailureException("error.handshake_failed");
+        throw new HandshakeFailureException("Invalid or missing token");
     }
 
     private String parseToken(ServerHttpRequest request) {
@@ -50,4 +53,5 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
         }
         return null;
     }
+    
 }

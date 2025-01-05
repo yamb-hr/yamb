@@ -14,6 +14,6 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 
     List<Log> findAllByOrderByCreatedAtDesc();
 
-    List<Log> findAllByPlayerId(Long playerId);
+    List<Log> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
     
 }

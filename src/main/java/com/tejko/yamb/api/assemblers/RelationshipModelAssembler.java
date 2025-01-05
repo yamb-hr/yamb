@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import com.tejko.yamb.api.controllers.PlayerController;
 import com.tejko.yamb.api.controllers.RelationshipController;
 import com.tejko.yamb.api.dto.responses.RelationshipResponse;
 import com.tejko.yamb.domain.models.PlayerRelationship;
@@ -21,6 +23,7 @@ public class RelationshipModelAssembler implements RepresentationModelAssembler<
 
     private final ModelMapper modelMapper;
 
+    @Autowired
     public RelationshipModelAssembler(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
@@ -31,6 +34,8 @@ public class RelationshipModelAssembler implements RepresentationModelAssembler<
 		relationshipResponse.add(linkTo(methodOn(RelationshipController.class).getByExternalId(relationshipResponse.getId())).withSelfRel());
 		relationshipResponse.add(linkTo(methodOn(RelationshipController.class).acceptByExternalId(relationshipResponse.getId())).withRel("accept"));
 		relationshipResponse.add(linkTo(methodOn(RelationshipController.class).declineByExternalId(relationshipResponse.getId())).withRel("decline"));
+        if (relationshipResponse.getPlayer() != null) relationshipResponse.getPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(relationshipResponse.getPlayer().getId())).withSelfRel());
+        if (relationshipResponse.getRelatedPlayer() != null) relationshipResponse.getRelatedPlayer().add(linkTo(methodOn(PlayerController.class).getByExternalId(relationshipResponse.getPlayer().getId())).withSelfRel());
 
         return relationshipResponse;
     }

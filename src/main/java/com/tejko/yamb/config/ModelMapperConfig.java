@@ -1,97 +1,97 @@
 package com.tejko.yamb.config;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.responses.AuthResponse;
+import com.tejko.yamb.api.dto.responses.ClashDetailResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
+import com.tejko.yamb.api.dto.responses.GameDetailResponse;
 import com.tejko.yamb.api.dto.responses.GameResponse;
 import com.tejko.yamb.api.dto.responses.GlobalPlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.GlobalScoreStatsResponse;
+import com.tejko.yamb.api.dto.responses.ImageResponse;
+import com.tejko.yamb.api.dto.responses.LogDetailResponse;
 import com.tejko.yamb.api.dto.responses.LogResponse;
+import com.tejko.yamb.api.dto.responses.NotificationResponse;
+import com.tejko.yamb.api.dto.responses.PlayerDetailResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
-import com.tejko.yamb.business.interfaces.PlayerService;
+import com.tejko.yamb.api.dto.responses.TicketResponse;
 import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Clash.ClashPlayer;
 import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
 import com.tejko.yamb.domain.models.GlobalScoreStats;
-import com.tejko.yamb.domain.models.GuestPlayer;
+import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
-import com.tejko.yamb.domain.models.RegisteredPlayer;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 
 @Configuration
 public class ModelMapperConfig {
 
-    private final PlayerService playerService;
-
-    @Autowired
-    public ModelMapperConfig(PlayerService playerService) {
-        this.playerService = playerService;
-    }
-
     @Bean
-@Primary
-public ModelMapper modelMapper() {
-    ModelMapper modelMapper = new ModelMapper();
-    modelMapper.getConfiguration()
-        .setFieldMatchingEnabled(true)
-        .setFieldAccessLevel(AccessLevel.PRIVATE)
-        .setAmbiguityIgnored(true)
-        .setSkipNullEnabled(true)
-        .setImplicitMappingEnabled(false);
-
-    configureMappings(modelMapper);
-    return modelMapper;
-}
+    @Primary
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+            .setFieldMatchingEnabled(true)
+            .setFieldAccessLevel(AccessLevel.PRIVATE)
+            .setAmbiguityIgnored(true)
+            .setSkipNullEnabled(true)
+            .setImplicitMappingEnabled(false);
+        configureMappings(modelMapper);
+        return modelMapper;
+    }
 
     private void configureMappings(ModelMapper modelMapper) {
 
-        Converter<Player, Boolean> isRegisteredConverter = context -> context.getSource() instanceof RegisteredPlayer;
-
+        Converter<Player, Boolean> isAdminConverter = ctx -> {
+            Player player = ctx.getSource();
+            if (player.getRoles() == null) {
+                return false;
+            }
+            return player.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getLabel()));
+        };
+        
         // player
         modelMapper.createTypeMap(Player.class, PlayerResponse.class)
             .addMapping(Player::getExternalId, PlayerResponse::setId)
             .addMapping(Player::getCreatedAt, PlayerResponse::setCreatedAt)
             .addMapping(Player::getUpdatedAt, PlayerResponse::setUpdatedAt)
             .addMapping(Player::getUsername, PlayerResponse::setName)
-            .addMapping(Player::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.using(isRegisteredConverter).map(src -> src, PlayerResponse::setRegistered));
+            .addMapping(Player::getAvatar, PlayerResponse::setAvatar);
 
-        modelMapper.createTypeMap(RegisteredPlayer.class, PlayerResponse.class)
-            .addMapping(RegisteredPlayer::getExternalId, PlayerResponse::setId)
-            .addMapping(RegisteredPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
-            .addMapping(RegisteredPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
-            .addMapping(RegisteredPlayer::getUsername, PlayerResponse::setName)
-            .addMapping(RegisteredPlayer::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.map(src -> true, PlayerResponse::setRegistered));
+        modelMapper.createTypeMap(Player.class, PlayerDetailResponse.class)
+            .addMapping(Player::getExternalId, PlayerDetailResponse::setId)
+            .addMapping(Player::getCreatedAt, PlayerDetailResponse::setCreatedAt)
+            .addMapping(Player::getUpdatedAt, PlayerDetailResponse::setUpdatedAt)
+            .addMapping(Player::getUsername, PlayerDetailResponse::setName)
+            .addMapping(Player::getAvatar, PlayerDetailResponse::setAvatar)
+            .addMapping(Player::getEmail, PlayerDetailResponse::setEmail)
+            .addMapping(Player::isEmailVerified, PlayerDetailResponse::setEmailVerified)
+            .addMappings(mapper -> mapper.using(isAdminConverter).map(src -> src, PlayerDetailResponse::setAdmin));
 
-        modelMapper.createTypeMap(GuestPlayer.class, PlayerResponse.class)
-            .addMapping(GuestPlayer::getExternalId, PlayerResponse::setId)
-            .addMapping(GuestPlayer::getCreatedAt, PlayerResponse::setCreatedAt)
-            .addMapping(GuestPlayer::getUpdatedAt, PlayerResponse::setUpdatedAt)
-            .addMapping(GuestPlayer::getUsername, PlayerResponse::setName)
-            .addMapping(GuestPlayer::getRoles, PlayerResponse::setRoles)
-            .addMappings(mapper -> mapper.map(src -> false, PlayerResponse::setRegistered));
-
+        // image
+        modelMapper.createTypeMap(Image.class, ImageResponse.class)
+            .addMapping(Image::getExternalId, ImageResponse::setId)
+            .addMapping(Image::getName, ImageResponse::setName)
+            .addMapping(Image::getUrl, ImageResponse::setUrl);
+        
         // role
         modelMapper.createTypeMap(Role.class, String.class)
             .setConverter(ctx -> ctx.getSource().getLabel());
@@ -107,65 +107,83 @@ public ModelMapper modelMapper() {
         modelMapper.createTypeMap(Log.class, LogResponse.class)
             .addMapping(Log::getExternalId, LogResponse::setId)
             .addMapping(Log::getCreatedAt, LogResponse::setCreatedAt)
-            .addMapping(Log::getData, LogResponse::setData)
             .addMapping(Log::getMessage, LogResponse::setMessage)
             .addMapping(Log::getLevel, LogResponse::setLevel)
             .addMapping(Log::getPlayer, LogResponse::setPlayer);
 
-        // game
-        Converter<UUID, PlayerResponse> playerConverter = context -> {
-            UUID playerExternalId = context.getSource();
-            Optional<Player> player = playerService.findByExternalId(playerExternalId);
-            return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
-        };
+        modelMapper.createTypeMap(Log.class, LogDetailResponse.class)
+            .addMapping(Log::getExternalId, LogDetailResponse::setId)
+            .addMapping(Log::getCreatedAt, LogDetailResponse::setCreatedAt)
+            .addMapping(Log::getData, LogDetailResponse::setData)
+            .addMapping(Log::getMessage, LogDetailResponse::setMessage)
+            .addMapping(Log::getLevel, LogDetailResponse::setLevel)
+            .addMapping(Log::getPlayer, LogDetailResponse::setPlayer);
 
+        //game
         modelMapper.createTypeMap(Game.class, GameResponse.class)
             .addMapping(Game::getExternalId, GameResponse::setId)
             .addMapping(Game::getCreatedAt, GameResponse::setCreatedAt)
             .addMapping(Game::getUpdatedAt, GameResponse::setUpdatedAt)
-            .addMapping(Game::getSheet, GameResponse::setSheet)
-            .addMapping(Game::getDices, GameResponse::setDices)
-            .addMapping(Game::getRollCount, GameResponse::setRollCount)
-            .addMapping(Game::getAnnouncement, GameResponse::setAnnouncement)
             .addMapping(Game::getStatus, GameResponse::setStatus)
             .addMapping(Game::getTotalSum, GameResponse::setTotalSum)
-            .addMappings(mapper -> mapper.using(playerConverter).map(Game::getPlayerId, GameResponse::setPlayer));
+            .addMapping(Game::getType, GameResponse::setType)
+            .addMapping(Game::getProgress, GameResponse::setProgress);
 
-        modelMapper.createTypeMap(Game.Sheet.class, GameResponse.Sheet.class)
-            .addMapping(Game.Sheet::getColumns, GameResponse.Sheet::setColumns);
+        modelMapper.createTypeMap(Game.class, GameDetailResponse.class)
+            .addMapping(Game::getExternalId, GameDetailResponse::setId)
+            .addMapping(Game::getCreatedAt, GameDetailResponse::setCreatedAt)
+            .addMapping(Game::getUpdatedAt, GameDetailResponse::setUpdatedAt)
+            .addMapping(Game::getSheet, GameDetailResponse::setSheet)
+            .addMapping(Game::getDices, GameDetailResponse::setDices)
+            .addMapping(Game::getRollCount, GameDetailResponse::setRollCount)
+            .addMapping(Game::getAnnouncement, GameDetailResponse::setAnnouncement)
+            .addMapping(Game::getStatus, GameDetailResponse::setStatus)
+            .addMapping(Game::getTotalSum, GameDetailResponse::setTotalSum)
+            .addMapping(Game::getLatestDiceRolled, GameDetailResponse::setLatestDiceRolled)
+            .addMapping(Game::getPreviousRollCount, GameDetailResponse::setPreviousRollCount)
+            .addMapping(Game::getLatestColumnFilled, GameDetailResponse::setLatestColumnFilled)
+            .addMapping(Game::getLatestBoxFilled, GameDetailResponse::setLatestBoxFilled)
+            .addMapping(Game::getType, GameDetailResponse::setType)
+            .addMapping(Game::getProgress, GameDetailResponse::setProgress);
 
-        modelMapper.createTypeMap(Game.Column.class, GameResponse.Column.class)
-            .addMapping(Game.Column::getType, GameResponse.Column::setType)
-            .addMapping(Game.Column::getBoxes, GameResponse.Column::setBoxes);
+        modelMapper.createTypeMap(Game.Sheet.class, GameDetailResponse.Sheet.class)
+            .addMapping(Game.Sheet::getColumns, GameDetailResponse.Sheet::setColumns);
 
-        modelMapper.createTypeMap(Game.Box.class, GameResponse.Box.class)
-            .addMapping(Game.Box::getType, GameResponse.Box::setType)
-            .addMapping(Game.Box::getValue, GameResponse.Box::setValue);
+        modelMapper.createTypeMap(Game.Column.class, GameDetailResponse.Column.class)
+            .addMapping(Game.Column::getType, GameDetailResponse.Column::setType)
+            .addMapping(Game.Column::getBoxes, GameDetailResponse.Column::setBoxes);
 
-        modelMapper.createTypeMap(Game.Dice.class, GameResponse.Dice.class)
-            .addMapping(Game.Dice::getIndex, GameResponse.Dice::setIndex)   
-            .addMapping(Game.Dice::getValue, GameResponse.Dice::setValue);
+        modelMapper.createTypeMap(Game.Box.class, GameDetailResponse.Box.class)
+            .addMapping(Game.Box::getType, GameDetailResponse.Box::setType)
+            .addMapping(Game.Box::getValue, GameDetailResponse.Box::setValue);
 
-        // clash
-        Converter<List<UUID>, List<PlayerResponse>> playerListConverter = context ->
-            context.getSource().stream()
-                .map(playerId -> {
-                    Optional<Player> player = playerService.findByExternalId(playerId);
-                    return player.isPresent() ? modelMapper.map(player.get(), PlayerResponse.class) : null;
-                })
-                .collect(Collectors.toList());
+        modelMapper.createTypeMap(Game.Dice.class, GameDetailResponse.Dice.class)
+            .addMapping(Game.Dice::getIndex, GameDetailResponse.Dice::setIndex)   
+            .addMapping(Game.Dice::getValue, GameDetailResponse.Dice::setValue);
                 
+        // clash
+        modelMapper.createTypeMap(Clash.class, ClashDetailResponse.class)
+            .addMapping(Clash::getExternalId, ClashDetailResponse::setId)
+            .addMapping(Clash::getCreatedAt, ClashDetailResponse::setCreatedAt)
+            .addMapping(Clash::getUpdatedAt, ClashDetailResponse::setUpdatedAt)
+            .addMapping(Clash::getName, ClashDetailResponse::setName)
+            .addMapping(Clash::getType, ClashDetailResponse::setType)
+            .addMapping(Clash::getStatus, ClashDetailResponse::setStatus)
+            .addMapping(Clash::getTurn, ClashDetailResponse::setTurn);
+
         modelMapper.createTypeMap(Clash.class, ClashResponse.class)
             .addMapping(Clash::getExternalId, ClashResponse::setId)
             .addMapping(Clash::getCreatedAt, ClashResponse::setCreatedAt)
             .addMapping(Clash::getUpdatedAt, ClashResponse::setUpdatedAt)
+            .addMapping(Clash::getName, ClashResponse::setName)
             .addMapping(Clash::getType, ClashResponse::setType)
-            .addMapping(Clash::getStatus, ClashResponse::setStatus)
-            .addMapping(Clash::getInvitations, ClashResponse::setInvitations)
-            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getOwnerId, ClashResponse::setOwner))
-            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getWinnerId, ClashResponse::setWinner))
-            .addMappings(mapper -> mapper.using(playerConverter).map(Clash::getCurrentPlayerId, ClashResponse::setCurrentPlayer))
-            .addMappings(mapper -> mapper.using(playerListConverter).map(Clash::getPlayerIds, ClashResponse::setPlayers));
+            .addMapping(Clash::getStatus, ClashResponse::setStatus);
+
+        modelMapper.createTypeMap(ClashPlayer.class, ClashDetailResponse.ClashPlayer.class)
+            .addMapping(ClashPlayer::getId, ClashDetailResponse.ClashPlayer::setId)
+            .addMapping(ClashPlayer::getGameId, ClashDetailResponse.ClashPlayer::setGameId)
+            .addMapping(ClashPlayer::getStatus, ClashDetailResponse.ClashPlayer::setStatus)
+            .addMapping(ClashPlayer::getScore, ClashDetailResponse.ClashPlayer::setScore);
 
         // stats
         modelMapper.createTypeMap(GlobalPlayerStats.class, GlobalPlayerStatsResponse.class)
@@ -192,6 +210,10 @@ public ModelMapper modelMapper() {
             .addMapping(PlayerPreferences::getLanguage, PlayerPreferencesResponse::setLanguage)
             .addMapping(PlayerPreferences::getTheme, PlayerPreferencesResponse::setTheme);
 
+        modelMapper.createTypeMap(PlayerPreferencesRequest.class, PlayerPreferences.class)
+            .addMapping(PlayerPreferencesRequest::getLanguage, PlayerPreferences::setLanguage)
+            .addMapping(PlayerPreferencesRequest::getTheme, PlayerPreferences::setTheme);
+
         modelMapper.createTypeMap(PlayerStats.class, PlayerStatsResponse.class)
             .addMapping(PlayerStats::getLastActivity, PlayerStatsResponse::setLastActivity)
             .addMapping(PlayerStats::getAverageScore, PlayerStatsResponse::setAverageScore)
@@ -202,5 +224,26 @@ public ModelMapper modelMapper() {
         modelMapper.createTypeMap(PlayerWithToken.class, AuthResponse.class)
             .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
             .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
+
+        // ticket
+        modelMapper.createTypeMap(Ticket.class, TicketResponse.class)
+            .addMapping(Ticket::getExternalId, TicketResponse::setId)
+            .addMapping(Ticket::getCreatedAt, TicketResponse::setCreatedAt)
+            .addMapping(Ticket::getUpdatedAt, TicketResponse::setUpdatedAt)
+            .addMapping(Ticket::getTitle, TicketResponse::setTitle)
+            .addMapping(Ticket::getDescription, TicketResponse::setDescription)
+            .addMapping(Ticket::getStatus, TicketResponse::setStatus)
+            .addMapping(Ticket::getEmailAddress, TicketResponse::setEmailAddresses)
+            .addMappings(mapper -> mapper.map(Ticket::getPlayer, TicketResponse::setPlayer));
+
+        // notification
+        modelMapper.createTypeMap(Notification.class, NotificationResponse.class)
+            .addMapping(Notification::getExternalId, NotificationResponse::setId)
+            .addMapping(Notification::getCreatedAt, NotificationResponse::setCreatedAt)
+            .addMapping(Notification::getContent, NotificationResponse::setContent)
+            .addMapping(Notification::getLink, NotificationResponse::setLink)
+            .addMapping(Notification::getType, NotificationResponse::setType);
+
     }
+
 }

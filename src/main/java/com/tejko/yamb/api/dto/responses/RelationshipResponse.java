@@ -5,13 +5,12 @@ import java.util.UUID;
 import org.springframework.hateoas.RepresentationModel;
 
 import com.tejko.yamb.domain.enums.RelationshipType;
-import com.tejko.yamb.domain.models.Player;
 
 public class RelationshipResponse extends RepresentationModel<RelationshipResponse> {
 
     private UUID id;
-    private Player player;
-    private Player relatedPlayer;
+    private PlayerResponse player;
+    private PlayerResponse relatedPlayer;
     private RelationshipType type;
     private boolean active;
 
@@ -25,19 +24,19 @@ public class RelationshipResponse extends RepresentationModel<RelationshipRespon
         this.id = id;
     }
 
-    public Player getPlayer() {
+    public PlayerResponse getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(PlayerResponse player) {
         this.player = player;
     }
 
-    public Player getRelatedPlayer() {
+    public PlayerResponse getRelatedPlayer() {
         return relatedPlayer;
     }
 
-    public void setRelatedPlayer(Player relatedPlayer) {
+    public void setRelatedPlayer(PlayerResponse relatedPlayer) {
         this.relatedPlayer = relatedPlayer;
     }
 

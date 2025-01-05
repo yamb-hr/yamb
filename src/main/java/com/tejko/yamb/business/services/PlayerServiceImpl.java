@@ -1,7 +1,9 @@
 package com.tejko.yamb.business.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,39 +14,62 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tejko.yamb.business.interfaces.PlayerService;
 import com.tejko.yamb.domain.models.Clash;
+import com.tejko.yamb.domain.models.Game;
 import com.tejko.yamb.domain.models.GlobalPlayerStats;
+import com.tejko.yamb.domain.models.Image;
 import com.tejko.yamb.domain.models.Log;
+import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.Score;
+import com.tejko.yamb.domain.models.Ticket;
 import com.tejko.yamb.domain.repositories.ClashRepository;
+import com.tejko.yamb.domain.repositories.GameRepository;
 import com.tejko.yamb.domain.repositories.LogRepository;
+import com.tejko.yamb.domain.repositories.NotificationRepository;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.domain.repositories.RelationshipRepository;
 import com.tejko.yamb.domain.repositories.ScoreRepository;
+import com.tejko.yamb.domain.repositories.TicketRepository;
 import com.tejko.yamb.security.AuthContext;
+import com.tejko.yamb.util.ActivePlayerDirectory;
+import com.tejko.yamb.util.CloudinaryClient;
+import com.tejko.yamb.util.EmailManager;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepo;
     private final ScoreRepository scoreRepo;
+    private final GameRepository gameRepo;
     private final ClashRepository clashRepo;
     private final RelationshipRepository relationshipRepo;
     private final LogRepository logRepo;
+    private final TicketRepository ticketRepo;
+    private final NotificationRepository notificationRepo;
+    private final CloudinaryClient cloudinaryClient;
 
     @Autowired
-    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, ClashRepository clashRepo, RelationshipRepository relationshipRepo, LogRepository logRepo) {
+    public PlayerServiceImpl(PlayerRepository playerRepo, ScoreRepository scoreRepo, 
+                            GameRepository gameRepo, ClashRepository clashRepo, 
+                            RelationshipRepository relationshipRepo, LogRepository logRepo, 
+                            TicketRepository ticketRepo, NotificationRepository notificationRepo,
+                            CloudinaryClient cloudinaryClient) {
         this.playerRepo = playerRepo;
         this.scoreRepo = scoreRepo;
+        this.gameRepo = gameRepo;
         this.clashRepo = clashRepo;
         this.relationshipRepo = relationshipRepo;
         this.logRepo = logRepo;
+        this.ticketRepo = ticketRepo;
+        this.notificationRepo = notificationRepo;
+        this.cloudinaryClient = cloudinaryClient;
     }
 
     @Override
@@ -64,6 +89,11 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Page<Player> getAllActive(Pageable pageable) {
+        return playerRepo.findAllByExternalIdIn(ActivePlayerDirectory.getActivePlayerExternalIdSet(), pageable);
+    }
+
+    @Override
     public List<Score> getScoresByPlayerExternalId(UUID playerExternalId) {
         Player player = getByExternalId(playerExternalId);
         List<Score> scores = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
@@ -71,17 +101,29 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public List<Game> getGamesByPlayerExternalId(UUID playerExternalId) {
+        List<Game> games = gameRepo.findAllByPlayerIdOrderByUpdatedAtDesc(playerExternalId);
+        return games;
+    }
+
+    @Override
     public List<Clash> getClashesByPlayerExternalId(UUID playerExternalId) {
-        Player player = getByExternalId(playerExternalId);
-        List<Clash> clashes = clashRepo.findAllByPlayerIdsContains(player.getExternalId());
+        List<Clash> clashes = clashRepo.findAllByPlayerIdOrderByUpdatedAtDesc(playerExternalId);
         return clashes;
     }
 
     @Override
     public List<Log> getLogsByPlayerExternalId(UUID playerExternalId) {
         Player player = getByExternalId(playerExternalId);
-        List<Log> logs = logRepo.findAllByPlayerId(player.getId());
+        List<Log> logs = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
         return logs;
+    }
+
+    @Override
+    public List<Ticket> getTicketsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        List<Ticket> tickets = ticketRepo.findAllByPlayerIdOrderByUpdatedAtDesc(player.getId());
+        return tickets;
     }
 
     @Override
@@ -144,7 +186,6 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerPreferences getPreferencesByPlayerExternalId(UUID playerExternalId) {
         checkPermission(playerExternalId);
 
-        
         Player player = getByExternalId(playerExternalId);
         if (player.getPreferences() == null) {
             throw new ResourceNotFoundException("error.not_found.preferences");
@@ -156,7 +197,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public PlayerPreferences setPreferencesByPlayerExternalId(UUID playerExternalId, PlayerPreferences playerPreferences) {
         checkPermission(playerExternalId);
-
+        
         Player player = getByExternalId(playerExternalId);
         PlayerPreferences preferences = player.getPreferences();
 
@@ -176,7 +217,7 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getPreferences();
     }
 
-    public Player changeUsernameByExternalId(UUID externalId, String username) {
+    public Player updateUsernameByExternalId(UUID externalId, String username) {
         Player player = getByExternalId(externalId);
     
         validateUsername(username);
@@ -185,8 +226,22 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepo.save(player);
     }
 
+    public Player updateEmailByExternalId(UUID externalId, String email) {
+        Player player = getByExternalId(externalId);
+        String normalizedEmail = EmailManager.normalizeEmail(email);
+        validateEmail(normalizedEmail);
+        player.setEmail(normalizedEmail);
+        return playerRepo.save(player);
+    }
+
+    private void validateEmail(String email) {
+        if (playerRepo.existsByEmailIgnoreCaseAndEmailVerified(email, true)) {
+            throw new IllegalArgumentException("error.email_taken");
+        }
+    }
+
     private void validateUsername(String username) {
-        if (playerRepo.existsByUsername(username)) {
+        if (playerRepo.existsByUsernameIgnoreCase(username)) {
             throw new IllegalArgumentException("error.username_taken");
         }
     }
@@ -218,18 +273,18 @@ public class PlayerServiceImpl implements PlayerService {
     public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds) {
         
         Player parentPlayer = getByExternalId(parentExternalId);
-        List<Player> players = playerRepo.findAllByExternalIdIn(playerExternalIds);
+        List<Player> players = playerRepo.findAllByExternalIdInOrderByUpdatedAtDesc(playerExternalIds);
 
         for (Player player : players) {
             List<Score> scoresToMerge = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
             scoresToMerge.forEach(score -> score.setPlayer(parentPlayer));
             scoreRepo.saveAll(scoresToMerge);
 
-            List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContains(player.getExternalId());
-            clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
-            clashRepo.saveAll(clashesToMerge);
+            // List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(player.getExternalId());
+            // clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
+            // clashRepo.saveAll(clashesToMerge);
 
-            List<Log> logsToMerge = logRepo.findAllByPlayerId(player.getId());
+            List<Log> logsToMerge = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
             logsToMerge.forEach(log -> log.setPlayer(parentPlayer));
             logRepo.saveAll(logsToMerge);
 
@@ -246,6 +301,65 @@ public class PlayerServiceImpl implements PlayerService {
 
         playerRepo.deleteAll(players);
         playerRepo.save(parentPlayer);
+    }
+
+    @Override
+    public void deleteByExternalId(UUID externalId) {
+        Player player = getByExternalId(externalId);
+        playerRepo.delete(player);
+    }
+
+    @Override
+    public Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar) {
+        validateAvatar(avatar);
+        Player player = getByExternalId(playerExternalId);
+        Image existingAvatar = player.getAvatar();
+        String oldPublicId = (existingAvatar != null) ? existingAvatar.getPublicId() : null;
+
+        Map<String, Object> uploadedFile = cloudinaryClient.uploadFile(avatar, "avatars", oldPublicId);
+        if (uploadedFile == null) {
+            throw new IllegalArgumentException("Failed to upload new avatar.");
+        }
+
+        if (existingAvatar != null) {
+            existingAvatar.setName((String) uploadedFile.get("name"));
+            existingAvatar.setUrl((String) uploadedFile.get("url"));
+            existingAvatar.setPublicId((String) uploadedFile.get("public_id"));
+        } else {
+            Image newAvatar = Image.getInstance(player, (String) uploadedFile.get("name"), (String) uploadedFile.get("url"), (String) uploadedFile.get("public_id"));
+            player.setAvatar(newAvatar);
+        }
+
+        playerRepo.save(player);
+
+        return player;
+    }
+
+    @Override
+    public List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        return notificationRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+    }
+
+    @Override
+    public void deleteNotificationsByPlayerExternalId(UUID playerExternalId) {
+        Player player = getByExternalId(playerExternalId);
+        List<Notification> notifications = notificationRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+        notificationRepo.deleteAll(notifications);
+    }
+
+    private void validateAvatar(MultipartFile avatar) {
+        if (avatar.getName().isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        if (avatar.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public List<Player> findAllByExternalIds(Set<UUID> playerExternalIds) {
+        return playerRepo.findAllByExternalIdIn(playerExternalIds);
     }
 
 }

@@ -9,12 +9,12 @@ import com.tejko.yamb.domain.models.Log;
 
 public interface LogService {
 
-    public Log getByExternalId(UUID externalId);
+    Log getByExternalId(UUID externalId);
 
-    public Page<Log> getAll(Pageable pageable);
+    Page<Log> getAll(Pageable pageable);
     
-    public Log create(Log log);
+    Log create(Log log);
 
-    public void deleteAll();
+    void deleteAll();
     
 }

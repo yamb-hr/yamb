@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.tejko.yamb.domain.enums.BoxType;
 import com.tejko.yamb.domain.enums.ColumnType;
 import com.tejko.yamb.domain.enums.GameStatus;
+import com.tejko.yamb.domain.enums.GameType;
 import com.tejko.yamb.domain.exceptions.AnnouncementAlreadyMadeException;
 import com.tejko.yamb.domain.exceptions.AnnouncementNotAllowedException;
 import com.tejko.yamb.domain.exceptions.AnnouncementRequiredException;
@@ -27,7 +28,7 @@ public class GameTest {
 
     @BeforeEach
     public void setUp() {
-        game = Game.getInstance(UUID.randomUUID());
+        game = Game.getInstance(UUID.randomUUID(), GameType.NORMAL);
     }
 
     @Test

@@ -14,7 +14,6 @@ public class LogResponse extends RepresentationModel<LogResponse> {
     private UUID id;
     private LocalDateTime createdAt;
     private PlayerResponse player;
-    private Object data;
     private String message;
     private Level level;
 
@@ -42,14 +41,6 @@ public class LogResponse extends RepresentationModel<LogResponse> {
 
     public void setPlayer(PlayerResponse player) {
         this.player = player;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
     }
 
     public String getMessage() {

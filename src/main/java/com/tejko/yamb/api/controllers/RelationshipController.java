@@ -27,6 +27,8 @@ import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
 import com.tejko.yamb.api.dto.requests.RelationshipRequest;
 import com.tejko.yamb.api.dto.responses.RelationshipResponse;
 import com.tejko.yamb.business.interfaces.RelationshipService;
+import com.tejko.yamb.domain.models.PlayerRelationship;
+import com.tejko.yamb.util.SortFieldTranslator;
 
 @RestController
 @RequestMapping("/api/relationships")
@@ -34,11 +36,14 @@ public class RelationshipController {
 
 	private final RelationshipService relationshipService;
 	private final RelationshipModelAssembler relationshipModelAssembler;
+	private final SortFieldTranslator sortFieldTranslator;
 
 	@Autowired
-	public RelationshipController(RelationshipService relationshipService, RelationshipModelAssembler relationshipModelAssembler) {
+	public RelationshipController(RelationshipService relationshipService, RelationshipModelAssembler relationshipModelAssembler,
+								  SortFieldTranslator sortFieldTranslator) {
 		this.relationshipService = relationshipService;
 		this.relationshipModelAssembler = relationshipModelAssembler;
+		this.sortFieldTranslator = sortFieldTranslator;
 	}
 
 	@GetMapping("/{externalId}")
@@ -50,7 +55,8 @@ public class RelationshipController {
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<PagedModel<RelationshipResponse>> getAll(@PageableDefault(page = 0, size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		PagedModel<RelationshipResponse> pagedRelationships = relationshipModelAssembler.toPagedModel(relationshipService.getAll(pageable));
+		Pageable modifiedPageable = sortFieldTranslator.translateSortField(pageable, PlayerRelationship.class, RelationshipResponse.class);
+		PagedModel<RelationshipResponse> pagedRelationships = relationshipModelAssembler.toPagedModel(relationshipService.getAll(modifiedPageable));
 		return ResponseEntity.ok(pagedRelationships);
 	}
 
@@ -74,7 +80,7 @@ public class RelationshipController {
 	public ResponseEntity<Void> declineByExternalId(@PathVariable UUID externalId) {
 		relationshipService.declineByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(RelationshipController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
 
@@ -83,7 +89,7 @@ public class RelationshipController {
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		relationshipService.deleteByExternalId(externalId);
 		return ResponseEntity.noContent()
-			.location(linkTo(methodOn(RelationshipController.class).getAll(null)).toUri())
+			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
     

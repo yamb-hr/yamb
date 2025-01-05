@@ -1011,8 +1011,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/RoleResponse'
-          isRegistered:
-            type: boolean
 
       PlayerStatsResponse:
         type: object
