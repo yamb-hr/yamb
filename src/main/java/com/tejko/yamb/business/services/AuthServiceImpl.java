@@ -66,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         validateEmail(normalizedEmail);
         Player player = Player.getInstance(normalizedEmail, username, encoder.encode(password), getDefaultRoles());
         player = playerRepo.save(player);
-        emailSender.sendNewUserNotificationEmail("matej@jamb.com.hr", player.getUsername());
+        emailSender.sendNewUserNotificationEmail("matej@jamb.com.hr", player.getUsername(), "https://jamb.com.hr/players/" + player.getExternalId());
         return player;
     }
 
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
         validateUsername(username);
         Player player = Player.getInstance(null, username, null, getDefaultRoles());
         player = playerRepo.save(player);
-        emailSender.sendNewUserNotificationEmail("matej@jamb.com.hr", player.getUsername());
+        emailSender.sendNewUserNotificationEmail("matej@jamb.com.hr", player.getUsername(), "https://jamb.com.hr/players/" + player.getExternalId());
         return new PlayerWithToken(player, jwtUtil.generateToken(player.getExternalId()));
     }
 

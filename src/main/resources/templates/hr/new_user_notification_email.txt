@@ -2,6 +2,8 @@ New User Registration
 
 A new user has registered on Jamb.
 
-Username: {username}
+{username}
+
+{playerLink}
 
 © 2024 Jamb. All rights reserved.
