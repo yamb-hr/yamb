@@ -72,12 +72,12 @@ public class EmailManager {
         send(to, "Password Reset Request", htmlContent, plainTextContent);
     }
 
-    public void sendNewUserNotificationEmail(String to, String username) {
+    public void sendNewUserNotificationEmail(String to, String username, String playerLink) {
         String htmlContent = buildContent("new_user_notification_email.html", Map.of(
-                "username", username
+                "username", username, "playerLink", playerLink
         ));
         String plainTextContent = buildContent("new_user_notification_email.txt", Map.of(
-                "username", username
+                "username", username, "playerLink", playerLink
         ));
         send(to, "New User: " + username, htmlContent, plainTextContent);
     }
