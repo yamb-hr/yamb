@@ -165,7 +165,7 @@ public class GameServiceImpl implements GameService {
                 if (clash.getTurn() == clash.getPlayers().size() -1 ) {
                     clash.setStatus(ClashStatus.COMPLETED);
                     List<Game> games = gameRepo.findAllByExternalIdIn(clash.getPlayers().stream().map(t -> t.getGameId()).collect(Collectors.toSet()));
-                    clash.setWinnerId(games.stream().max((o1, o2) -> o2.getTotalSum()-o1.getTotalSum()).get().getPlayerId());
+                    clash.setWinnerId(games.stream().max((o1, o2) -> o1.getTotalSum()-o2.getTotalSum()).get().getPlayerId());
                 } 
             }
             clash.advanceTurn();
