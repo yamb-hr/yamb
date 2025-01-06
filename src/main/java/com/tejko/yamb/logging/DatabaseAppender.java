@@ -42,7 +42,8 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
                                 .map(StackTraceElement::toString)
                                 .collect(Collectors.toList())
                 );
-                logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), eventObject.getThrowableProxy().getMessage(), stackTraceData, Level.ERROR));
+                String message = eventObject.getThrowableProxy().getMessage() != null ? eventObject.getThrowableProxy().getMessage() : eventObject.getThrowableProxy().getClassName();
+                logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), message, stackTraceData, Level.ERROR));
             }
         } catch (Exception e) {
             // e.printStackTrace();
