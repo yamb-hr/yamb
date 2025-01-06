@@ -94,5 +94,14 @@ public class RelationshipController {
 			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
 			.build();
 	}
+
+	@DeleteMapping("")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public ResponseEntity<Void> deleteAll() {
+		relationshipService.deleteAll();
+		return ResponseEntity.noContent()
+			.location(linkTo(methodOn(RelationshipController.class).getAll(Pageable.unpaged())).toUri())
+			.build();
+	}
     
 }

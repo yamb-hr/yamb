@@ -21,5 +21,7 @@ public interface RelationshipService {
     void declineByExternalId(UUID externalId);
 
     void deleteByExternalId(UUID externalId);
+
+    void deleteAll();
     
 }

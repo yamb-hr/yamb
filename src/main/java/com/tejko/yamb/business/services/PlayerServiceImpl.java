@@ -350,10 +350,10 @@ public class PlayerServiceImpl implements PlayerService {
 
     private void validateAvatar(MultipartFile avatar) {
         if (avatar.getName().isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid Avatar Name");
         }
         if (avatar.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid Avatar");
         }
     }
 

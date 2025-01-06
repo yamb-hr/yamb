@@ -95,7 +95,7 @@ public class ClashServiceImpl implements ClashService {
         }
         for (UUID playerExternalId : playerExternalIds) {
             if (playerExternalId == null) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Invalid Player Id");
             }
         }
     }

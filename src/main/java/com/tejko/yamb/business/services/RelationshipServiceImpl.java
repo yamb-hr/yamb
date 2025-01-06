@@ -71,9 +71,9 @@ public class RelationshipServiceImpl implements RelationshipService {
         
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
         if (!authenticatedPlayer.getExternalId().equals(playerExternalId)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot request relationship for others");
         } else if (playerExternalId.equals(relatedPlayerExternalId)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Invalid Relationship");
         }
 
         Player player = playerRepo.findByExternalId(playerExternalId).get();
@@ -81,11 +81,11 @@ public class RelationshipServiceImpl implements RelationshipService {
         Optional<PlayerRelationship> existingRelationship = relationshipRepo.findByPlayerIds(player.getId(), relatedPlayer.getId());
 
         if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.BLOCK) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Invalid Relationship");
         } else if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.FRIEND && existingRelationship.get().isActive()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Relationship is already active");
         } else if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.FRIEND && !existingRelationship.get().isActive() && existingRelationship.get().getId().getPlayer().getId().equals(player.getId())) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Relationship already requested");
         }
     }
 
@@ -102,11 +102,11 @@ public class RelationshipServiceImpl implements RelationshipService {
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
         PlayerRelationship relationship = getByExternalId(externalId);
         if (authenticatedPlayer.getId() != relationship.getId().getRelatedPlayer().getId()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot accept relationship for others");
         } else if (relationship.getType() == RelationshipType.BLOCK) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Invalid Request");
         } else if (relationship.isActive()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Relationship is already active");
         }
     }
 
@@ -121,11 +121,11 @@ public class RelationshipServiceImpl implements RelationshipService {
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
         PlayerRelationship relationship = getByExternalId(externalId);
         if (authenticatedPlayer.getId() != relationship.getId().getRelatedPlayer().getId()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot decline relationship for others");
         } else if (relationship.getType() == RelationshipType.BLOCK) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Invalid Request");
         } else if (relationship.isActive()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Relationship is already active");
         }
     }
 
@@ -140,10 +140,15 @@ public class RelationshipServiceImpl implements RelationshipService {
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
         PlayerRelationship relationship = getByExternalId(externalId);
         if (relationship.getType() == RelationshipType.FRIEND && (relationship.getId().getPlayer().getId().equals(authenticatedPlayer.getId()) || relationship.getId().getRelatedPlayer().getId().equals(authenticatedPlayer.getId()))) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot delete");
         } else if (relationship.getType() == RelationshipType.BLOCK && !relationship.getId().getPlayer().getId().equals(authenticatedPlayer.getId())) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot delete");
         }
+    }
+
+    @Override
+    public void deleteAll() {
+        relationshipRepo.deleteAll();
     }
     
 }
