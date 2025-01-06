@@ -30,27 +30,22 @@ public class DatabaseAppender extends AppenderBase<ILoggingEvent> {
         if (!eventObject.getLevel().isGreaterOrEqual(ch.qos.logback.classic.Level.ERROR)) {
             return;
         }
-
         try {
-            String message = eventObject.getThrowableProxy().getClassName() + ": " + eventObject.getThrowableProxy().getMessage();
-            String stackTraceData = null;
-
             IThrowableProxy throwableProxy = eventObject.getThrowableProxy();
-
             if (throwableProxy != null) {
                 StackTraceElementProxy[] stackTraceElementProxies = throwableProxy.getStackTraceElementProxyArray();
 
-                stackTraceData = objectMapper.writeValueAsString(
+                String stackTraceData = objectMapper.writeValueAsString(
                         Arrays.stream(stackTraceElementProxies)
                                 .map(StackTraceElementProxy::getStackTraceElement)
                                 .filter(element -> element.getClassName().startsWith("com.tejko"))
                                 .map(StackTraceElement::toString)
                                 .collect(Collectors.toList())
                 );
+                logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), eventObject.getThrowableProxy().getMessage(), stackTraceData, Level.ERROR));
             }
-            logService.create(Log.getInstance(AuthContext.getAuthenticatedPlayer(), message, stackTraceData, Level.ERROR));
         } catch (Exception e) {
-            System.err.println("Failed to log to database: " + e.getLocalizedMessage());
+            // e.printStackTrace();
         }
     }
 }

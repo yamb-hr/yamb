@@ -52,7 +52,6 @@ public class Log {
     @Column(name = "data", nullable = true, columnDefinition = "jsonb")
     private Object data;
 
-    // set type to text
     @Column(name = "message", nullable = false, columnDefinition = "text")
     private String message;
 

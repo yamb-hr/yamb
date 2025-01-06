@@ -31,7 +31,6 @@ public class LogbackAppenderListener implements ApplicationListener<ApplicationR
 
         context.getLogger("ROOT").addAppender(databaseAppender);
 
-        // Optional: Print internal state to ensure it's configured correctly
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
     }
 }

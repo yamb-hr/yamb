@@ -22,7 +22,7 @@ public class PlayerRelationshipId implements Serializable {
 
     public PlayerRelationshipId(Player player, Player relatedPlayer) {
         this.player = player;
-        this.player = relatedPlayer;
+        this.relatedPlayer = relatedPlayer;
     }
 
     public Player getPlayer() {

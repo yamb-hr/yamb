@@ -23,6 +23,7 @@ import com.tejko.yamb.api.dto.responses.PlayerDetailResponse;
 import com.tejko.yamb.api.dto.responses.PlayerPreferencesResponse;
 import com.tejko.yamb.api.dto.responses.PlayerResponse;
 import com.tejko.yamb.api.dto.responses.PlayerStatsResponse;
+import com.tejko.yamb.api.dto.responses.RelationshipResponse;
 import com.tejko.yamb.api.dto.responses.ScoreResponse;
 import com.tejko.yamb.api.dto.responses.TicketResponse;
 import com.tejko.yamb.domain.models.Clash;
@@ -35,6 +36,7 @@ import com.tejko.yamb.domain.models.Log;
 import com.tejko.yamb.domain.models.Notification;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
+import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
 import com.tejko.yamb.domain.models.PlayerWithToken;
 import com.tejko.yamb.domain.models.Role;
@@ -244,6 +246,11 @@ public class ModelMapperConfig {
             .addMapping(Notification::getLink, NotificationResponse::setLink)
             .addMapping(Notification::getType, NotificationResponse::setType);
 
+        // relationship
+        modelMapper.createTypeMap(PlayerRelationship.class, RelationshipResponse.class)
+            .addMapping(PlayerRelationship::getExternalId, RelationshipResponse::setId)
+            .addMapping(PlayerRelationship::getType, RelationshipResponse::setType)
+            .addMapping(PlayerRelationship::isActive, RelationshipResponse::setActive);
     }
 
 }

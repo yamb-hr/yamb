@@ -42,14 +42,14 @@ public class RelationshipServiceImpl implements RelationshipService {
     
     @Override
     public PlayerRelationship requestRelationship(UUID playerExternalId, UUID relatedPlayerExternalId, RelationshipType type) {
-        validateRelationshipRequest(playerExternalId,relatedPlayerExternalId,type);
+        validateRelationshipRequest(playerExternalId, relatedPlayerExternalId, type);
         Player player = playerRepo.findByExternalId(playerExternalId).get();
         Player relatedPlayer = playerRepo.findByExternalId(relatedPlayerExternalId).get();
         Optional<PlayerRelationship> existingRelationship = relationshipRepo.findByPlayerIds(player.getId(), relatedPlayer.getId());
         PlayerRelationship relationship;
         if (existingRelationship.isPresent()) {
             relationship = existingRelationship.get();
-            if (type == RelationshipType.FRIEND && relationship.getType() == RelationshipType.FRIEND && player.getId() == relationship.getId().getRelatedPlayer().getId() && !relationship.isActive()) {
+            if (type == RelationshipType.FRIEND && relationship.getType() == RelationshipType.FRIEND && relationship.getId().getRelatedPlayer().getId().equals(player.getId()) && !relationship.isActive()) {
                 relationship.setActive(true);
                 relationshipRepo.save(relationship);
             } else if (RelationshipType.BLOCK.equals(type)) {
@@ -70,9 +70,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     private void validateRelationshipRequest(UUID playerExternalId, UUID relatedPlayerExternalId, RelationshipType type) {
         
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
-        if (playerExternalId != authenticatedPlayer.getExternalId()) {
+        if (!authenticatedPlayer.getExternalId().equals(playerExternalId)) {
             throw new IllegalStateException();
-        } else if (playerExternalId == relatedPlayerExternalId) {
+        } else if (playerExternalId.equals(relatedPlayerExternalId)) {
             throw new IllegalStateException();
         }
 
@@ -84,7 +84,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             throw new IllegalStateException();
         } else if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.FRIEND && existingRelationship.get().isActive()) {
             throw new IllegalStateException();
-        } else if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.FRIEND && !existingRelationship.get().isActive() && player.getId() == existingRelationship.get().getId().getPlayer().getId()) {
+        } else if (existingRelationship.isPresent() && existingRelationship.get().getType() == RelationshipType.FRIEND && !existingRelationship.get().isActive() && existingRelationship.get().getId().getPlayer().getId().equals(player.getId())) {
             throw new IllegalStateException();
         }
     }
@@ -139,9 +139,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     private void validateDeleteRelationship(UUID externalId) {
         Player authenticatedPlayer = AuthContext.getAuthenticatedPlayer();
         PlayerRelationship relationship = getByExternalId(externalId);
-        if (relationship.getType() == RelationshipType.FRIEND && (authenticatedPlayer.getId() == relationship.getId().getPlayer().getId() || authenticatedPlayer.getId() == relationship.getId().getRelatedPlayer().getId())) {
+        if (relationship.getType() == RelationshipType.FRIEND && (relationship.getId().getPlayer().getId().equals(authenticatedPlayer.getId()) || relationship.getId().getRelatedPlayer().getId().equals(authenticatedPlayer.getId()))) {
             throw new IllegalStateException();
-        } else if (relationship.getType() == RelationshipType.BLOCK && authenticatedPlayer.getId() != relationship.getId().getPlayer().getId() ) {
+        } else if (relationship.getType() == RelationshipType.BLOCK && !relationship.getId().getPlayer().getId().equals(authenticatedPlayer.getId())) {
             throw new IllegalStateException();
         }
     }

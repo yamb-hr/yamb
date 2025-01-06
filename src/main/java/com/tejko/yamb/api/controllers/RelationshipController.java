@@ -47,6 +47,7 @@ public class RelationshipController {
 	}
 
 	@GetMapping("/{externalId}")
+	@PreAuthorize("isAuthenticated()")
     public ResponseEntity<RelationshipResponse> getByExternalId(@PathVariable UUID externalId) {
         RelationshipResponse relationshipResponse = relationshipModelAssembler.toModel(relationshipService.getByExternalId(externalId));
         return ResponseEntity.ok(relationshipResponse);
@@ -64,6 +65,7 @@ public class RelationshipController {
     @PostMapping("")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<RelationshipResponse> requestRelationship(@Valid @RequestBody RelationshipRequest relationshipRequest) {
+		System.out.println(relationshipRequest.getPlayerId() + " " + relationshipRequest.getRelatedPlayerId());
 		RelationshipResponse relationshipResponse = relationshipModelAssembler.toModel(relationshipService.requestRelationship(relationshipRequest.getPlayerId(), relationshipRequest.getRelatedPlayerId(), relationshipRequest.getType()));
 		return ResponseEntity.ok(relationshipResponse);
 	}
@@ -84,7 +86,7 @@ public class RelationshipController {
 			.build();
 	}
 
-	@DeleteMapping("/relationships/{externalId}")
+	@DeleteMapping("/{externalId}")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Void> deleteByExternalId(@PathVariable UUID externalId) {
 		relationshipService.deleteByExternalId(externalId);

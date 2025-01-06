@@ -2,19 +2,19 @@ package com.tejko.yamb.api.dto.requests;
 
 import java.util.UUID;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.tejko.yamb.domain.enums.RelationshipType;
 
 public class RelationshipRequest {
 
-    @NotBlank
+    @NotNull
     private UUID playerId;
 
-    @NotBlank
+    @NotNull
     private UUID relatedPlayerId;
 
-    @NotBlank
+    @NotNull
     private RelationshipType type;
 
     public RelationshipRequest() {}

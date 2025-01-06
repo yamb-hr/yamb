@@ -10,7 +10,7 @@ public class ErrorResponse extends RepresentationModel<ErrorResponse> {
     private String error;
     private String message;
     private Instant timestamp;
-    private String detail;
+    private String path;
     
     public ErrorResponse() {}
     
@@ -46,12 +46,12 @@ public class ErrorResponse extends RepresentationModel<ErrorResponse> {
         this.timestamp = timestamp;
     }
 
-    public String getDetail() {
-        return detail;
+    public String getPath() {
+        return path;
     }
 
-    public void setDetail(String detail) {
-        this.detail = detail;
+    public void setPath(String path) {
+        this.path = path;
     }
 
 }

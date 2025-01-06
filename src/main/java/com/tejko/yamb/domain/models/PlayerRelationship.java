@@ -46,18 +46,22 @@ public class PlayerRelationship {
 
     protected PlayerRelationship() {}
 
-    protected PlayerRelationship(Player player, Player relatedPlayer, RelationshipType type, boolean active) {
-        this.id = new PlayerRelationshipId(player, relatedPlayer);
+    protected PlayerRelationship(PlayerRelationshipId id, RelationshipType type, boolean active) {
+        this.id = id;
         this.type = type;
         this.active = active;
     }
 
     public static PlayerRelationship getInstance(Player player, Player relatedPlayer, RelationshipType type) {
-        return new PlayerRelationship(player, relatedPlayer, type, false);
+        return new PlayerRelationship(new PlayerRelationshipId(player, relatedPlayer), type, false);
     }
 
     public PlayerRelationshipId getId() {
         return id;
+    }
+
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public RelationshipType getType() {
