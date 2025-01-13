@@ -3,6 +3,8 @@ package com.tejko.yamb.api.assemblers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -86,4 +89,42 @@ public class GameModelAssembler implements RepresentationModelAssembler<Game, Ga
 
         return pagedGames;
     }
+
+    @Override
+    public CollectionModel<GameResponse> toCollectionModel(Iterable<? extends Game> games) {
+        
+        Set<UUID> playerIds = new HashSet<>();
+        for (Game game : games) {
+            if (game.getPlayerId() != null) {
+                playerIds.add(game.getPlayerId());
+            }
+        }
+
+        List<Player> players = playerService.findAllByExternalIds(playerIds);
+        Map<UUID, Player> playerMap = players.stream()
+            .collect(Collectors.toMap(Player::getExternalId, Function.identity()));
+
+        List<GameResponse> gameResponses = new ArrayList<>();
+        for (Game game : games) {
+            GameResponse gameResponse = modelMapper.map(game, GameResponse.class);
+
+            UUID pid = game.getPlayerId();
+            if (pid != null && playerMap.containsKey(pid)) {
+                Player player = playerMap.get(pid);
+                PlayerResponse playerResponse = modelMapper.map(player, PlayerResponse.class);
+                gameResponse.setPlayer(playerResponse);
+                if (gameResponse.getPlayer() != null) {
+                    gameResponse.getPlayer().add(linkTo(methodOn(PlayerController.class)
+                            .getByExternalId(gameResponse.getPlayer().getId()))
+                            .withSelfRel());
+                }
+            }
+
+            gameResponse.add(linkTo(methodOn(GameController.class).getByExternalId(gameResponse.getId())).withSelfRel());
+            gameResponses.add(gameResponse);
+        }
+
+        return CollectionModel.of(gameResponses);
+    }
+
 }
