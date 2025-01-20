@@ -180,7 +180,7 @@ public class Clash {
         validateRemovePlayer();
         players.removeIf(player -> player.getId().equals(playerId));
         updatePlayerHash();
-        if (allInvitationsAccepted()) {
+        if (allInvitationsAccepted() && players.size() >= 2) {
             this.status = ClashStatus.IN_PROGRESS;
         }
     }
