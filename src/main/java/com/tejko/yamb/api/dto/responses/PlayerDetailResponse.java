@@ -16,6 +16,7 @@ public class PlayerDetailResponse extends RepresentationModel<PlayerDetailRespon
     private String email;
     private boolean isEmailVerified;
     private boolean isAdmin;
+    private boolean isGuest;
     private ImageResponse avatar;
 
     public PlayerDetailResponse() {}
@@ -74,6 +75,14 @@ public class PlayerDetailResponse extends RepresentationModel<PlayerDetailRespon
 
     public void setAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    public boolean isGuest() {
+        return isGuest;
+    }
+
+    public void setGuest(boolean isGuest) {
+        this.isGuest = isGuest;
     }
 
     public ImageResponse getAvatar() {

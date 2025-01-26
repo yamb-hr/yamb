@@ -1,6 +1,5 @@
 package com.tejko.yamb.config;
 
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
 import org.springframework.context.annotation.Bean;
@@ -61,14 +60,6 @@ public class ModelMapperConfig {
     }
 
     private void configureMappings(ModelMapper modelMapper) {
-
-        Converter<Player, Boolean> isAdminConverter = ctx -> {
-            Player player = ctx.getSource();
-            if (player.getRoles() == null) {
-                return false;
-            }
-            return player.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getLabel()));
-        };
         
         // player
         modelMapper.createTypeMap(Player.class, PlayerResponse.class)
@@ -86,7 +77,8 @@ public class ModelMapperConfig {
             .addMapping(Player::getAvatar, PlayerDetailResponse::setAvatar)
             .addMapping(Player::getEmail, PlayerDetailResponse::setEmail)
             .addMapping(Player::isEmailVerified, PlayerDetailResponse::setEmailVerified)
-            .addMappings(mapper -> mapper.using(isAdminConverter).map(src -> src, PlayerDetailResponse::setAdmin));
+            .addMapping(Player::isAdmin, PlayerDetailResponse::setAdmin)
+            .addMapping(Player::isGuest, PlayerDetailResponse::setGuest);
 
         // image
         modelMapper.createTypeMap(Image.class, ImageResponse.class)
@@ -251,6 +243,7 @@ public class ModelMapperConfig {
             .addMapping(PlayerRelationship::getExternalId, RelationshipResponse::setId)
             .addMapping(PlayerRelationship::getType, RelationshipResponse::setType)
             .addMapping(PlayerRelationship::isActive, RelationshipResponse::setActive);
+
     }
 
 }

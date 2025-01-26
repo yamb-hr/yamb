@@ -11,13 +11,13 @@ public class NotificationRequest {
     @NotNull(message = "error.player_id_required")
     private UUID playerId;
     
-    @NotNull(message = "error.content_id_required")
+    @NotNull(message = "error.content_required")
     private String content;
 
-    @NotNull(message = "error.link_id_required")
+    @NotNull(message = "error.link_required")
     private String link;
     
-    @NotNull(message = "error.type_id_required")
+    @NotNull(message = "error.type_required")
     private NotificationType type;
 
     public NotificationRequest() {}

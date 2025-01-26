@@ -236,6 +236,10 @@ public class Player implements UserDetails, Principal {
             .anyMatch(role -> "ADMIN".equalsIgnoreCase(role.getLabel()));
     }
 
+    public boolean isGuest() {
+        return password == null;
+    }
+
     @Override    
     public boolean isAccountNonExpired() {
         return true;
