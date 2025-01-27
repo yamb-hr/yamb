@@ -167,6 +167,10 @@ public class GameDetailResponse extends RepresentationModel<GameDetailResponse> 
     public GameAction getLastAction() {
         return lastAction;
     }
+
+    public void setLastAction(GameAction lastAction) {
+        this.lastAction = lastAction;
+    }
     
     public static class Dice {
 

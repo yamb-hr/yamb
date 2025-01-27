@@ -166,6 +166,10 @@ public class Game {
     public int getTotalSum() {
         return sheet.getTotalSum();
     }
+
+    public GameAction getLastAction() {
+        return lastAction;
+    }
     
     private static List<Dice> generateDices() {
         List<Dice> dices = new ArrayList<>();

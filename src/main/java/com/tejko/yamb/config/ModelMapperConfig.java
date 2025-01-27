@@ -134,6 +134,7 @@ public class ModelMapperConfig {
             .addMapping(Game::getStatus, GameDetailResponse::setStatus)
             .addMapping(Game::getTotalSum, GameDetailResponse::setTotalSum)
             .addMapping(Game::getLatestDiceRolled, GameDetailResponse::setLatestDiceRolled)
+            .addMapping(Game::getLastAction, GameDetailResponse::setLastAction)
             .addMapping(Game::getPreviousRollCount, GameDetailResponse::setPreviousRollCount)
             .addMapping(Game::getLatestColumnFilled, GameDetailResponse::setLatestColumnFilled)
             .addMapping(Game::getLatestBoxFilled, GameDetailResponse::setLatestBoxFilled)
