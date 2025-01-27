@@ -28,7 +28,7 @@ public class ClashUpdatedEventHandler {
         webSocketManager.convertAndSend(
             "/topic/clashes/" + clashDetailResponse.getId(),
             clashDetailResponse, 
-            MessageType.CLASH
+            MessageType.UPDATE
         );
     }
     

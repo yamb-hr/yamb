@@ -5,34 +5,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.GenericMessage;
 
 import com.tejko.yamb.domain.enums.MessageType;
 
-public class WebSocketMessage implements Message<Object> {
+public class WebSocketMessage extends GenericMessage<Object> {
 
     private UUID senderId;
     private UUID receiverId;
-    private Object payload;
     private MessageType type;
-    private LocalDateTime timestamp; 
-    private MessageHeaders headers;
+    private LocalDateTime timestamp;
 
     protected WebSocketMessage(Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
-        this.payload = payload;
+        super(payload, headers);
         this.type = type;
         this.timestamp = timestamp;
-        this.headers = headers;
     }
 
     protected WebSocketMessage(UUID senderId, UUID receiverId, Object payload, MessageType type, LocalDateTime timestamp, MessageHeaders headers) {
+        super(payload, headers);
         this.senderId = senderId;
         this.receiverId = receiverId;
-        this.payload = payload;
         this.type = type;
         this.timestamp = timestamp;
-        this.headers = headers;
     }
 
     public static WebSocketMessage getInstance(UUID senderId, UUID receiverId, Object payload, MessageType type) {
@@ -82,16 +78,6 @@ public class WebSocketMessage implements Message<Object> {
 
     public LocalDateTime getTimestamp() {
         return timestamp;
-    }
-
-    @Override
-    public Object getPayload() {
-        return payload;
-    }
-
-    @Override
-    public MessageHeaders getHeaders() {
-        return headers;
     }
     
 }

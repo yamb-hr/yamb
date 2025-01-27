@@ -33,17 +33,26 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public void publicMessage(WebSocketMessage message, Principal principal) {
-        UUID senderExternalId = UUID.fromString(principal.getName());
-        message.setSenderId(senderExternalId);
-        webSocketManager.send("/topic/public", message);
+    public void publicMessage(String message, Principal principal) {
+        webSocketManager.convertAndSend("/topic/public", message, MessageType.DEFAULT);
     }
 
     @Override
-    public void privateMessage(WebSocketMessage message, Principal principal) {
+    public void privateMessage(String message, Principal principal) {
         UUID senderExternalId = UUID.fromString(principal.getName());
-        message.setSenderId(senderExternalId);
-        webSocketManager.sendToUser(message);
+        WebSocketMessage wsMessage = WebSocketMessage.getInstance(message, MessageType.DEFAULT);
+        wsMessage.setSenderId(senderExternalId);
+        webSocketManager.sendToUser(wsMessage);
+    }
+
+    @Override
+    public void handleReaction(UUID clashId, String message, Principal principal) {
+        webSocketManager.convertAndSend("/topic/clashes/" + clashId, message, MessageType.REACTION);
+    }
+
+    @Override
+    public void handleSuggestion(UUID clashId, String message, Principal principal) {
+        webSocketManager.convertAndSend("/topic/clashes/" + clashId, message, MessageType.SUGGESTION);
     }
 
     @Override

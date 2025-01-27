@@ -33,8 +33,8 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
         if (authToken != null && jwtUtil.validateToken(authToken)) {
             UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
             Principal principal = playerRepo.findByExternalId(playerExternalId)
-                                            .map(player -> (Principal) player)
-                                            .orElseThrow(() -> new HandshakeFailureException("Player not found"));
+                .map(player -> (Principal) player)
+                .orElseThrow(() -> new HandshakeFailureException("Player not found"));
             return principal;
         }
         throw new HandshakeFailureException("Invalid or missing token");

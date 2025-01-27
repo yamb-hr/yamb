@@ -149,6 +149,14 @@ public class Clash {
         return turn;
     }
 
+    public boolean allInvitationsAnswered() {
+        return players.stream().allMatch(player -> InvitationStatus.ACCEPTED.equals(player.getStatus()) || InvitationStatus.DECLINED.equals(player.getStatus()));
+    }
+
+    public List<ClashPlayer> getAcceptedPlayers() {
+        return players.stream().filter(player -> InvitationStatus.ACCEPTED.equals(player.getStatus())).collect(Collectors.toList());
+    }
+
     public void addPlayers(Set<UUID> playerIds) {
         for (UUID playerId : playerIds) {
             addPlayer(playerId);
@@ -180,9 +188,6 @@ public class Clash {
         validateRemovePlayer();
         players.removeIf(player -> player.getId().equals(playerId));
         updatePlayerHash();
-        if (allInvitationsAccepted() && players.size() >= 2) {
-            this.status = ClashStatus.IN_PROGRESS;
-        }
     }
 
     private void validateRemovePlayer() {
@@ -200,9 +205,16 @@ public class Clash {
         }
         player.setStatus(InvitationStatus.ACCEPTED);
         player.setGameId(gameId);
-        if (allInvitationsAccepted()) {
-            this.status = ClashStatus.IN_PROGRESS;
-        }
+    }
+
+    public boolean checkStartConditions() {
+        return allInvitationsAnswered() && getAcceptedPlayers().size() >= 2;
+    }
+
+    public void startClash() {
+        status = ClashStatus.IN_PROGRESS;
+        players = getAcceptedPlayers(); 
+        updatePlayerHash();
     }
 
     public void declineInvitation(UUID playerId) {
@@ -218,10 +230,6 @@ public class Clash {
             .filter(player -> player.getId().equals(playerId))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Player not part of this clash."));
-    }
-    
-    private boolean allInvitationsAccepted() {
-        return players.stream().allMatch(player -> player.getStatus() == InvitationStatus.ACCEPTED);
     }
 
     public void advanceTurn() {

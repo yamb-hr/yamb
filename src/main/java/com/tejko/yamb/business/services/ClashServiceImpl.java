@@ -112,6 +112,9 @@ public class ClashServiceImpl implements ClashService {
         gameRepo.save(game);
         clash.acceptInvitation(playerExternalId, game.getExternalId());
         clash.getPlayer(playerExternalId).setGameId(game.getExternalId());
+        if (clash.checkStartConditions()) {
+            clash.startClash();
+        }
         clashRepo.save(clash);
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         return clash;
@@ -121,6 +124,9 @@ public class ClashServiceImpl implements ClashService {
     public Clash declineInvitationByExternalId(UUID externalId, UUID playerExternalId) {
         Clash clash = getByExternalId(externalId);
         clash.declineInvitation(playerExternalId);
+        if (clash.checkStartConditions()) {
+            clash.startClash();
+        }
         clashRepo.save(clash);
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         return clash;
@@ -141,6 +147,9 @@ public class ClashServiceImpl implements ClashService {
         Clash clash = getByExternalId(externalId);
         checkPermission(clash.getOwnerId());
         clash.removePlayers(playerExternalIds);
+        if (clash.checkStartConditions()) {
+            clash.startClash();
+        }
         clashRepo.save(clash);
         ApplicationContextProvider.publishEvent(new ClashUpdatedEvent(clash));
         return clash;    }

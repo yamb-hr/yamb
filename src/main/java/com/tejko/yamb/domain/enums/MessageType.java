@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.enums;
 
 public enum MessageType {
 
+    DEFAULT,
     ROLL,
     ANNOUNCE,
     FILL,
@@ -12,6 +13,8 @@ public enum MessageType {
     ACCEPT,
     DECLINE,
     NOTIFICATION,
-    UPDATE
+    UPDATE,
+    REACTION,
+    SUGGESTION
 
 }
