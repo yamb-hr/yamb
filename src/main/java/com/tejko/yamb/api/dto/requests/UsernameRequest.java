@@ -6,7 +6,7 @@ import javax.validation.constraints.Size;
 public class UsernameRequest {
 
     @NotBlank(message = "error.username_required")
-    @Size(min = 3, max = 15, message = "error.username_length_invalid")
+    @Size(min = 3, max = 18, message = "error.username_length_invalid")
     private String username;
 
     public UsernameRequest() {}
