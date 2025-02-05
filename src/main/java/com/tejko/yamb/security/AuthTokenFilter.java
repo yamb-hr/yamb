@@ -12,18 +12,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.tejko.yamb.api.controllers.AuthController;
 import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.util.JwtUtil;
+import com.tejko.yamb.util.TokenExtractor;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -38,53 +37,43 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        if (isProtectedEndpoint(request.getRequestURI())) {
-            System.out.println(request.getMethod() + " " + request.getRequestURI());
-            String authToken = parseToken(request);
+        try {
+            String authToken = TokenExtractor.extractToken(request);
             if (authToken != null && jwtUtil.validateToken(authToken)) {
                 UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
                 Player player = playerRepo.findByExternalId(playerExternalId).get();
+                System.out.println(player.getUsername() + ": " + request.getRequestURI());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(player, null, player.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
+            } else if (isProtectedEndpoint(request.getRequestURI())) {
                 response.sendError(401, "Unauthorized");
                 return;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         filterChain.doFilter(request, response);
     }
 
-    // every endpoint except token fetching and (guest) registration may expect authorization
     private boolean isProtectedEndpoint(String requestURI) {
-        String tokenUri = linkTo(methodOn(AuthController.class).getToken(null)).toUri().getPath();
+        String tokenUri = linkTo(methodOn(AuthController.class).getToken(null, null)).toUri().getPath();
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
-        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null, null)).toUri().getPath();
         String passwordResetUri = linkTo(methodOn(AuthController.class).sendPasswordResetEmail(null)).toUri().getPath();
-        
+        String refreshTokenUri = linkTo(methodOn(AuthController.class).refreshToken(null, null)).toUri().getPath();
+        String logoutUri = linkTo(methodOn(AuthController.class).logout(null, null)).toUri().getPath();
+
         if (!requestURI.startsWith("/api")) {
             return false;
         }
-    
-        return !requestURI.equals(tokenUri) && 
-                !requestURI.equals(registerGuestUri) && 
-                !requestURI.equals(registerUri) &&
-                !requestURI.equals(passwordResetUri);
-    }
-
-    private String parseToken(HttpServletRequest request) {
         
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-    
-        String tokenParam = request.getParameter("token");
-        if (StringUtils.hasText(tokenParam)) {
-            return tokenParam;
-        }
-        return null;
-    }
-    
+        return !requestURI.equals(tokenUri)
+            && !requestURI.equals(registerGuestUri)
+            && !requestURI.equals(registerUri)
+            && !requestURI.equals(passwordResetUri)
+            && !requestURI.equals(refreshTokenUri)
+            && !requestURI.equals(logoutUri);
+    }   
 
 }

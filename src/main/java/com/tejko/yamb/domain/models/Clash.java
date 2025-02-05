@@ -169,6 +169,21 @@ public class Clash {
         }
     }
 
+    public void replacePlayer(UUID oldPlayerId, UUID newPlayerId) {
+        if (ownerId.equals(oldPlayerId)) {
+            ownerId = newPlayerId;
+        }
+        if (winnerId.equals(oldPlayerId)) {
+            ownerId = newPlayerId;
+        }
+        for (ClashPlayer player : players) {
+            if (player.getId().equals(oldPlayerId)) {
+                player.setId(newPlayerId);
+            }
+        }
+        updatePlayerHash();
+    }
+
     private void addPlayer(UUID playerId) {
         validateAddPlayer(playerId);
         players.add(new ClashPlayer(playerId, InvitationStatus.PENDING));

@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,5 +22,8 @@ public interface RelationshipRepository extends JpaRepository<PlayerRelationship
       "WHERE (pr.id.player.id = :playerId AND pr.id.relatedPlayer.id = :relatedPlayerId)" +
       "OR (pr.id.player.id = :relatedPlayerId AND pr.id.relatedPlayer.id = :playerId) ORDER BY updatedAt")
    Optional<PlayerRelationship> findByPlayerIds(Long playerId, Long relatedPlayerId);
+
+   @Query("SELECT pr FROM PlayerRelationship pr WHERE pr.id.player.id IN :playerIds OR pr.id.relatedPlayer.id IN :playerIds ORDER BY updatedAt")
+   List<PlayerRelationship> getRelationshipsByPlayerIdIn(Set<Long> playerIds);
 
 }

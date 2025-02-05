@@ -70,9 +70,9 @@ public class HomeController {
 
         rootResource.add(linkTo(methodOn(HomeController.class).getHealthCheck()).withRel("health"));
         rootResource.add(linkTo(methodOn(HomeController.class).getMetrics()).withRel("metrics"));
-        rootResource.add(linkTo(methodOn(AuthController.class).registerGuest(null)).withRel("register-guest"));
+        rootResource.add(linkTo(methodOn(AuthController.class).registerGuest(null, null)).withRel("register-guest"));
         rootResource.add(linkTo(methodOn(AuthController.class).register(null)).withRel("register"));
-        rootResource.add(linkTo(methodOn(AuthController.class).getToken(null)).withRel("token"));
+        rootResource.add(linkTo(methodOn(AuthController.class).getToken(null, null)).withRel("token"));
         rootResource.add(linkTo(methodOn(GameController.class).getOrCreate(null)).withRel("get-or-create-game"));
         rootResource.add(linkTo(methodOn(GameController.class).getAll(Pageable.unpaged())).withRel("games"));
         rootResource.add(linkTo(methodOn(PlayerController.class).getAll(Pageable.unpaged())).withRel("players"));

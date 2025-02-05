@@ -2,6 +2,7 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +16,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findAllByOrderByCreatedAtDesc();
 
     List<Log> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
+
+    List<Log> findAllByPlayerIdInOrderByCreatedAtDesc(Set<Long> playerIds);
     
 }

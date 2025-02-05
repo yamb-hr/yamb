@@ -14,6 +14,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import com.tejko.yamb.domain.repositories.PlayerRepository;
 import com.tejko.yamb.util.JwtUtil;
+import com.tejko.yamb.util.TokenExtractor;
 
 @Component
 public class WebSocketAuthHandler extends DefaultHandshakeHandler {
@@ -29,7 +30,7 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
 
     @Override
     protected Principal determineUser(@NonNull ServerHttpRequest request, @NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) {
-        String authToken = parseToken(request);
+        String authToken = TokenExtractor.extractToken(request);
         if (authToken != null && jwtUtil.validateToken(authToken)) {
             UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
             Principal principal = playerRepo.findByExternalId(playerExternalId)
@@ -40,18 +41,6 @@ public class WebSocketAuthHandler extends DefaultHandshakeHandler {
         throw new HandshakeFailureException("Invalid or missing token");
     }
 
-    private String parseToken(ServerHttpRequest request) {
-        String query = request.getURI().getQuery();
-        if (query != null) {
-            String[] params = query.split("&");
-            for (String param : params) {
-                String[] pair = param.split("=");
-                if (pair.length == 2 && pair[0].equals("token")) {
-                    return pair[1];
-                }
-            }
-        }
-        return null;
-    }
+    
     
 }
