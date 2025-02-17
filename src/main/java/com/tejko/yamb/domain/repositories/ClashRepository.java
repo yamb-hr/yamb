@@ -2,7 +2,6 @@ package com.tejko.yamb.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -18,9 +17,6 @@ public interface ClashRepository extends MongoRepository<Clash, String> {
 
     @Query("{ 'players.id': ?0 }")
     List<Clash> findAllByPlayerId(UUID playerId);
-    
-    @Query("{ 'players.id': { $in: ?0 } }")
-    List<Clash> findAllByPlayerIdIn(Set<UUID> playerIds);
 
     @Query("{ 'players.id': ?0 }")
     List<Clash> findAllByPlayerIdOrderByUpdatedAtDesc(UUID playerId);

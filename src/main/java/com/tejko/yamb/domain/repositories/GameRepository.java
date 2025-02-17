@@ -17,9 +17,9 @@ public interface GameRepository extends MongoRepository<Game, String> {
 
     List<Game> findAllByExternalIdIn(Set<UUID> externalIds);
     
-    List<Game> findAllByPlayerIdAndTypeAndStatusIn(UUID playerId, GameType type, List<GameStatus> statuses);
+    Optional<Game> findByPlayerIdAndTypeAndStatusIn(UUID playerId, GameType type, List<GameStatus> statuses);
 
-    List<Game> findAllByPlayerIdAndStatusAndType(UUID playerId, GameType type, GameStatus status);
+    Optional<Game> findByPlayerIdAndStatusAndType(UUID playerId, GameType type, GameStatus status);
 
     boolean existsByPlayerIdAndStatus(UUID playerId, GameStatus status);
 
@@ -28,7 +28,5 @@ public interface GameRepository extends MongoRepository<Game, String> {
     List<Game> findAllByOrderByUpdatedAtDesc();
 
     List<Game> findAllByPlayerIdOrderByUpdatedAtDesc(UUID playerId);
-
-    List<Game> findAllByPlayerIdInOrderByUpdatedAtDesc(Set<UUID> playerIds);
 
 }

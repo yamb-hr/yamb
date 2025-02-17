@@ -123,10 +123,6 @@ public class Game {
         return playerId;
     }
 
-    public void setPlayerId(UUID playerId) {
-        this.playerId = playerId;
-    }
-
     public Sheet getSheet() {
         return sheet;
     }

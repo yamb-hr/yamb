@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
+import com.tejko.yamb.api.dto.responses.AuthResponse;
 import com.tejko.yamb.api.dto.responses.ClashDetailResponse;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
 import com.tejko.yamb.api.dto.responses.GameDetailResponse;
@@ -36,6 +37,7 @@ import com.tejko.yamb.domain.models.Player;
 import com.tejko.yamb.domain.models.PlayerPreferences;
 import com.tejko.yamb.domain.models.PlayerRelationship;
 import com.tejko.yamb.domain.models.PlayerStats;
+import com.tejko.yamb.domain.models.PlayerWithToken;
 import com.tejko.yamb.domain.models.Role;
 import com.tejko.yamb.domain.models.Score;
 import com.tejko.yamb.domain.models.Ticket;
@@ -212,6 +214,11 @@ public class ModelMapperConfig {
             .addMapping(PlayerStats::getAverageScore, PlayerStatsResponse::setAverageScore)
             .addMapping(PlayerStats::getHighScore, PlayerStatsResponse::setHighScore)
             .addMapping(PlayerStats::getScoreCount, PlayerStatsResponse::setScoreCount);
+
+        // auth
+        modelMapper.createTypeMap(PlayerWithToken.class, AuthResponse.class)
+            .addMapping(PlayerWithToken::getToken, AuthResponse::setToken)
+            .addMapping(PlayerWithToken::getPlayer, AuthResponse::setPlayer);
 
         // ticket
         modelMapper.createTypeMap(Ticket.class, TicketResponse.class)

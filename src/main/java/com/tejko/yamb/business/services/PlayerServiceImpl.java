@@ -270,6 +270,40 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds) {
+        
+        Player parentPlayer = getByExternalId(parentExternalId);
+        List<Player> players = playerRepo.findAllByExternalIdInOrderByUpdatedAtDesc(playerExternalIds);
+
+        for (Player player : players) {
+            List<Score> scoresToMerge = scoreRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+            scoresToMerge.forEach(score -> score.setPlayer(parentPlayer));
+            scoreRepo.saveAll(scoresToMerge);
+
+            // List<Clash> clashesToMerge = clashRepo.findAllByPlayerIdsContainsOrderByUpdatedAtDesc(player.getExternalId());
+            // clashesToMerge.forEach(clash -> clash.replacePlayer(player.getExternalId(), parentPlayer.getExternalId()));
+            // clashRepo.saveAll(clashesToMerge);
+
+            List<Log> logsToMerge = logRepo.findAllByPlayerIdOrderByCreatedAtDesc(player.getId());
+            logsToMerge.forEach(log -> log.setPlayer(parentPlayer));
+            logRepo.saveAll(logsToMerge);
+
+            List<PlayerRelationship> relationshipsToMerge = relationshipRepo.getRelationshipsByPlayerId(player.getId());
+            relationshipsToMerge.forEach(relationship -> {
+                if (player.getId() == relationship.getId().getPlayer().getId()) {
+                    relationship.getId().setPlayer(parentPlayer);
+                } else if (player.getId() == relationship.getId().getRelatedPlayer().getId()) {
+                    relationship.getId().setRelatedPlayer(parentPlayer);
+                }
+            });
+            relationshipRepo.saveAll(relationshipsToMerge);
+        }
+
+        playerRepo.deleteAll(players);
+        playerRepo.save(parentPlayer);
+    }
+
+    @Override
     public void deleteByExternalId(UUID externalId) {
         Player player = getByExternalId(externalId);
         playerRepo.delete(player);
