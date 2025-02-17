@@ -42,7 +42,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (authToken != null && jwtUtil.validateToken(authToken)) {
                 UUID playerExternalId = jwtUtil.getPlayerExternalIdFromToken(authToken);
                 Player player = playerRepo.findByExternalId(playerExternalId).get();
-                System.out.println(player.getUsername() + ": " + request.getRequestURI());
+                System.out.println(player.getUsername() + " " + request.getMethod() + " " + request.getRequestURI());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(player, null, player.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,7 +51,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 return;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
