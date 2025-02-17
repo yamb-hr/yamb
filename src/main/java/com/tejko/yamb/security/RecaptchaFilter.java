@@ -48,7 +48,7 @@ public class RecaptchaFilter extends OncePerRequestFilter {
     // recaptcha is only required for (guest) registration
     private boolean isProtectedEndpoint(String requestURI) {
         String registerUri = linkTo(methodOn(AuthController.class).register(null)).toUri().getPath();
-        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null)).toUri().getPath();
+        String registerGuestUri = linkTo(methodOn(AuthController.class).registerGuest(null, null)).toUri().getPath();
         return !"dev".equalsIgnoreCase(activeProfile) && (requestURI.equals(registerUri) || requestURI.equals(registerGuestUri));
     }
 

@@ -1,15 +1,20 @@
 package com.tejko.yamb.business.interfaces;
 
-import com.tejko.yamb.domain.models.PlayerWithToken;
+import com.tejko.yamb.domain.models.PlayerWithTokens;
+
 import com.tejko.yamb.domain.models.Player;
 
 public interface AuthService {
 
-    PlayerWithToken getToken(String email, String username, String password);
+    PlayerWithTokens getToken(String email, String username, String password);
+
+    PlayerWithTokens migrateToken(String token);
+
+    PlayerWithTokens refreshTokens(String refreshToken);
 
     Player register(String email, String username, String password);
 
-    PlayerWithToken registerGuest(String username);
+    PlayerWithTokens registerGuest(String username);
 
     void verifyEmail(String emailVerificationToken);
     

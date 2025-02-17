@@ -3,6 +3,7 @@ package com.tejko.yamb.domain.repositories;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,8 @@ public interface ScoreRepository extends JpaRepository<Score, Long> {
     Optional<Score> findByExternalId(UUID externalId);
 
     List<Score> findAllByPlayerIdOrderByCreatedAtDesc(Long playerId);
+
+    List<Score> findAllByPlayerIdInOrderByCreatedAtDesc(Set<Long> playerIds);
 
     List<Score> findTop30ByCreatedAtBetweenOrderByValueDesc(LocalDateTime from, LocalDateTime to);
     
