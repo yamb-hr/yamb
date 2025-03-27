@@ -32,7 +32,6 @@ public class TokenExtractor {
     }
 
     private static String getTokenFromCookie(HttpServletRequest request) {
-        System.out.println("Getting token from cookie");
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -45,7 +44,6 @@ public class TokenExtractor {
     }
 
     private static String getTokenFromCookie(ServerHttpRequest request) {
-        System.out.println("Getting token from cookie 2");
         List<String> cookieHeaders = request.getHeaders().get(HttpHeaders.COOKIE);
         if (cookieHeaders != null) {
             for (String header : cookieHeaders) {
@@ -62,7 +60,6 @@ public class TokenExtractor {
     }
 
     private static String getTokenFromAuthHeader(HttpServletRequest request) {
-        System.out.println("Getting token from auth header");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(authHeader) && authHeader.startsWith(AUTH_TOKEN_PREFIX)) {
             return authHeader.substring(7);
@@ -75,7 +72,6 @@ public class TokenExtractor {
     }
 
     private static String getTokenFromQueryParam(ServerHttpRequest request) {
-        System.out.println("Getting token from query param");
         String query = request.getURI().getQuery();
         if (query != null) {
             String[] params = query.split("&");
