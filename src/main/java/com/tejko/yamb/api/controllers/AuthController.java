@@ -47,6 +47,8 @@ public class AuthController {
     private static final String COOKIE_ACCESS_TOKEN_NAME = "ACCESS_TOKEN";
     private static final String COOKIE_REFRESH_TOKEN_NAME = "REFRESH_TOKEN";
 
+    private static final String SAME_SITE_LAX = "Lax";
+
     @Autowired
     public AuthController(AuthService authService, PlayerDetailModelAssembler playerDetailModelAssembler) {
         this.authService = authService;
@@ -169,7 +171,7 @@ public class AuthController {
             .secure(true)
             .path("/api")
             .maxAge(Duration.ofMinutes(54))
-            .sameSite("Strict")
+            .sameSite(SAME_SITE_LAX)
             .build();
         cookies.add(accessCookie);
 
@@ -178,7 +180,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
+            .sameSite(SAME_SITE_LAX)
             .build();
         cookies.add(refreshCookie);
 
@@ -192,7 +194,7 @@ public class AuthController {
             .secure(true)
             .path("/api")
             .maxAge(0)
-            .sameSite("Strict")
+            .sameSite(SAME_SITE_LAX)
             .build();
         cookies.add(accessCookie);
 
@@ -201,7 +203,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(0)
-            .sameSite("Strict")
+            .sameSite(SAME_SITE_LAX)
             .build();
         cookies.add(refreshCookie);
 
