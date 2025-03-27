@@ -47,7 +47,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else if (isProtectedEndpoint(request.getRequestURI())) {
-                response.sendError(401, "Unauthorized");
+                response.sendError(401, "Endpoint is protected.");
                 return;
             }
         } catch (Exception e) {

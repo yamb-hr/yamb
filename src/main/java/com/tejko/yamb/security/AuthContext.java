@@ -11,7 +11,7 @@ public class AuthContext {
         try {
             return (Player) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         } catch (Exception e) {
-            throw new BadCredentialsException("error.unauthorized");
+            throw new BadCredentialsException("Bad Credentials.");
         }
     }
 
