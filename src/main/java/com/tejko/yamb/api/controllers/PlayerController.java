@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +35,6 @@ import com.tejko.yamb.api.assemblers.PlayerStatsModelAssembler;
 import com.tejko.yamb.api.assemblers.RelationshipModelAssembler;
 import com.tejko.yamb.api.assemblers.ScoreModelAssembler;
 import com.tejko.yamb.api.dto.requests.EmailRequest;
-import com.tejko.yamb.api.dto.requests.PlayerMergeRequest;
 import com.tejko.yamb.api.dto.requests.PlayerPreferencesRequest;
 import com.tejko.yamb.api.dto.requests.UsernameRequest;
 import com.tejko.yamb.api.dto.responses.ClashResponse;
@@ -177,13 +175,6 @@ public class PlayerController {
 	public ResponseEntity<CollectionModel<RelationshipResponse>> getRelationshipsByPlayerExternalId(@PathVariable UUID externalId) {
 		CollectionModel<RelationshipResponse> relationshipResponses = relationshipModelAssembler.toCollectionModel(playerService.getRelationshipsByPlayerExternalId(externalId));
 		return ResponseEntity.ok(relationshipResponses);
-	}
-
-	@PostMapping("/merge")
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Void> mergePlayers(@Valid @RequestBody PlayerMergeRequest playerMergeRequest) {
-		playerService.mergePlayers(playerMergeRequest.getParentId(), playerMergeRequest.getPlayerIds());
-		return ResponseEntity.accepted().build();
 	}
 
 	@DeleteMapping("/{externalId}")

@@ -62,8 +62,6 @@ public interface PlayerService extends UserDetailsService {
 
     List<PlayerRelationship> getRelationshipsByPlayerExternalId(UUID playerExternalId);
 
-    void mergePlayers(UUID parentExternalId, List<UUID> playerExternalIds);
-
     Player updateAvatarByExternalId(UUID playerExternalId, MultipartFile avatar);
 
     List<Notification> getNotificationsByPlayerExternalId(UUID playerExternalId);

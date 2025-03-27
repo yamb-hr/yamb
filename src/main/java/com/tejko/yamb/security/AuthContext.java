@@ -15,4 +15,13 @@ public class AuthContext {
         }
     }
 
+    public static boolean isAuthenticated() {
+        try {
+            getAuthenticatedPlayer();
+            return true;
+        } catch (BadCredentialsException e) {
+            return false;
+        }
+    }
+
 }

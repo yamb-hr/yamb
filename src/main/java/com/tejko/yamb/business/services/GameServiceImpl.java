@@ -57,8 +57,13 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getOrCreate(UUID playerExternalId) {
-        Optional<Game> existingGame = gameRepo.findByPlayerIdAndTypeAndStatusIn(playerExternalId, GameType.NORMAL, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
-        Game game = existingGame.orElseGet(() -> gameRepo.save(Game.getInstance(playerExternalId, GameType.NORMAL)));
+        List<Game> existingGames = gameRepo.findAllByPlayerIdAndTypeAndStatusIn(playerExternalId, GameType.NORMAL, Arrays.asList(GameStatus.IN_PROGRESS, GameStatus.COMPLETED));
+        Game game;
+        if (existingGames.isEmpty()) {
+            game = gameRepo.save(Game.getInstance(playerExternalId, GameType.NORMAL));
+        } else {
+            game = existingGames.get(0);
+        }
         return game;
     }
 
